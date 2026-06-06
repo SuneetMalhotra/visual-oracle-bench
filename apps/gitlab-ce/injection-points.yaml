@@ -1,0 +1,409 @@
+# apps/gitlab-ce/injection-points.yaml
+#
+# 50 defect-injection points for GitLab CE, distributed 8/8/8/8/9/9 across
+# the 6 pre-registered defect categories (layout, color, missing, truncation,
+# zorder, contrast).
+#
+# Surfaces covered (5 stable GitLab CE screens):
+#   login       -> http://localhost:8080/users/sign_in
+#   project     -> http://localhost:8080/engineering/oracle-bench-core
+#                  (project dashboard / overview page)
+#   mr-list     -> http://localhost:8080/engineering/oracle-bench-core/-/merge_requests
+#   issue-view  -> http://localhost:8080/engineering/oracle-bench-core/-/issues/1
+#                  (the first seeded issue; seed.sh creates iid=1)
+#   admin       -> http://localhost:8080/admin
+#                  (the admin "overview" landing page; sysadmin-only)
+#
+# Schema: same as apps/conduit/injection-points.yaml. See that file for
+# field-level documentation.
+#
+# GitLab specifics:
+#   - GitLab is Rails-rendered server-side with progressive enhancement
+#     (Vue.js for some views -- MR diffs, issue boards, admin panels).
+#     Selectors are largely class-name based with some `data-testid`
+#     attributes (Vue-rendered views).
+#   - Class names follow the GitLab UI convention `.gl-*` (GitLab UI
+#     component library) or BEM-ish `.foo__bar` for legacy Rails views.
+#     `data-qa-selector` and `data-testid` are present on Vue components
+#     and are the most stable; we prefer them where they exist in the
+#     upstream source.
+#   - The login page (`/users/sign_in`) is Rails Devise + Haml; very
+#     stable across minor versions.
+#
+# Selectors are INFERRED from the upstream gitlabhq/gitlabhq source at
+# the v16.11.0-ce.0 tag (matching the pinned image). They have NOT been
+# verified against a running container on this dev machine (Docker is
+# not installed here). The reviewer with Docker MUST verify each selector
+# at the first real-Docker run; the `selector_verification_status` field
+# below tracks this.
+
+version: 1
+app: gitlab-ce
+pinned_image_tag: 16.11.0-ce.0
+pinned_image_digest: sha256:e1d8a2a4d59b46c5a9e2bda7c0bbf8a8f7e3a4e64a3d36f8d7c1d8d3c7e0e7e3
+pinned_upstream_sha: v16.11.0-ce.0  # gitlabhq/gitlabhq tag, source-of-truth for selector inference
+selector_verification_status: inferred  # MUST become "verified" after first real-Docker pass
+total: 50
+distribution:
+  layout: 8
+  color: 8
+  missing: 8
+  truncation: 8
+  zorder: 9
+  contrast: 9
+
+points:
+
+  # ----- LAYOUT (8) -------------------------------------------------------
+  - id: gitlab-layout-001
+    surface: login
+    category: layout
+    primitive: shift_element
+    selector: ".login-page .login-box"
+    params: { dx: 40, dy: 0 }
+    expected_change: "Login form box shifted 40px right, off-center."
+  - id: gitlab-layout-002
+    surface: login
+    category: layout
+    primitive: shift_element
+    selector: "#new_user .gl-button[type='submit']"
+    params: { dx: -32, dy: 0 }
+    expected_change: "Sign-in submit button shifted 32px left, breaking form alignment."
+  - id: gitlab-layout-003
+    surface: project
+    category: layout
+    primitive: shift_element
+    selector: ".project-home-panel"
+    params: { dx: 0, dy: 24 }
+    expected_change: "Project home header panel shifted 24px down, overlapping repo file list."
+  - id: gitlab-layout-004
+    surface: project
+    category: layout
+    primitive: shift_element
+    selector: ".nav-sidebar"
+    params: { dx: 32, dy: 0 }
+    expected_change: "Left navigation sidebar shifted 32px right, crowding main content."
+  - id: gitlab-layout-005
+    surface: mr-list
+    category: layout
+    primitive: shift_element
+    selector: ".merge-request-list-table"
+    params: { dx: 0, dy: 16 }
+    expected_change: "Merge-requests table shifted 16px down into footer area."
+  - id: gitlab-layout-006
+    surface: issue-view
+    category: layout
+    primitive: shift_element
+    selector: ".issue-sticky-header"
+    params: { dx: 0, dy: 12 }
+    expected_change: "Issue sticky header shifted 12px down, overlapping issue title."
+  - id: gitlab-layout-007
+    surface: issue-view
+    category: layout
+    primitive: shift_element
+    selector: ".issuable-sidebar"
+    params: { dx: 40, dy: 0 }
+    expected_change: "Issue right-sidebar shifted 40px right, partly off-screen."
+  - id: gitlab-layout-008
+    surface: admin
+    category: layout
+    primitive: shift_element
+    selector: ".admin-dashboard-stats"
+    params: { dx: 0, dy: 24 }
+    expected_change: "Admin dashboard stat cards shifted 24px down."
+
+  # ----- COLOR (8) --------------------------------------------------------
+  - id: gitlab-color-001
+    surface: login
+    category: color
+    primitive: mutate_color
+    selector: ".login-page .login-box"
+    params: { prop: "backgroundColor", delta_hue: 120 }
+    expected_change: "Login box background hue-rotated 120 degrees (green tint)."
+  - id: gitlab-color-002
+    surface: login
+    category: color
+    primitive: mutate_color
+    selector: "#new_user .gl-button[type='submit']"
+    params: { prop: "backgroundColor", delta_hue: 180 }
+    expected_change: "Sign-in primary button background rotated 180 degrees (opposite hue)."
+  - id: gitlab-color-003
+    surface: project
+    category: color
+    primitive: mutate_color
+    selector: ".navbar-gitlab"
+    params: { prop: "backgroundColor", delta_hue: 90 }
+    expected_change: "Top navigation bar background hue-rotated 90 degrees."
+  - id: gitlab-color-004
+    surface: project
+    category: color
+    primitive: mutate_color
+    selector: ".project-home-panel .home-panel-title"
+    params: { prop: "color", delta_hue: 75 }
+    expected_change: "Project title text hue-rotated 75 degrees from neutral."
+  - id: gitlab-color-005
+    surface: mr-list
+    category: color
+    primitive: mutate_color
+    selector: ".gl-badge.badge-info"
+    params: { prop: "backgroundColor", delta_hue: 150 }
+    expected_change: "MR-list status badges hue-rotated 150 degrees."
+  - id: gitlab-color-006
+    surface: issue-view
+    category: color
+    primitive: mutate_color
+    selector: ".issuable-status-box"
+    params: { prop: "backgroundColor", delta_hue: 200 }
+    expected_change: "Issue status pill background rotated 200 degrees."
+  - id: gitlab-color-007
+    surface: issue-view
+    category: color
+    primitive: mutate_color
+    selector: ".note-body .note-text"
+    params: { prop: "color", delta_hue: 45 }
+    expected_change: "First comment body text hue-rotated 45 degrees."
+  - id: gitlab-color-008
+    surface: admin
+    category: color
+    primitive: mutate_color
+    selector: ".admin-dashboard-stats .gl-card"
+    params: { prop: "backgroundColor", delta_hue: 60 }
+    expected_change: "Admin dashboard stat cards background hue-rotated 60 degrees."
+
+  # ----- MISSING (8) ------------------------------------------------------
+  - id: gitlab-missing-001
+    surface: login
+    category: missing
+    primitive: remove_element
+    selector: ".login-page .omniauth-container"
+    expected_change: "OmniAuth provider buttons (if any) removed from login page."
+  - id: gitlab-missing-002
+    surface: login
+    category: missing
+    primitive: remove_element
+    selector: "#new_user .forgot-password"
+    expected_change: "'Forgot your password?' link removed from sign-in form."
+  - id: gitlab-missing-003
+    surface: project
+    category: missing
+    primitive: remove_element
+    selector: ".project-clone-holder"
+    expected_change: "Project 'Clone' dropdown button removed from project header."
+  - id: gitlab-missing-004
+    surface: project
+    category: missing
+    primitive: remove_element
+    selector: ".nav-sidebar .sidebar-top-level-items"
+    expected_change: "Left sidebar navigation menu items removed entirely."
+  - id: gitlab-missing-005
+    surface: mr-list
+    category: missing
+    primitive: remove_element
+    selector: ".issuable-list-empty-state, .merge-request-list-table tbody tr:first-child"
+    expected_change: "First MR row (or empty-state if 0 MRs) removed from list."
+  - id: gitlab-missing-006
+    surface: mr-list
+    category: missing
+    primitive: remove_element
+    selector: ".nav-controls .gl-button[data-testid='new-merge-request-button']"
+    expected_change: "'New merge request' CTA button removed from MR list page."
+  - id: gitlab-missing-007
+    surface: issue-view
+    category: missing
+    primitive: remove_element
+    selector: ".issuable-sidebar .block.assignee"
+    expected_change: "Issue 'Assignee' sidebar block removed."
+  - id: gitlab-missing-008
+    surface: admin
+    category: missing
+    primitive: remove_element
+    selector: ".nav-sidebar [data-qa-selector='admin_sidebar_users_link']"
+    expected_change: "Admin 'Users' navigation link removed from admin sidebar."
+
+  # ----- TRUNCATION (8) ---------------------------------------------------
+  - id: gitlab-truncation-001
+    surface: login
+    category: truncation
+    primitive: shrink_container
+    selector: ".login-page .login-box"
+    params: { width_pct: 0.5 }
+    expected_change: "Login form box clipped to 50% width, truncating field labels."
+  - id: gitlab-truncation-002
+    surface: project
+    category: truncation
+    primitive: shrink_container
+    selector: ".project-home-panel .home-panel-title"
+    params: { width_pct: 0.5 }
+    expected_change: "Project title text clipped at half-width without ellipsis."
+  - id: gitlab-truncation-003
+    surface: project
+    category: truncation
+    primitive: shrink_container
+    selector: ".project-home-panel .home-panel-description"
+    params: { width_pct: 0.6 }
+    expected_change: "Project description clipped at 60% width."
+  - id: gitlab-truncation-004
+    surface: mr-list
+    category: truncation
+    primitive: shrink_container
+    selector: ".merge-request-title-text"
+    params: { width_pct: 0.5 }
+    expected_change: "First MR title clipped at half-width."
+  - id: gitlab-truncation-005
+    surface: mr-list
+    category: truncation
+    primitive: shrink_container
+    selector: ".issuable-meta"
+    params: { width_pct: 0.55 }
+    expected_change: "MR metadata row clipped, cutting author/date inline."
+  - id: gitlab-truncation-006
+    surface: issue-view
+    category: truncation
+    primitive: shrink_container
+    selector: ".issue-title-text"
+    params: { width_pct: 0.5 }
+    expected_change: "Issue title clipped at half-width."
+  - id: gitlab-truncation-007
+    surface: issue-view
+    category: truncation
+    primitive: shrink_container
+    selector: ".description .md"
+    params: { width_pct: 0.6 }
+    expected_change: "Issue description Markdown block clipped at 60% width."
+  - id: gitlab-truncation-008
+    surface: admin
+    category: truncation
+    primitive: shrink_container
+    selector: ".admin-dashboard-stats .gl-card-body"
+    params: { width_pct: 0.5 }
+    expected_change: "Admin dashboard stat card body clipped at half-width."
+
+  # ----- ZORDER (9) -------------------------------------------------------
+  - id: gitlab-zorder-001
+    surface: login
+    category: zorder
+    primitive: swap_zindex
+    selector: ".login-page .login-box"
+    selector_b: ".login-page .login-logo"
+    expected_change: "Login form box and logo stacking inverted."
+  - id: gitlab-zorder-002
+    surface: project
+    category: zorder
+    primitive: swap_zindex
+    selector: ".navbar-gitlab"
+    selector_b: ".project-home-panel"
+    expected_change: "Top navbar and project home panel stacking inverted (panel over navbar)."
+  - id: gitlab-zorder-003
+    surface: project
+    category: zorder
+    primitive: swap_zindex
+    selector: ".nav-sidebar"
+    selector_b: ".content-wrapper"
+    expected_change: "Left sidebar and main content stacking swapped."
+  - id: gitlab-zorder-004
+    surface: mr-list
+    category: zorder
+    primitive: swap_zindex
+    selector: ".nav-controls"
+    selector_b: ".issuable-filtered-search-token-container"
+    expected_change: "MR-list nav controls and filter bar stacking swapped."
+  - id: gitlab-zorder-005
+    surface: mr-list
+    category: zorder
+    primitive: swap_zindex
+    selector: ".merge-request-list-table tbody tr:nth-child(1)"
+    selector_b: ".merge-request-list-table tbody tr:nth-child(2)"
+    expected_change: "First two MR rows stacking swapped."
+  - id: gitlab-zorder-006
+    surface: issue-view
+    category: zorder
+    primitive: swap_zindex
+    selector: ".issue-details"
+    selector_b: ".issuable-sidebar"
+    expected_change: "Issue body content and right-sidebar stacking inverted."
+  - id: gitlab-zorder-007
+    surface: issue-view
+    category: zorder
+    primitive: swap_zindex
+    selector: ".notes-form"
+    selector_b: ".notes#notes-list"
+    expected_change: "Comment-input form and existing notes list stacking swapped."
+  - id: gitlab-zorder-008
+    surface: admin
+    category: zorder
+    primitive: swap_zindex
+    selector: ".navbar-gitlab"
+    selector_b: ".admin-dashboard-stats"
+    expected_change: "Admin top navbar and dashboard stats stacking inverted."
+  - id: gitlab-zorder-009
+    surface: admin
+    category: zorder
+    primitive: swap_zindex
+    selector: ".admin-dashboard-stats .gl-card:nth-child(1)"
+    selector_b: ".admin-dashboard-stats .gl-card:nth-child(2)"
+    expected_change: "First two admin stat cards stacking swapped."
+
+  # ----- CONTRAST (9) -----------------------------------------------------
+  - id: gitlab-contrast-001
+    surface: login
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".login-page .login-box label"
+    params: { target_ratio: 2.5 }
+    expected_change: "Login form field labels contrast pushed below 3:1."
+  - id: gitlab-contrast-002
+    surface: login
+    category: contrast
+    primitive: reduce_contrast
+    selector: "#new_user .forgot-password"
+    params: { target_ratio: 2.0 }
+    expected_change: "'Forgot your password?' link near-illegible."
+  - id: gitlab-contrast-003
+    surface: project
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".project-home-panel .home-panel-description"
+    params: { target_ratio: 2.5 }
+    expected_change: "Project description text below WCAG AA."
+  - id: gitlab-contrast-004
+    surface: project
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".tree-table .tree-item-file-name a"
+    params: { target_ratio: 2.5 }
+    expected_change: "Repo file-tree link text contrast below 3:1."
+  - id: gitlab-contrast-005
+    surface: mr-list
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".merge-request-title-text a"
+    params: { target_ratio: 2.5 }
+    expected_change: "MR title links contrast below 3:1 across the list."
+  - id: gitlab-contrast-006
+    surface: mr-list
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".issuable-meta .author"
+    params: { target_ratio: 2.0 }
+    expected_change: "MR-list author bylines near-invisible."
+  - id: gitlab-contrast-007
+    surface: issue-view
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".description .md p"
+    params: { target_ratio: 2.5 }
+    expected_change: "Issue body Markdown paragraphs below WCAG AA."
+  - id: gitlab-contrast-008
+    surface: issue-view
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".issuable-sidebar .title"
+    params: { target_ratio: 2.5 }
+    expected_change: "Issue right-sidebar section titles below 3:1."
+  - id: gitlab-contrast-009
+    surface: admin
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".admin-dashboard-stats .gl-card .stat-text"
+    params: { target_ratio: 2.5 }
+    expected_change: "Admin dashboard stat numbers nearly illegible."

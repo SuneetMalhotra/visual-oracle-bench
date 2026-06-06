@@ -1,0 +1,102 @@
+# apps/gitlab-ce/docker-compose.yml
+#
+# Brings up a GitLab Community Edition instance for screenshot capture.
+# GitLab is the "code host" class app in the visual-oracle-bench corpus.
+#
+# We do NOT build GitLab from source: a from-source build is 3+ GB and
+# 30+ min on a developer laptop. The official `gitlab/gitlab-ce` Docker
+# image is the upstream-supported distribution and is pinned here by
+# immutable digest (NOT a moving tag like `latest` or `16.x.x`).
+#
+# Upstream pins (immutable image digest):
+#   gitlab/gitlab-ce  @ sha256:e1d8a2a4d59b46c5a9e2bda7c0bbf8a8f7e3a4e64a3d36f8d7c1d8d3c7e0e7e3
+#                       (tag 16.11.0-ce.0, multi-arch index pushed 2024-04-22)
+#
+# IMPORTANT: the digest above is a placeholder REPRESENTATIVE value. This
+# dev machine does not have Docker installed, so the reviewer with Docker
+# MUST verify and replace it with the actual digest:
+#
+#   docker pull gitlab/gitlab-ce:16.11.0-ce.0
+#   docker inspect --format='{{index .RepoDigests 0}}' gitlab/gitlab-ce:16.11.0-ce.0
+#
+# Then update both the `image:` line below AND `apps/gitlab-ce/injection-points.yaml`
+# `pinned_image_digest:` field in lockstep. Tracked in apps/gitlab-ce/RUNBOOK.md
+# "Known risks" #1.
+#
+# Boot time warning: GitLab's first boot runs database migrations, secret
+# generation, Puma + Sidekiq + Gitaly + nginx initialization, and the
+# Rails reconfigure step. Expect 3-5 MINUTES from `up -d` to first healthy
+# response on `/-/health`. See RUNBOOK.md "Bring-up sequence" for the
+# wait-loop snippet.
+#
+# Usage:
+#   docker compose -f apps/gitlab-ce/docker-compose.yml up -d
+#   # wait for /-/health to return 200 (typically 3-5 min cold)
+#   while ! curl -sf http://localhost:8080/-/health >/dev/null; do sleep 5; done
+#   ./apps/gitlab-ce/seed.sh
+#   <run tests/smoke_gitlab_ce_pipeline.ts>
+#   docker compose -f apps/gitlab-ce/docker-compose.yml down -v
+
+services:
+  gitlab:
+    image: gitlab/gitlab-ce:16.11.0-ce.0@sha256:e1d8a2a4d59b46c5a9e2bda7c0bbf8a8f7e3a4e64a3d36f8d7c1d8d3c7e0e7e3
+    container_name: voracle-gitlab-ce
+    # GitLab's first-boot reconfigure is CPU-intensive and benefits from
+    # raised shared-memory limits. Without this, Postgres inside the image
+    # logs "could not resize shared memory segment" warnings.
+    shm_size: 256m
+    # The hostname is used by GitLab to construct clone URLs and OAuth
+    # callbacks. We force it to `localhost` so seed.sh can hit the API at
+    # http://localhost:8080 without rewriting hostnames.
+    hostname: localhost
+    environment:
+      # external_url is what GitLab uses to build every absolute URL it
+      # ever emits (clone HTTPS, MR links, email notifications, OAuth
+      # callbacks). Must match the port we publish below.
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://localhost:8080'
+        # Disable letsencrypt / TLS for local benchmarking.
+        nginx['redirect_http_to_https'] = false
+        letsencrypt['enable'] = false
+        # Quiet the GC, lower worker count -- this is a single-developer
+        # benchmark instance, not production.
+        puma['worker_processes'] = 2
+        sidekiq['max_concurrency'] = 5
+        prometheus_monitoring['enable'] = false
+        gitlab_kas['enable'] = false
+        registry['enable'] = false
+        # Disable signup. The seed script will create users via the admin
+        # API, and we don't want random clients registering against a
+        # benchmark instance left on a developer laptop.
+        gitlab_rails['gitlab_signup_enabled'] = false
+        # Seed an initial admin password instead of writing one to
+        # /etc/gitlab/initial_root_password (which is rotated after 24h).
+        # The seed script reads this value to obtain a root token.
+        gitlab_rails['initial_root_password'] = 'voracle-seed-Pa55word!'
+        gitlab_rails['store_initial_root_password'] = true
+    ports:
+      # 8080 -> Rails web UI + REST API (`/api/v4/...`)
+      # 2222 -> SSH for git operations (unused by capture pipeline; published
+      #         for completeness so a reviewer can `git clone` if desired)
+      - "8080:80"
+      - "2222:22"
+    volumes:
+      - gitlab_config:/etc/gitlab
+      - gitlab_logs:/var/log/gitlab
+      - gitlab_data:/var/opt/gitlab
+    healthcheck:
+      # GitLab exposes a documented health endpoint at /-/health. It returns
+      # 200 only after Rails has fully reconfigured and the database is
+      # migrated, which is exactly the gate we want.
+      test: ["CMD", "curl", "-fsS", "http://localhost:80/-/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+      # start_period is the GRACE window inside which failing probes are
+      # not counted toward `retries`. GitLab needs 3-5 min on first boot.
+      start_period: 360s
+
+volumes:
+  gitlab_config:
+  gitlab_logs:
+  gitlab_data:

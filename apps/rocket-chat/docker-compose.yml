@@ -1,0 +1,109 @@
+# apps/rocket-chat/docker-compose.yml
+#
+# Brings up a Rocket.Chat instance for screenshot capture. Rocket.Chat
+# is a chat/collab class app (companion to Mattermost in the corpus --
+# both chat, but on different stacks: Mattermost is React+Go, Rocket.Chat
+# is Meteor+React+Blaze on Node).
+#
+# We do NOT build Rocket.Chat from source: the upstream Meteor build is
+# slow and brittle outside the Rocket.Chat team's CI. The official
+# `rocketchat/rocket.chat` image is the upstream-supported distribution
+# and is pinned here by immutable digest (NOT a moving tag).
+#
+# Upstream pins (immutable digests):
+#   rocketchat/rocket.chat @
+#     sha256:1bb7f2e5dca5e7e0ad0d50c4d9c9e3c7a8e8e7a0c7b2b1c3d4e5f6a7b8c9d0e1
+#     (tag 6.10.0, multi-arch index pushed 2024-04-19)
+#   mongo:7.0 @
+#     sha256:2cc8f1e8dca6f7f0bc1e51d5e0d0e4c8b9f9f8b1d8c3c2d4e5f7a8b9c0d1e2f3
+#     (multi-arch index)
+#
+# IMPORTANT: the digests above are placeholder REPRESENTATIVE values.
+# This dev machine does not have Docker installed, so the reviewer with
+# Docker MUST verify and replace them:
+#
+#   docker pull rocketchat/rocket.chat:6.10.0
+#   docker inspect --format='{{index .RepoDigests 0}}' rocketchat/rocket.chat:6.10.0
+#   docker pull mongo:7.0
+#   docker inspect --format='{{index .RepoDigests 0}}' mongo:7.0
+#
+# Then update both image lines below AND `apps/rocket-chat/injection-points.yaml`
+# `pinned_image_digest:` field in lockstep. Tracked in RUNBOOK.md "Known risks" #1.
+#
+# Usage:
+#   docker compose -f apps/rocket-chat/docker-compose.yml up -d
+#   # wait for /api/info to return 200 (typically 30-60s)
+#   while ! curl -sf http://localhost:3001/api/info >/dev/null; do sleep 3; done
+#   ./apps/rocket-chat/seed.sh
+#   <run tests/smoke_rocket_chat_pipeline.ts>
+#   docker compose -f apps/rocket-chat/docker-compose.yml down -v
+
+services:
+  mongo:
+    image: mongo:7.0@sha256:2cc8f1e8dca6f7f0bc1e51d5e0d0e4c8b9f9f8b1d8c3c2d4e5f7a8b9c0d1e2f3
+    container_name: voracle-rocket-mongo
+    # Rocket.Chat requires MongoDB started as a single-node replica-set
+    # (NOT a standalone). Meteor's OplogObserveDriver needs the oplog,
+    # and the oplog only exists in a replica-set deployment. We bring
+    # up `rs0` with a fixed name and let Meteor's connection-string
+    # opt into it.
+    command: >
+      mongod
+      --replSet rs0
+      --bind_ip_all
+      --oplogSize 128
+    volumes:
+      - rocket_mongo_data:/data/db
+      - rocket_mongo_config:/data/configdb
+    healthcheck:
+      # `mongosh --eval` returns non-zero if the rs.status() call errors,
+      # which is exactly the gate we want: rs MUST be initiated before
+      # Rocket.Chat will accept connections.
+      test: |
+        echo 'try { rs.status().ok } catch(e) { rs.initiate({_id:"rs0",members:[{_id:0,host:"mongo:27017"}]}).ok }' | mongosh --quiet || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  rocketchat:
+    image: rocketchat/rocket.chat:6.10.0@sha256:1bb7f2e5dca5e7e0ad0d50c4d9c9e3c7a8e8e7a0c7b2b1c3d4e5f6a7b8c9d0e1
+    container_name: voracle-rocket-chat
+    depends_on:
+      mongo:
+        condition: service_healthy
+    # Run as the in-image rocketchat uid; the image's own entrypoint
+    # handles the upstream wait-for-mongo + Meteor bootstrap.
+    environment:
+      # Connection strings: both the primary URL and the oplog URL must
+      # point at the replica-set name `rs0` (see mongo `command` above).
+      MONGO_URL: "mongodb://mongo:27017/rocketchat?replicaSet=rs0&directConnection=true"
+      MONGO_OPLOG_URL: "mongodb://mongo:27017/local?replicaSet=rs0&directConnection=true"
+      ROOT_URL: "http://localhost:3001"
+      PORT: "3001"
+      # Pre-seed the admin user at first boot so seed.sh does not have to
+      # walk the setup wizard. Rocket.Chat reads these env vars on first
+      # boot only; they are ignored after the admin user has been created.
+      ADMIN_USERNAME: "admin"
+      ADMIN_PASS: "voracle-seed-Pa55word!"
+      ADMIN_EMAIL: "admin@voracle.test"
+      OVERWRITE_SETTING_Show_Setup_Wizard: "completed"
+      OVERWRITE_SETTING_Accounts_RegistrationForm: "Disabled"
+      # Silence telemetry / update-checking for benchmark runs.
+      OVERWRITE_SETTING_Statistics_reporting: "false"
+      OVERWRITE_SETTING_Update_LatestAvailableVersion: "1.0.0"
+    ports:
+      - "3001:3001"
+    healthcheck:
+      # /api/info is a public endpoint that returns server metadata once
+      # the Meteor app has finished bootstrapping. Returns 200 always
+      # when up, so we only need a status-code check.
+      test: ["CMD", "curl", "-fsS", "http://localhost:3001/api/info"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+volumes:
+  rocket_mongo_data:
+  rocket_mongo_config:

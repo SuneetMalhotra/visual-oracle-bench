@@ -7,8 +7,8 @@
 | Conduit (RealWorld) | Social/blog | W2 | **files complete; docker build pending** |
 | Mattermost | Chat/collab | W3 | **files complete; docker build pending; selectors inferred from release-11.8, post-build verification required** |
 | Excalidraw | Canvas/design | W3 | **files complete; docker build pending; canvas-content injection uses positional-overlay compromise (32/50 chrome, 18/50 canvas overlays) — see RUNBOOK.md #3** |
-| GitLab CE | Code host | W4 | not started |
-| Rocket.Chat | Chat/collab | W4 | not started |
+| GitLab CE | Code host | W4 | **files complete; docker build pending** |
+| Rocket.Chat | Chat/collab | W4 | **files complete; docker build pending** |
 | Penpot | Canvas/design | W5 | not started |
 | Cal.com | Scheduling | W5 | not started |
 | NocoDB | Database UI | W5 | not started |

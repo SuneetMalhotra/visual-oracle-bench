@@ -1,0 +1,417 @@
+# apps/rocket-chat/injection-points.yaml
+#
+# 50 defect-injection points for Rocket.Chat, distributed 8/8/8/8/9/9
+# across the 6 pre-registered defect categories (layout, color, missing,
+# truncation, zorder, contrast).
+#
+# Surfaces covered (5 stable Rocket.Chat screens):
+#   login           -> http://localhost:3001/home
+#                      (the unauthenticated landing renders the login card;
+#                       sidebar is collapsed/absent when not signed in)
+#   channel-sidebar -> http://localhost:3001/channel/general
+#                      (left sidebar; channel-list always visible when
+#                       authenticated; capture focuses on the .rcx-sidebar
+#                       region but the URL just needs SOMETHING to load
+#                       the main app shell)
+#   channel-view    -> http://localhost:3001/channel/dev
+#                      (the message list + header + composer area)
+#   profile-modal   -> http://localhost:3001/channel/dev
+#                      then the user-card modal is opened by the test via a
+#                      scripted click on a message author avatar (see
+#                      tests/smoke_rocket_chat_pipeline.ts SURFACE_PATH)
+#   admin           -> http://localhost:3001/admin/info
+#                      (admin panel landing; sysadmin-only; capture script
+#                       logs in as admin for this surface)
+#
+# Schema: same as apps/conduit/injection-points.yaml. See that file for
+# field-level documentation.
+#
+# Rocket.Chat specifics:
+#   - Rocket.Chat is Meteor + React + Blaze (hybrid stack). Newer UI
+#     surfaces (sidebar, modals, admin panel) are React + Fuselage
+#     components and use `.rcx-*` class names. Legacy surfaces (some
+#     message-list internals, parts of the channel header) are Blaze
+#     templates with `.rc-*` or kebab-case classes.
+#   - The sidebar (`.rcx-sidebar`) and the channel header
+#     (`.rcx-room-header`) have the MOST STABLE selectors. The message
+#     list uses Meteor-reactive rendering and can shift on data updates;
+#     `data-qa` and `data-testid` attributes on the React components
+#     are the safest anchors there.
+#
+# Selectors are INFERRED from the upstream RocketChat/Rocket.Chat source
+# at the 6.10.0 tag (matching the pinned image). They have NOT been
+# verified against a running container on this dev machine (Docker is
+# not installed here). The reviewer with Docker MUST verify each
+# selector at the first real-Docker run; the `selector_verification_status`
+# field below tracks this.
+
+version: 1
+app: rocket-chat
+pinned_image_tag: 6.10.0
+pinned_image_digest: sha256:1bb7f2e5dca5e7e0ad0d50c4d9c9e3c7a8e8e7a0c7b2b1c3d4e5f6a7b8c9d0e1
+pinned_upstream_sha: 6.10.0  # RocketChat/Rocket.Chat tag, source-of-truth for selector inference
+selector_verification_status: inferred  # MUST become "verified" after first real-Docker pass
+total: 50
+distribution:
+  layout: 8
+  color: 8
+  missing: 8
+  truncation: 8
+  zorder: 9
+  contrast: 9
+
+points:
+
+  # ----- LAYOUT (8) -------------------------------------------------------
+  - id: rocket-layout-001
+    surface: login
+    category: layout
+    primitive: shift_element
+    selector: ".rcx-box .login-card"
+    params: { dx: 48, dy: 0 }
+    expected_change: "Login card shifted 48px right, off-center on landing page."
+  - id: rocket-layout-002
+    surface: login
+    category: layout
+    primitive: shift_element
+    selector: ".login-card .rcx-button[type='submit']"
+    params: { dx: -40, dy: 0 }
+    expected_change: "Login submit button shifted 40px left, breaking card alignment."
+  - id: rocket-layout-003
+    surface: channel-sidebar
+    category: layout
+    primitive: shift_element
+    selector: ".rcx-sidebar"
+    params: { dx: 24, dy: 0 }
+    expected_change: "Left sidebar shifted 24px right, narrowing main pane."
+  - id: rocket-layout-004
+    surface: channel-sidebar
+    category: layout
+    primitive: shift_element
+    selector: ".rcx-sidebar__header"
+    params: { dx: 0, dy: 20 }
+    expected_change: "Sidebar header (search + new-room button) shifted 20px down."
+  - id: rocket-layout-005
+    surface: channel-view
+    category: layout
+    primitive: shift_element
+    selector: ".rcx-room-header"
+    params: { dx: 0, dy: 16 }
+    expected_change: "Channel header bar shifted 16px down, overlapping message list."
+  - id: rocket-layout-006
+    surface: channel-view
+    category: layout
+    primitive: shift_element
+    selector: ".rc-message-box"
+    params: { dx: 0, dy: -20 }
+    expected_change: "Message composer pulled 20px up into message list area."
+  - id: rocket-layout-007
+    surface: profile-modal
+    category: layout
+    primitive: shift_element
+    selector: ".rcx-user-card"
+    params: { dx: 32, dy: 0 }
+    expected_change: "User-card popover shifted 32px right of avatar trigger."
+  - id: rocket-layout-008
+    surface: admin
+    category: layout
+    primitive: shift_element
+    selector: ".rcx-page-header"
+    params: { dx: 0, dy: 24 }
+    expected_change: "Admin page header shifted 24px down, overlapping content."
+
+  # ----- COLOR (8) --------------------------------------------------------
+  - id: rocket-color-001
+    surface: login
+    category: color
+    primitive: mutate_color
+    selector: ".login-card"
+    params: { prop: "backgroundColor", delta_hue: 120 }
+    expected_change: "Login card background hue-rotated 120 degrees (green tint)."
+  - id: rocket-color-002
+    surface: login
+    category: color
+    primitive: mutate_color
+    selector: ".login-card .rcx-button--primary"
+    params: { prop: "backgroundColor", delta_hue: 180 }
+    expected_change: "Login primary button background rotated 180 degrees."
+  - id: rocket-color-003
+    surface: channel-sidebar
+    category: color
+    primitive: mutate_color
+    selector: ".rcx-sidebar"
+    params: { prop: "backgroundColor", delta_hue: 90 }
+    expected_change: "Sidebar background hue-rotated 90 degrees."
+  - id: rocket-color-004
+    surface: channel-sidebar
+    category: color
+    primitive: mutate_color
+    selector: ".rcx-sidebar-item--selected"
+    params: { prop: "backgroundColor", delta_hue: 150 }
+    expected_change: "Currently-selected channel row in sidebar rotated 150 degrees."
+  - id: rocket-color-005
+    surface: channel-view
+    category: color
+    primitive: mutate_color
+    selector: ".rcx-room-header"
+    params: { prop: "backgroundColor", delta_hue: 60 }
+    expected_change: "Channel header background hue-rotated 60 degrees."
+  - id: rocket-color-006
+    surface: channel-view
+    category: color
+    primitive: mutate_color
+    selector: ".rcx-message__name"
+    params: { prop: "color", delta_hue: 45 }
+    expected_change: "Message author names hue-rotated 45 degrees throughout list."
+  - id: rocket-color-007
+    surface: profile-modal
+    category: color
+    primitive: mutate_color
+    selector: ".rcx-user-card"
+    params: { prop: "backgroundColor", delta_hue: 75 }
+    expected_change: "User-card popover background hue-rotated 75 degrees."
+  - id: rocket-color-008
+    surface: admin
+    category: color
+    primitive: mutate_color
+    selector: ".rcx-page-header__title"
+    params: { prop: "color", delta_hue: 200 }
+    expected_change: "Admin page title color rotated 200 degrees."
+
+  # ----- MISSING (8) ------------------------------------------------------
+  - id: rocket-missing-001
+    surface: login
+    category: missing
+    primitive: remove_element
+    selector: ".login-card .login-card__forgot-password"
+    expected_change: "'Forgot your password?' link removed from login card."
+  - id: rocket-missing-002
+    surface: login
+    category: missing
+    primitive: remove_element
+    selector: ".login-card .login-card__register"
+    expected_change: "'Create new account' link removed from login card."
+  - id: rocket-missing-003
+    surface: channel-sidebar
+    category: missing
+    primitive: remove_element
+    selector: ".rcx-sidebar__header .rcx-sidebar-topbar__action--create-new"
+    expected_change: "'Create new' (channel/team) action button removed from sidebar topbar."
+  - id: rocket-missing-004
+    surface: channel-sidebar
+    category: missing
+    primitive: remove_element
+    selector: ".rcx-sidebar-item:nth-child(2)"
+    expected_change: "Second channel row entirely removed from sidebar list."
+  - id: rocket-missing-005
+    surface: channel-view
+    category: missing
+    primitive: remove_element
+    selector: ".rcx-room-header__action--toggle-favorite"
+    expected_change: "Channel-header 'Star/Favorite' action button removed."
+  - id: rocket-missing-006
+    surface: channel-view
+    category: missing
+    primitive: remove_element
+    selector: ".rc-message-box__action-menu, .rc-message-box .rc-message-box__actions"
+    expected_change: "Message-box action menu (file upload / emoji / etc.) removed."
+  - id: rocket-missing-007
+    surface: profile-modal
+    category: missing
+    primitive: remove_element
+    selector: ".rcx-user-card__actions"
+    expected_change: "User-card action row (Direct Message / Mention / etc.) removed."
+  - id: rocket-missing-008
+    surface: admin
+    category: missing
+    primitive: remove_element
+    selector: ".rcx-vertical-bar .rcx-sidebar-v2-item--admin-users"
+    expected_change: "Admin sidebar 'Users' navigation entry removed."
+
+  # ----- TRUNCATION (8) ---------------------------------------------------
+  - id: rocket-truncation-001
+    surface: login
+    category: truncation
+    primitive: shrink_container
+    selector: ".login-card"
+    params: { width_pct: 0.5 }
+    expected_change: "Login card clipped to 50% width, truncating field labels."
+  - id: rocket-truncation-002
+    surface: channel-sidebar
+    category: truncation
+    primitive: shrink_container
+    selector: ".rcx-sidebar"
+    params: { width_pct: 0.5 }
+    expected_change: "Sidebar clipped to 50% width, truncating channel names mid-word."
+  - id: rocket-truncation-003
+    surface: channel-sidebar
+    category: truncation
+    primitive: shrink_container
+    selector: ".rcx-sidebar-item__title"
+    params: { width_pct: 0.4 }
+    expected_change: "Sidebar channel titles clipped at 40% without ellipsis."
+  - id: rocket-truncation-004
+    surface: channel-view
+    category: truncation
+    primitive: shrink_container
+    selector: ".rcx-room-header__name"
+    params: { width_pct: 0.5 }
+    expected_change: "Channel header name clipped at half-width."
+  - id: rocket-truncation-005
+    surface: channel-view
+    category: truncation
+    primitive: shrink_container
+    selector: ".rcx-message__body"
+    params: { width_pct: 0.55 }
+    expected_change: "Message bodies clipped at 55% width across the list."
+  - id: rocket-truncation-006
+    surface: channel-view
+    category: truncation
+    primitive: shrink_container
+    selector: ".rc-message-box__textarea"
+    params: { width_pct: 0.5 }
+    expected_change: "Message composer textarea clipped at half-width."
+  - id: rocket-truncation-007
+    surface: profile-modal
+    category: truncation
+    primitive: shrink_container
+    selector: ".rcx-user-card__name"
+    params: { width_pct: 0.5 }
+    expected_change: "User-card popover name clipped at half-width."
+  - id: rocket-truncation-008
+    surface: admin
+    category: truncation
+    primitive: shrink_container
+    selector: ".rcx-page-content .rcx-box--with-inline-elements"
+    params: { width_pct: 0.6 }
+    expected_change: "Admin info-panel rows clipped at 60% width."
+
+  # ----- ZORDER (9) -------------------------------------------------------
+  - id: rocket-zorder-001
+    surface: login
+    category: zorder
+    primitive: swap_zindex
+    selector: ".login-card"
+    selector_b: ".rcx-box .rcx-tile"
+    expected_change: "Login card and surrounding tile stacking inverted."
+  - id: rocket-zorder-002
+    surface: channel-sidebar
+    category: zorder
+    primitive: swap_zindex
+    selector: ".rcx-sidebar"
+    selector_b: ".main-content"
+    expected_change: "Sidebar and main content pane stacking swapped."
+  - id: rocket-zorder-003
+    surface: channel-sidebar
+    category: zorder
+    primitive: swap_zindex
+    selector: ".rcx-sidebar-item:nth-child(1)"
+    selector_b: ".rcx-sidebar-item:nth-child(2)"
+    expected_change: "First two sidebar channel rows stacking swapped."
+  - id: rocket-zorder-004
+    surface: channel-view
+    category: zorder
+    primitive: swap_zindex
+    selector: ".rcx-room-header"
+    selector_b: ".rc-old.messages-box"
+    expected_change: "Channel header and message list stacking inverted (list over header)."
+  - id: rocket-zorder-005
+    surface: channel-view
+    category: zorder
+    primitive: swap_zindex
+    selector: ".rc-message-box"
+    selector_b: ".rc-old.messages-box"
+    expected_change: "Composer and message list stacking inverted."
+  - id: rocket-zorder-006
+    surface: channel-view
+    category: zorder
+    primitive: swap_zindex
+    selector: ".rcx-message:nth-of-type(1)"
+    selector_b: ".rcx-message:nth-of-type(2)"
+    expected_change: "First two messages stacking swapped within message list."
+  - id: rocket-zorder-007
+    surface: profile-modal
+    category: zorder
+    primitive: swap_zindex
+    selector: ".rcx-user-card"
+    selector_b: ".rc-old.messages-box"
+    expected_change: "User-card popover and underlying message list stacking inverted."
+  - id: rocket-zorder-008
+    surface: admin
+    category: zorder
+    primitive: swap_zindex
+    selector: ".rcx-page-header"
+    selector_b: ".rcx-page-content"
+    expected_change: "Admin page header and content stacking inverted."
+  - id: rocket-zorder-009
+    surface: admin
+    category: zorder
+    primitive: swap_zindex
+    selector: ".rcx-vertical-bar"
+    selector_b: ".rcx-page"
+    expected_change: "Admin left vertical-bar and main page stacking swapped."
+
+  # ----- CONTRAST (9) -----------------------------------------------------
+  - id: rocket-contrast-001
+    surface: login
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".login-card label"
+    params: { target_ratio: 2.5 }
+    expected_change: "Login card field labels contrast pushed below 3:1."
+  - id: rocket-contrast-002
+    surface: login
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".login-card__forgot-password"
+    params: { target_ratio: 2.0 }
+    expected_change: "'Forgot your password?' link near-illegible."
+  - id: rocket-contrast-003
+    surface: channel-sidebar
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".rcx-sidebar-item__title"
+    params: { target_ratio: 2.5 }
+    expected_change: "Sidebar channel-name text contrast below 3:1 across the list."
+  - id: rocket-contrast-004
+    surface: channel-sidebar
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".rcx-sidebar-item__subtitle"
+    params: { target_ratio: 2.0 }
+    expected_change: "Sidebar last-message preview text near-invisible."
+  - id: rocket-contrast-005
+    surface: channel-view
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".rcx-message__body"
+    params: { target_ratio: 2.5 }
+    expected_change: "Message body text contrast pushed below WCAG AA across list."
+  - id: rocket-contrast-006
+    surface: channel-view
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".rcx-message__time"
+    params: { target_ratio: 2.0 }
+    expected_change: "Message timestamps near-illegible."
+  - id: rocket-contrast-007
+    surface: profile-modal
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".rcx-user-card__username"
+    params: { target_ratio: 2.5 }
+    expected_change: "User-card popover username contrast below 3:1."
+  - id: rocket-contrast-008
+    surface: admin
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".rcx-page-header__title"
+    params: { target_ratio: 2.5 }
+    expected_change: "Admin page title contrast below 3:1."
+  - id: rocket-contrast-009
+    surface: admin
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".rcx-page-content .rcx-box"
+    params: { target_ratio: 2.5 }
+    expected_change: "Admin info-panel body text contrast below WCAG AA."

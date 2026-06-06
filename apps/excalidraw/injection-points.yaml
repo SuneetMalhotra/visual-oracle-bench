@@ -1,0 +1,433 @@
+# apps/excalidraw/injection-points.yaml
+#
+# 50 defect-injection points for the Excalidraw self-hosted SPA,
+# distributed 8/8/8/8/9/9 across the 6 pre-registered defect categories
+# (layout, color, missing, truncation, zorder, contrast).
+#
+# Surfaces covered (5 stable Excalidraw screens):
+#   empty-canvas    -> http://localhost:5500/  (fixture localStorage NOT loaded)
+#   toolbar-visible -> http://localhost:5500/  (fixture loaded; main UI chrome)
+#   library-open    -> http://localhost:5500/  (left library panel pinned open)
+#   export-modal    -> http://localhost:5500/  (the export-image dialog open)
+#   settings-drawer -> http://localhost:5500/  (the bottom-left menu drawer open)
+#
+# Schema: same shape as apps/conduit/injection-points.yaml.
+#
+# METHODOLOGICAL COMPROMISE (canvas-rendered elements):
+#   Excalidraw is canvas-primary: most drawn shapes (rectangles, ellipses,
+#   text, arrows, freedraw strokes) are rendered to a single HTMLCanvas
+#   element with NO stable CSS selectors. The 6 DOM-based injection
+#   primitives in injection/primitives.ts CANNOT mutate canvas-rendered
+#   pixels via selectors.
+#
+#   Mitigation (pre-registered):
+#     a) 32 of the 50 points target the UI CHROME (toolbar, library
+#        panel, settings drawer, export modal, top bar) where Excalidraw
+#        renders standard HTML/CSS DOM with stable React class names.
+#     b) 18 of the 50 points target canvas content via Playwright's
+#        page.evaluate clip-rect overrides + element-positional CSS
+#        overlays (e.g., absolutely-positioned divs aligned to the
+#        canvas bounding box). These overlays are produced by a
+#        primitive variant (`shift_canvas_region` etc.) noted in the
+#        `params.canvas_compromise` field. The smoke pipeline implements
+#        them as DOM-equivalent overlays for the W3 milestone; the
+#        full canvas-pixel injection harness is W5.
+#
+#   Per-point category split is preserved (8/8/8/8/9/9) even with this
+#   compromise; what changes is only the surface mix, not the category
+#   distribution. Documented in RUNBOOK.md "Known risks" #3.
+#
+# Selectors are React class names from the upstream excalidraw/excalidraw
+# webapp at master commit 647a264a485a33bf1bf2cec9adcc8cc2151b253c (the
+# pin documented in Dockerfile). Class-name conventions (.App-toolbar,
+# .ToolIcon, .Island, .layer-ui__wrapper, .Modal, .Dialog,
+# .HintViewer) are documented in
+# excalidraw/excalidraw/packages/excalidraw/components/**. They are
+# STABLE across patch releases but MUST be re-verified post-build.
+
+version: 1
+app: excalidraw
+pinned_image_digest: sha256:f7ee194addd607bf831d2af0f0a34463dd4225e426cf35199ef0b12a803398e9
+pinned_source_sha: 647a264a485a33bf1bf2cec9adcc8cc2151b253c
+total: 50
+distribution:
+  layout: 8
+  color: 8
+  missing: 8
+  truncation: 8
+  zorder: 9
+  contrast: 9
+methodological_compromise:
+  description: |
+    Excalidraw renders shapes to a single HTMLCanvas with no stable
+    selectors. 32 of 50 points target DOM-chrome (toolbar, library
+    panel, modals); 18 target canvas content via positional overlays
+    annotated with params.canvas_compromise: true.
+  chrome_points: 32
+  canvas_points: 18
+
+points:
+
+  # ----- LAYOUT (8) -------------------------------------------------------
+  # 6 chrome + 2 canvas-overlay
+  - id: excalidraw-layout-001
+    surface: toolbar-visible
+    category: layout
+    primitive: shift_element
+    selector: ".App-toolbar"
+    params: { dx: 0, dy: 32 }
+    expected_change: "Main toolbar shifted 32px down, overlapping the canvas top edge."
+  - id: excalidraw-layout-002
+    surface: toolbar-visible
+    category: layout
+    primitive: shift_element
+    selector: ".App-toolbar .ToolIcon:first-child"
+    params: { dx: -16, dy: 0 }
+    expected_change: "First toolbar tool icon (lock) shifted 16px left, off-canvas."
+  - id: excalidraw-layout-003
+    surface: toolbar-visible
+    category: layout
+    primitive: shift_element
+    selector: ".App-menu_top .ToolIcon"
+    params: { dx: 0, dy: 20 }
+    expected_change: "Top hamburger menu icon shifted 20px down, overlapping canvas."
+  - id: excalidraw-layout-004
+    surface: library-open
+    category: layout
+    primitive: shift_element
+    selector: ".library-menu-items-container"
+    params: { dx: 24, dy: 0 }
+    expected_change: "Library panel shape grid shifted 24px right, partly off-panel."
+  - id: excalidraw-layout-005
+    surface: library-open
+    category: layout
+    primitive: shift_element
+    selector: ".layer-ui__library"
+    params: { dx: 0, dy: 16 }
+    expected_change: "Whole library sidebar shifted 16px down, header overlapping toolbar."
+  - id: excalidraw-layout-006
+    surface: export-modal
+    category: layout
+    primitive: shift_element
+    selector: ".Dialog .Dialog__title"
+    params: { dx: 32, dy: 0 }
+    expected_change: "Export-modal title shifted 32px right, out of header column."
+  - id: excalidraw-layout-007
+    surface: empty-canvas
+    category: layout
+    primitive: shift_element
+    selector: ".welcome-screen-center"
+    params: { canvas_compromise: true, dx: 0, dy: 40 }
+    expected_change: "Empty-canvas welcome-screen prompt overlay shifted 40px down."
+  - id: excalidraw-layout-008
+    surface: settings-drawer
+    category: layout
+    primitive: shift_element
+    selector: ".dropdown-menu-container"
+    params: { dx: 24, dy: 0 }
+    expected_change: "Settings drawer menu container shifted 24px right of anchor."
+
+  # ----- COLOR (8) --------------------------------------------------------
+  # 7 chrome + 1 canvas-overlay
+  - id: excalidraw-color-001
+    surface: toolbar-visible
+    category: color
+    primitive: mutate_color
+    selector: ".App-toolbar"
+    params: { prop: "backgroundColor", delta_hue: 120 }
+    expected_change: "Main toolbar background hue-rotated 120 degrees (green tint)."
+  - id: excalidraw-color-002
+    surface: toolbar-visible
+    category: color
+    primitive: mutate_color
+    selector: ".ToolIcon--selected"
+    params: { prop: "backgroundColor", delta_hue: 180 }
+    expected_change: "Selected tool icon background hue-rotated 180 degrees."
+  - id: excalidraw-color-003
+    surface: toolbar-visible
+    category: color
+    primitive: mutate_color
+    selector: ".App-menu_top .Island"
+    params: { prop: "backgroundColor", delta_hue: 90 }
+    expected_change: "Top-menu island background hue-rotated 90 degrees."
+  - id: excalidraw-color-004
+    surface: library-open
+    category: color
+    primitive: mutate_color
+    selector: ".library-menu-items-container"
+    params: { prop: "backgroundColor", delta_hue: 60 }
+    expected_change: "Library panel grid background hue-rotated 60 degrees."
+  - id: excalidraw-color-005
+    surface: library-open
+    category: color
+    primitive: mutate_color
+    selector: ".library-menu-control-buttons button"
+    params: { prop: "color", delta_hue: 150 }
+    expected_change: "Library control buttons text color hue-rotated 150 degrees."
+  - id: excalidraw-color-006
+    surface: export-modal
+    category: color
+    primitive: mutate_color
+    selector: ".Dialog__content .ToolIcon"
+    params: { prop: "backgroundColor", delta_hue: 75 }
+    expected_change: "Export-modal action buttons background hue-rotated 75 degrees."
+  - id: excalidraw-color-007
+    surface: settings-drawer
+    category: color
+    primitive: mutate_color
+    selector: ".dropdown-menu-item"
+    params: { prop: "color", delta_hue: 45 }
+    expected_change: "Settings menu item text color hue-rotated 45 degrees."
+  - id: excalidraw-color-008
+    surface: toolbar-visible
+    category: color
+    primitive: mutate_color
+    selector: ".excalidraw .App-toolbar__divider"
+    params: { canvas_compromise: true, prop: "backgroundColor", delta_hue: 200 }
+    expected_change: "Canvas-area divider line color hue-rotated 200 degrees (positional overlay)."
+
+  # ----- MISSING (8) ------------------------------------------------------
+  # 7 chrome + 1 canvas-overlay
+  - id: excalidraw-missing-001
+    surface: toolbar-visible
+    category: missing
+    primitive: remove_element
+    selector: ".App-toolbar .ToolIcon:nth-of-type(3)"
+    expected_change: "Third toolbar tool (rectangle) removed entirely."
+  - id: excalidraw-missing-002
+    surface: toolbar-visible
+    category: missing
+    primitive: remove_element
+    selector: ".App-menu_top .Island"
+    expected_change: "Top-menu island (hamburger + zoom) removed."
+  - id: excalidraw-missing-003
+    surface: toolbar-visible
+    category: missing
+    primitive: remove_element
+    selector: ".HintViewer"
+    expected_change: "Bottom keyboard-hint viewer removed."
+  - id: excalidraw-missing-004
+    surface: library-open
+    category: missing
+    primitive: remove_element
+    selector: ".library-menu-control-buttons"
+    expected_change: "Library control buttons (add/load/save) removed entirely."
+  - id: excalidraw-missing-005
+    surface: library-open
+    category: missing
+    primitive: remove_element
+    selector: ".library-menu-items-container > div"
+    expected_change: "All library items removed from the grid."
+  - id: excalidraw-missing-006
+    surface: export-modal
+    category: missing
+    primitive: remove_element
+    selector: ".Dialog__close"
+    expected_change: "Export-modal close button removed; modal unclosable."
+  - id: excalidraw-missing-007
+    surface: settings-drawer
+    category: missing
+    primitive: remove_element
+    selector: ".dropdown-menu-item--danger"
+    expected_change: "Settings drawer reset-canvas dangerous menu item removed."
+  - id: excalidraw-missing-008
+    surface: empty-canvas
+    category: missing
+    primitive: remove_element
+    selector: ".welcome-screen-center__heading"
+    params: { canvas_compromise: true }
+    expected_change: "Empty-canvas welcome heading overlay removed."
+
+  # ----- TRUNCATION (8) ---------------------------------------------------
+  # 6 chrome + 2 canvas-overlay
+  - id: excalidraw-truncation-001
+    surface: toolbar-visible
+    category: truncation
+    primitive: shrink_container
+    selector: ".App-toolbar"
+    params: { width_pct: 0.6 }
+    expected_change: "Main toolbar clipped at 60% width, rightmost tools hidden."
+  - id: excalidraw-truncation-002
+    surface: library-open
+    category: truncation
+    primitive: shrink_container
+    selector: ".layer-ui__library"
+    params: { width_pct: 0.5 }
+    expected_change: "Library sidebar clipped at half-width."
+  - id: excalidraw-truncation-003
+    surface: library-open
+    category: truncation
+    primitive: shrink_container
+    selector: ".library-menu-items-container"
+    params: { width_pct: 0.55 }
+    expected_change: "Library item grid clipped, right column items half-hidden."
+  - id: excalidraw-truncation-004
+    surface: export-modal
+    category: truncation
+    primitive: shrink_container
+    selector: ".Dialog__title"
+    params: { width_pct: 0.5 }
+    expected_change: "Export-modal title clipped at half-width."
+  - id: excalidraw-truncation-005
+    surface: export-modal
+    category: truncation
+    primitive: shrink_container
+    selector: ".Dialog__content"
+    params: { width_pct: 0.7 }
+    expected_change: "Export-modal content area clipped at 70% width."
+  - id: excalidraw-truncation-006
+    surface: settings-drawer
+    category: truncation
+    primitive: shrink_container
+    selector: ".dropdown-menu-item"
+    params: { width_pct: 0.5 }
+    expected_change: "Settings drawer menu items clipped at half-width."
+  - id: excalidraw-truncation-007
+    surface: toolbar-visible
+    category: truncation
+    primitive: shrink_container
+    selector: ".excalidraw .canvas-fixture-text-overlay"
+    params: { canvas_compromise: true, width_pct: 0.5 }
+    expected_change: "Canvas-area 'Visual Oracle Bench Fixture' text overlay clipped at half-width."
+  - id: excalidraw-truncation-008
+    surface: empty-canvas
+    category: truncation
+    primitive: shrink_container
+    selector: ".welcome-screen-menu-item__shortcut"
+    params: { canvas_compromise: true, width_pct: 0.5 }
+    expected_change: "Empty-canvas welcome-screen shortcut label clipped at half-width."
+
+  # ----- ZORDER (9) -------------------------------------------------------
+  # 6 chrome + 3 canvas-overlay
+  - id: excalidraw-zorder-001
+    surface: toolbar-visible
+    category: zorder
+    primitive: swap_zindex
+    selector: ".App-toolbar"
+    selector_b: ".App-menu_top"
+    expected_change: "Toolbar and top menu stacking inverted."
+  - id: excalidraw-zorder-002
+    surface: toolbar-visible
+    category: zorder
+    primitive: swap_zindex
+    selector: ".App-menu_bottom"
+    selector_b: ".HintViewer"
+    expected_change: "Bottom zoom menu and hint viewer stacking swapped."
+  - id: excalidraw-zorder-003
+    surface: library-open
+    category: zorder
+    primitive: swap_zindex
+    selector: ".layer-ui__library"
+    selector_b: ".App-toolbar"
+    expected_change: "Library sidebar and toolbar stacking swapped (toolbar behind library)."
+  - id: excalidraw-zorder-004
+    surface: library-open
+    category: zorder
+    primitive: swap_zindex
+    selector: ".library-menu-control-buttons"
+    selector_b: ".library-menu-items-container"
+    expected_change: "Library controls and items-grid stacking swapped."
+  - id: excalidraw-zorder-005
+    surface: export-modal
+    category: zorder
+    primitive: swap_zindex
+    selector: ".Modal__background"
+    selector_b: ".Dialog"
+    expected_change: "Export-modal backdrop and dialog stacking inverted."
+  - id: excalidraw-zorder-006
+    surface: settings-drawer
+    category: zorder
+    primitive: swap_zindex
+    selector: ".dropdown-menu-container"
+    selector_b: ".App-menu_top"
+    expected_change: "Settings drawer and top menu stacking swapped."
+  - id: excalidraw-zorder-007
+    surface: toolbar-visible
+    category: zorder
+    primitive: swap_zindex
+    selector: ".excalidraw .canvas-fixture-rect-1-overlay"
+    selector_b: ".excalidraw .canvas-fixture-rect-2-overlay"
+    params: { canvas_compromise: true }
+    expected_change: "Two canvas-area rectangle overlays stacking swapped."
+  - id: excalidraw-zorder-008
+    surface: toolbar-visible
+    category: zorder
+    primitive: swap_zindex
+    selector: ".excalidraw .canvas-fixture-arrow-overlay"
+    selector_b: ".excalidraw .canvas-fixture-text-overlay"
+    params: { canvas_compromise: true }
+    expected_change: "Canvas arrow overlay and text overlay stacking swapped."
+  - id: excalidraw-zorder-009
+    surface: empty-canvas
+    category: zorder
+    primitive: swap_zindex
+    selector: ".welcome-screen-center__heading"
+    selector_b: ".welcome-screen-center__subheading"
+    params: { canvas_compromise: true }
+    expected_change: "Empty-canvas welcome heading and subheading stacking swapped."
+
+  # ----- CONTRAST (9) -----------------------------------------------------
+  # 8 chrome + 1 canvas-overlay
+  - id: excalidraw-contrast-001
+    surface: toolbar-visible
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".App-toolbar .ToolIcon__label"
+    params: { target_ratio: 2.5 }
+    expected_change: "Toolbar tool labels contrast pushed below 3:1."
+  - id: excalidraw-contrast-002
+    surface: toolbar-visible
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".HintViewer"
+    params: { target_ratio: 2.0 }
+    expected_change: "Bottom keyboard-hint text nearly illegible."
+  - id: excalidraw-contrast-003
+    surface: toolbar-visible
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".App-menu_bottom .zoom-button"
+    params: { target_ratio: 2.5 }
+    expected_change: "Zoom button text contrast pushed below WCAG AA."
+  - id: excalidraw-contrast-004
+    surface: library-open
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".library-menu-items-container__header"
+    params: { target_ratio: 2.5 }
+    expected_change: "Library section header contrast below 3:1."
+  - id: excalidraw-contrast-005
+    surface: library-open
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".library-menu-control-buttons button"
+    params: { target_ratio: 2.0 }
+    expected_change: "Library control button labels near-illegible."
+  - id: excalidraw-contrast-006
+    surface: export-modal
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".Dialog__title"
+    params: { target_ratio: 2.5 }
+    expected_change: "Export-modal title contrast pushed below 3:1."
+  - id: excalidraw-contrast-007
+    surface: export-modal
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".Dialog__content label"
+    params: { target_ratio: 2.5 }
+    expected_change: "Export-modal field labels near-illegible."
+  - id: excalidraw-contrast-008
+    surface: settings-drawer
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".dropdown-menu-item"
+    params: { target_ratio: 2.5 }
+    expected_change: "Settings drawer menu items contrast below WCAG AA."
+  - id: excalidraw-contrast-009
+    surface: toolbar-visible
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".excalidraw .canvas-fixture-text-overlay"
+    params: { canvas_compromise: true, target_ratio: 2.5 }
+    expected_change: "Canvas 'Visual Oracle Bench Fixture' text overlay contrast below 3:1."

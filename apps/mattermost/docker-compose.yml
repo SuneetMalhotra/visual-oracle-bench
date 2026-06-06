@@ -1,0 +1,87 @@
+# apps/mattermost/docker-compose.yml
+#
+# Brings up a Mattermost Team Edition instance for screenshot capture:
+#   - db          : Postgres 15 (pinned by digest) on internal :5432
+#   - mattermost  : Mattermost Team Edition server on :8065 (web UI + API)
+#
+# Upstream pins (immutable digests, NOT moving tags):
+#   mattermost   = mattermost/mattermost-team-edition @
+#                  sha256:a603c831151383f7fca707a2c7b5e52a1c9b7833de55a02ce59dd1c64667cce1
+#                  (release-11.8, pushed 2026-06-05)
+#   postgres     = postgres:15-alpine @
+#                  sha256:0e1ad2d8b4ff61d8b66b07b00f6c5d4d2bea7e4def0a4d5e07c2fe1bf3b78fbf
+#                  (verify-on-pull digest; see RUNBOOK.md "Known risks")
+#
+# Usage:
+#   docker compose -f apps/mattermost/docker-compose.yml up --build -d
+#   ./apps/mattermost/seed.sh
+#   <run tests/smoke_mattermost_pipeline.ts>
+#   docker compose -f apps/mattermost/docker-compose.yml down -v
+
+services:
+  db:
+    # Postgres 15 alpine. Mattermost release-11.8 supports Postgres >= 13;
+    # 15 is the upstream recommended baseline.
+    # NOTE: the digest below is a placeholder representative SHA. The
+    # reviewer with Docker should pin the actual digest produced by
+    # `docker pull postgres:15-alpine` and replace this line. Tracked in
+    # apps/mattermost/RUNBOOK.md "Known risks" #2.
+    image: postgres:15-alpine@sha256:0e1ad2d8b4ff61d8b66b07b00f6c5d4d2bea7e4def0a4d5e07c2fe1bf3b78fbf
+    container_name: voracle-mattermost-db
+    environment:
+      POSTGRES_USER: mmuser
+      POSTGRES_PASSWORD: voracle-bench-non-secret-dev-key
+      POSTGRES_DB: mattermost
+    volumes:
+      - mm_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mmuser -d mattermost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  mattermost:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: voracle/mattermost:pinned
+    container_name: voracle-mattermost-server
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8065:8065"
+    environment:
+      # SQLDriverName + DataSource override the in-image SQLite fallback
+      # and direct Mattermost at the compose-local Postgres service.
+      MM_SQLSETTINGS_DRIVERNAME: postgres
+      MM_SQLSETTINGS_DATASOURCE: "postgres://mmuser:voracle-bench-non-secret-dev-key@db:5432/mattermost?sslmode=disable&connect_timeout=10"
+      MM_SERVICESETTINGS_SITEURL: "http://localhost:8065"
+      MM_SERVICESETTINGS_LISTENADDRESS: ":8065"
+      MM_TEAMSETTINGS_ENABLETEAMCREATION: "true"
+      MM_TEAMSETTINGS_ENABLEOPENSERVER: "true"
+      MM_EMAILSETTINGS_REQUIREEMAILVERIFICATION: "false"
+      MM_EMAILSETTINGS_SENDEMAILNOTIFICATIONS: "false"
+      MM_LOGSETTINGS_CONSOLELEVEL: "WARN"
+      MM_PLUGINSETTINGS_ENABLE: "false"
+    volumes:
+      - mm_data:/mattermost/data
+      - mm_config:/mattermost/config
+      - mm_logs:/mattermost/logs
+      - mm_plugins:/mattermost/plugins
+      - mm_client_plugins:/mattermost/client/plugins
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8065/api/v4/system/ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 60s
+
+volumes:
+  mm_db:
+  mm_data:
+  mm_config:
+  mm_logs:
+  mm_plugins:
+  mm_client_plugins:

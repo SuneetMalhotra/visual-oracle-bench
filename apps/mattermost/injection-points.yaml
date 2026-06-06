@@ -1,0 +1,402 @@
+# apps/mattermost/injection-points.yaml
+#
+# 50 defect-injection points for the Mattermost Team Edition webapp,
+# distributed 8/8/8/8/9/9 across the 6 pre-registered defect categories
+# (layout, color, missing, truncation, zorder, contrast).
+#
+# Surfaces covered (5 stable Mattermost screens):
+#   login          -> http://localhost:8065/login
+#   channel-list   -> http://localhost:8065/engineering/channels/town-square
+#                     (left sidebar with team-switcher + channel list visible)
+#   channel-view   -> http://localhost:8065/engineering/channels/backend
+#                     (channel header + post list + post composer visible)
+#   profile-modal  -> http://localhost:8065/engineering/channels/backend
+#                     then the profile modal is opened by the test via a
+#                     scripted click on a post-author avatar (see
+#                     tests/smoke_mattermost_pipeline.ts SURFACE_PATH)
+#   settings       -> http://localhost:8065/admin_console/user_management/users
+#                     (sysadmin-only; capture script logs in as admin)
+#
+# Schema: same shape as apps/conduit/injection-points.yaml. See that file
+# for field documentation. The only Mattermost-specific addition is that
+# the `profile-modal` surface requires the capture script to drive a
+# UI-level click (`page.click('.post__header .profile-icon')`) before
+# the injection runs, because the modal is React-portaled and has no
+# stable deep link.
+#
+# Selectors are React class names from the upstream mattermost/mattermost
+# webapp at release-11.8. Most class names (Sidebar, ChannelHeader, post,
+# post__content, profile-icon, modal-body) are documented in
+# mattermost/mattermost/webapp/channels/src/components/**. They are
+# STABLE across patch releases within the 11.x line but MUST be
+# re-verified post-Docker-build before the W7 corpus capture; see
+# RUNBOOK.md "Known risks" for the verification checklist.
+
+version: 1
+app: mattermost
+pinned_image_digest: sha256:a603c831151383f7fca707a2c7b5e52a1c9b7833de55a02ce59dd1c64667cce1
+pinned_image_tag: release-11.8
+total: 50
+distribution:
+  layout: 8
+  color: 8
+  missing: 8
+  truncation: 8
+  zorder: 9
+  contrast: 9
+
+points:
+
+  # ----- LAYOUT (8) -------------------------------------------------------
+  - id: mattermost-layout-001
+    surface: login
+    category: layout
+    primitive: shift_element
+    selector: ".signup-team-logo"
+    params: { dx: 32, dy: 0 }
+    expected_change: "Login page Mattermost logo shifted 32px right of center."
+  - id: mattermost-layout-002
+    surface: login
+    category: layout
+    primitive: shift_element
+    selector: "#input_loginId"
+    params: { dx: 0, dy: 24 }
+    expected_change: "Login email/username input shifted 24px down, overlapping password field."
+  - id: mattermost-layout-003
+    surface: channel-list
+    category: layout
+    primitive: shift_element
+    selector: "#sidebarTeamMenuButton"
+    params: { dx: 0, dy: 12 }
+    expected_change: "Team menu button shifted 12px down, overlapping the team-name header."
+  - id: mattermost-layout-004
+    surface: channel-list
+    category: layout
+    primitive: shift_element
+    selector: ".SidebarChannelGroupHeader"
+    params: { dx: 20, dy: 0 }
+    expected_change: "Sidebar 'CHANNELS' group header shifted 20px right, out of column."
+  - id: mattermost-layout-005
+    surface: channel-view
+    category: layout
+    primitive: shift_element
+    selector: "#channelHeaderTitle"
+    params: { dx: 0, dy: 18 }
+    expected_change: "Channel header title shifted 18px down into the post list area."
+  - id: mattermost-layout-006
+    surface: channel-view
+    category: layout
+    primitive: shift_element
+    selector: "#post_textbox"
+    params: { dx: 32, dy: 0 }
+    expected_change: "Post composer text area shifted 32px right, breaking input column alignment."
+  - id: mattermost-layout-007
+    surface: profile-modal
+    category: layout
+    primitive: shift_element
+    selector: ".user-popover__image"
+    params: { dx: 40, dy: 0 }
+    expected_change: "Profile-modal avatar shifted 40px right, separated from username header."
+  - id: mattermost-layout-008
+    surface: settings
+    category: layout
+    primitive: shift_element
+    selector: ".admin-sidebar"
+    params: { dx: 24, dy: 0 }
+    expected_change: "Admin console sidebar shifted 24px right, crowding the main content pane."
+
+  # ----- COLOR (8) --------------------------------------------------------
+  - id: mattermost-color-001
+    surface: login
+    category: color
+    primitive: mutate_color
+    selector: "#saveSetting"
+    params: { prop: "backgroundColor", delta_hue: 120 }
+    expected_change: "Login 'Sign in' button background hue-rotated 120 degrees (green tint)."
+  - id: mattermost-color-002
+    surface: login
+    category: color
+    primitive: mutate_color
+    selector: ".signup-team-logo"
+    params: { prop: "color", delta_hue: 90 }
+    expected_change: "Login logo wordmark fill hue-rotated 90 degrees."
+  - id: mattermost-color-003
+    surface: channel-list
+    category: color
+    primitive: mutate_color
+    selector: ".SidebarChannel.active"
+    params: { prop: "backgroundColor", delta_hue: 180 }
+    expected_change: "Active sidebar channel highlight color rotated 180 degrees."
+  - id: mattermost-color-004
+    surface: channel-list
+    category: color
+    primitive: mutate_color
+    selector: ".team-btn"
+    params: { prop: "backgroundColor", delta_hue: 60 }
+    expected_change: "Team-switcher icon background hue-rotated 60 degrees."
+  - id: mattermost-color-005
+    surface: channel-view
+    category: color
+    primitive: mutate_color
+    selector: "#channel-header"
+    params: { prop: "backgroundColor", delta_hue: 75 }
+    expected_change: "Channel header bar background hue-rotated 75 degrees."
+  - id: mattermost-color-006
+    surface: channel-view
+    category: color
+    primitive: mutate_color
+    selector: ".post__header .post__time"
+    params: { prop: "color", delta_hue: 45 }
+    expected_change: "Post timestamps hue-rotated 45 degrees from neutral grey."
+  - id: mattermost-color-007
+    surface: profile-modal
+    category: color
+    primitive: mutate_color
+    selector: ".user-popover__email"
+    params: { prop: "color", delta_hue: 150 }
+    expected_change: "Profile-modal email-row text color hue-rotated 150 degrees."
+  - id: mattermost-color-008
+    surface: settings
+    category: color
+    primitive: mutate_color
+    selector: ".admin-console__header"
+    params: { prop: "backgroundColor", delta_hue: 200 }
+    expected_change: "Admin console header background hue-rotated 200 degrees."
+
+  # ----- MISSING (8) ------------------------------------------------------
+  - id: mattermost-missing-001
+    surface: login
+    category: missing
+    primitive: remove_element
+    selector: "#input_loginId"
+    expected_change: "Login email/username field removed entirely; form unusable."
+  - id: mattermost-missing-002
+    surface: channel-list
+    category: missing
+    primitive: remove_element
+    selector: ".AddChannelDropdown_dropdownButton"
+    expected_change: "Sidebar 'Add channel' (+) plus-button removed."
+  - id: mattermost-missing-003
+    surface: channel-list
+    category: missing
+    primitive: remove_element
+    selector: ".SidebarChannelGroup_content"
+    expected_change: "Entire sidebar channel-list group content removed."
+  - id: mattermost-missing-004
+    surface: channel-view
+    category: missing
+    primitive: remove_element
+    selector: ".channel-header__icon"
+    expected_change: "Channel header icon cluster (members/pinned/files) removed."
+  - id: mattermost-missing-005
+    surface: channel-view
+    category: missing
+    primitive: remove_element
+    selector: ".post-create__container"
+    expected_change: "Post composer container removed; users cannot post."
+  - id: mattermost-missing-006
+    surface: profile-modal
+    category: missing
+    primitive: remove_element
+    selector: ".user-popover__image"
+    expected_change: "Profile-modal avatar removed from popover header."
+  - id: mattermost-missing-007
+    surface: profile-modal
+    category: missing
+    primitive: remove_element
+    selector: ".user-popover__role-section"
+    expected_change: "Profile-modal role/title section removed entirely."
+  - id: mattermost-missing-008
+    surface: settings
+    category: missing
+    primitive: remove_element
+    selector: ".admin-console__wrapper .admin-console__content"
+    expected_change: "Admin console main content area removed, leaving only the sidebar."
+
+  # ----- TRUNCATION (8) ---------------------------------------------------
+  - id: mattermost-truncation-001
+    surface: login
+    category: truncation
+    primitive: shrink_container
+    selector: ".signup-team-logo"
+    params: { width_pct: 0.4 }
+    expected_change: "Login logo clipped at 40% width, wordmark cut off."
+  - id: mattermost-truncation-002
+    surface: channel-list
+    category: truncation
+    primitive: shrink_container
+    selector: ".SidebarChannel:first-of-type .SidebarChannelLinkLabel"
+    params: { width_pct: 0.5 }
+    expected_change: "First sidebar channel name clipped without ellipsis."
+  - id: mattermost-truncation-003
+    surface: channel-list
+    category: truncation
+    primitive: shrink_container
+    selector: "#headerTeamName"
+    params: { width_pct: 0.55 }
+    expected_change: "Sidebar team-name header clipped mid-word."
+  - id: mattermost-truncation-004
+    surface: channel-view
+    category: truncation
+    primitive: shrink_container
+    selector: "#channelHeaderTitle"
+    params: { width_pct: 0.5 }
+    expected_change: "Channel header title clipped at half-width."
+  - id: mattermost-truncation-005
+    surface: channel-view
+    category: truncation
+    primitive: shrink_container
+    selector: ".post:first-of-type .post-message__text"
+    params: { width_pct: 0.6 }
+    expected_change: "First post message text clipped at right edge."
+  - id: mattermost-truncation-006
+    surface: profile-modal
+    category: truncation
+    primitive: shrink_container
+    selector: ".user-popover__email"
+    params: { width_pct: 0.5 }
+    expected_change: "Profile-modal email clipped at half-width."
+  - id: mattermost-truncation-007
+    surface: profile-modal
+    category: truncation
+    primitive: shrink_container
+    selector: ".user-popover__fullname"
+    params: { width_pct: 0.5 }
+    expected_change: "Profile-modal full-name field clipped at half-width."
+  - id: mattermost-truncation-008
+    surface: settings
+    category: truncation
+    primitive: shrink_container
+    selector: ".admin-console__header h1"
+    params: { width_pct: 0.5 }
+    expected_change: "Admin console page header clipped at half-width."
+
+  # ----- ZORDER (9) -------------------------------------------------------
+  - id: mattermost-zorder-001
+    surface: login
+    category: zorder
+    primitive: swap_zindex
+    selector: ".signup-team-logo"
+    selector_b: ".signup__content"
+    expected_change: "Login logo and content card stacking inverted."
+  - id: mattermost-zorder-002
+    surface: channel-list
+    category: zorder
+    primitive: swap_zindex
+    selector: ".sidebar--left"
+    selector_b: "#channel_view"
+    expected_change: "Sidebar and main channel pane stacking swapped."
+  - id: mattermost-zorder-003
+    surface: channel-list
+    category: zorder
+    primitive: swap_zindex
+    selector: ".SidebarChannel:first-of-type"
+    selector_b: ".SidebarChannel:nth-of-type(2)"
+    expected_change: "First two sidebar channels stacking swapped."
+  - id: mattermost-zorder-004
+    surface: channel-view
+    category: zorder
+    primitive: swap_zindex
+    selector: "#channel-header"
+    selector_b: ".post-list__table"
+    expected_change: "Channel header and post-list stacking inverted (header behind posts)."
+  - id: mattermost-zorder-005
+    surface: channel-view
+    category: zorder
+    primitive: swap_zindex
+    selector: ".post-create__container"
+    selector_b: ".post:last-of-type"
+    expected_change: "Post composer and last post stacking swapped."
+  - id: mattermost-zorder-006
+    surface: profile-modal
+    category: zorder
+    primitive: swap_zindex
+    selector: ".user-popover__image"
+    selector_b: ".user-popover__name"
+    expected_change: "Profile-modal avatar and name stacking swapped."
+  - id: mattermost-zorder-007
+    surface: profile-modal
+    category: zorder
+    primitive: swap_zindex
+    selector: ".modal-backdrop"
+    selector_b: ".modal-content"
+    expected_change: "Profile modal backdrop and content stacking inverted."
+  - id: mattermost-zorder-008
+    surface: settings
+    category: zorder
+    primitive: swap_zindex
+    selector: ".admin-sidebar"
+    selector_b: ".admin-console__content"
+    expected_change: "Admin console sidebar and content pane stacking swapped."
+  - id: mattermost-zorder-009
+    surface: settings
+    category: zorder
+    primitive: swap_zindex
+    selector: ".admin-console__header"
+    selector_b: ".admin-console__content"
+    expected_change: "Admin console header bar stacking-swapped behind content."
+
+  # ----- CONTRAST (9) -----------------------------------------------------
+  - id: mattermost-contrast-001
+    surface: login
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".signup__markdown"
+    params: { target_ratio: 2.5 }
+    expected_change: "Login page markdown helper text contrast pushed below 3:1."
+  - id: mattermost-contrast-002
+    surface: login
+    category: contrast
+    primitive: reduce_contrast
+    selector: "#input_loginId + label, #input_password + label"
+    params: { target_ratio: 2.0 }
+    expected_change: "Login field labels near-illegible."
+  - id: mattermost-contrast-003
+    surface: channel-list
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".SidebarChannelLinkLabel"
+    params: { target_ratio: 2.5 }
+    expected_change: "Sidebar channel names contrast pushed below WCAG AA."
+  - id: mattermost-contrast-004
+    surface: channel-list
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".SidebarChannelGroupHeader_text"
+    params: { target_ratio: 2.0 }
+    expected_change: "Sidebar 'CHANNELS' group header nearly invisible."
+  - id: mattermost-contrast-005
+    surface: channel-view
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".post__header .post__time"
+    params: { target_ratio: 2.0 }
+    expected_change: "Post timestamps nearly invisible against background."
+  - id: mattermost-contrast-006
+    surface: channel-view
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".post-message__text"
+    params: { target_ratio: 2.5 }
+    expected_change: "Post body text contrast pushed below WCAG AA."
+  - id: mattermost-contrast-007
+    surface: profile-modal
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".user-popover__username"
+    params: { target_ratio: 2.5 }
+    expected_change: "Profile-modal username contrast below 3:1."
+  - id: mattermost-contrast-008
+    surface: settings
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".admin-console label"
+    params: { target_ratio: 2.5 }
+    expected_change: "Admin console field labels near-illegible."
+  - id: mattermost-contrast-009
+    surface: settings
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".admin-console__header h1"
+    params: { target_ratio: 2.5 }
+    expected_change: "Admin console page title contrast pushed below 3:1."

@@ -35,7 +35,7 @@ A prior single-application study (Malhotra 2026, *An Agent Harness for Test Auto
 - **Sample units:** 8 open-source web applications, deliberately selected for diversity across application class, framework, and rendering paradigm.
 - **Applications:** RealWorld Conduit, Mattermost, Excalidraw, GitLab CE, Rocket.Chat, Penpot, Cal.com, NocoDB.
   - All distributed under OSS licenses permitting research use; all containerizable via official Docker images at pinned digests.
-- **Substitution rule:** If any of the 8 apps cannot be onboarded by 2026-07-12 (W5 milestone), drop in priority order: NocoDB, Penpot. Re-derive sample to 6 or 7 apps; report substitution in manuscript.
+- **Substitution rule (FINAL, per §12 Decision C):** If any of the 8 apps cannot be onboarded, drop in priority order: (1) NocoDB, (2) Penpot. If both drops occur and the sample falls to 6 apps, the analysis proceeds with 6 apps and the §6.1 Threats section reports the reduced sample. If a third drop is required, add **Vue Storefront** (`https://github.com/vuestorefront/vue-storefront`, Apache-2.0) as backup #3 to maintain a 6-app minimum (Vue Storefront adds e-commerce-class + Vue-framework diversity to the corpus). If Vue Storefront also fails, proceed with N=5 and disclose. All substitutions documented in the manuscript with reasoned justification.
 
 ### 4.2 Defect catalog
 
@@ -62,10 +62,10 @@ A prior single-application study (Malhotra 2026, *An Agent Harness for Test Auto
 ### 4.4 LLM judges
 
 Four models exercised under the LLM-as-judge oracle. Model versions pinned in the manuscript and at the release tag:
-- GPT-4o (`gpt-4o-2024-11-20`)
-- Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`)
-- Gemini 2.5 Pro (`gemini-2.5-pro-XXXX-XX-XX` — version pinned at run time)
-- Llama 3.2 Vision (`llama3.2-vision:11b`, served via local Ollama)
+- GPT-4o — pinned identifier `gpt-4o-2024-11-20`
+- Claude Sonnet 4.5 — pinned identifier `claude-sonnet-4-5-20250929`
+- Gemini 2.5 Pro — pinned at W7 first-judgment run (see §12 Decision A: the OSF pre-registration commits to the "version-at-run-time" policy with mandatory reporting in the manuscript; the exact Gemini snapshot identifier used is captured in `results/judgments_metadata.json` and quoted verbatim in the manuscript §4.4 table)
+- Llama 3.2 Vision — pinned identifier `llama3.2-vision:11b`, served via local Ollama
 
 ### 4.5 Total judgment volume
 
@@ -76,6 +76,7 @@ Four models exercised under the LLM-as-judge oracle. Model versions pinned in th
 
 - **Primary:** sole author hand-codes 100% of 800 image pairs as `{defect_present: yes|no, defect_category: layout|color|missing|truncation|zorder|contrast, confidence: high|medium|low}`. Author coding conducted in 90-minute blocks to mitigate fatigue drift.
 - **Secondary:** stratified random subsample of 80 image pairs (10%) double-coded by two additional volunteer raters, who are not co-authors and have no prior collaboration with the author on this manuscript. Raters receive the codebook and a 10-image calibration set before coding the 80-pair subsample. Inter-rater Cohen's κ computed across the 3 coders (Fleiss' κ for 3-way agreement). Disagreement resolution by pre-specified protocol: any pair where ≥1 rater disagrees with the author triggers a three-way discussion; if no consensus, the pair is reported as "unresolved" and excluded from the primary analysis with sensitivity check.
+- **Fleiss' κ failure floor (FINAL, per §12 Decision B):** if Fleiss' κ across the 3 coders falls below **0.60** on the 80-pair subsample, the coding scheme is declared unreliable for the analysis as-pre-registered. Remediation: (1) the author re-runs calibration with an expanded 20-image calibration set incorporating exemplars from the disagreement region; (2) all 80 pairs are re-coded by all three coders against the revised codebook; (3) Fleiss' κ is recomputed. One re-calibration cycle maximum. If Fleiss' κ remains below 0.60 after re-calibration, the manuscript reports the failure transparently and the inter-rater analysis is moved from §5.1 Primary to §5.3 Exploratory with full disclosure.
 
 ## 5. Analysis plan
 
@@ -158,24 +159,27 @@ Four models exercised under the LLM-as-judge oracle. Model versions pinned in th
 - **Stratification axes for all random draws:** application × defect-category. No further axes (e.g., framework) used as strata.
 - **Statistical software pin:** R 4.4.x (latest patch at run time); `lme4` 1.1-x; Python 3.11.x; `numpy` 1.26.x; `scikit-image` 0.24.x for SSIM. Versions frozen at the W7 first-analysis run and reported in manuscript.
 
-## 12. Lock status (as of 2026-06-06, W2 in progress)
-
-This pre-registration is submission-ready pending three items that require firm-lawyer or co-author sign-off before OSF submission on **2026-06-19**:
+## 12. Lock status (FINAL — all items resolved 2026-06-06; pre-registration is submission-ready)
 
 **Locked and submission-ready:**
 - §1 Background, §2 RQs, §3 Hypotheses (H1–H4 directional, magnitudes specified).
 - §4.2 Defect catalog (6 categories, 50/app split 8/8/8/8/9/9, dual viewport).
-- §4.4 LLM judge list (4 models; specific version pins as listed).
+- §4.4 LLM judge list (4 models; version-pin policy now locked, see Decision A below).
 - §4.5 Total judgment volume (~11,200).
+- §4.6 Ground truth and inter-rater protocol (Fleiss' κ floor now locked, see Decision B below).
+- §4.1 Application corpus + substitution rule (Decision C below).
 - §5.1 Primary analyses, §5.2 sensitivity analyses, §5.3 exploratory analyses.
 - §6 Exclusion rules (3 rules, all pre-specified with thresholds).
 - §11 Random seeds (all 5 seeds pre-stated).
 
-**Flagged for explicit OSF-submission decision (review before 2026-06-19):**
-- (A) Gemini 2.5 Pro exact version pin (§4.4) — will be available only at first-judgment run in W7; OSF entry should commit to "version-at-run-time" with mandatory reporting in manuscript.
-- (B) Inter-rater κ target threshold for declaring an inter-coder failure (currently implicit: §4.6 says "Fleiss' κ reported"; should we pre-register a floor below which we declare the coding scheme unreliable and re-run calibration? Proposed: Fleiss' κ ≥ 0.60 across 3 coders on the 80-pair subsample, or expand to 4th coder).
-- (C) Substitution-rule extension: if BOTH Penpot AND NocoDB drop, can we proceed with 6 apps, or do we add Vue Storefront as a backup? Proposed: pre-register Vue Storefront as backup #3 with the same diversity profile (Vue, e-commerce).
+**Resolved items (rationale per decision):**
+
+**Decision A — Gemini 2.5 Pro version-pin policy.** Pre-register the "version-at-run-time" policy with mandatory reporting in the manuscript. Specifically: the exact Gemini model identifier (e.g., `gemini-2.5-pro-XXXX-XX-XX` with the actual snapshot date) is captured at the W7 first-judgment run, written verbatim into `results/judgments_metadata.json`, and quoted in the manuscript §4.4 table. Rationale: Gemini snapshot identifiers rotate roughly quarterly with no stable "GA" alias guaranteed to point at the same weights at submission time vs. revision time; locking a placeholder now risks documenting a model that has been retired by the time reviewers want to reproduce. The OSF entry commits to the policy, not a specific weight; the manuscript commits to the specific weight used. GPT-4o (`gpt-4o-2024-11-20`), Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`), and Llama 3.2 Vision (`llama3.2-vision:11b`) are pinned by exact identifier in §4.4 since stable retroactively-resolvable handles exist.
+
+**Decision B — Fleiss' κ failure floor.** Pre-register **Fleiss' κ ≥ 0.60** across the three coders on the 80-pair subsample as the inter-rater reliability floor. If the observed Fleiss' κ falls below 0.60: (1) the coding scheme is declared unreliable for the analysis as-pre-registered; (2) the author re-runs calibration with an expanded 20-image calibration set (up from 10), incorporating exemplars from the disagreement region; (3) all 80 pairs are re-coded by all three coders against the revised codebook; (4) Fleiss' κ is recomputed. If Fleiss' κ remains below 0.60 after one re-calibration cycle, the manuscript reports the coding-scheme failure transparently and the inter-rater analysis is moved from §5.1 Primary to §5.3 Exploratory with full disclosure. Rationale: 0.60 is the Landis & Koch "substantial agreement" threshold and matches the floor the antecedent agent-harness work (§6 of Malhotra 2026) uses for citation-quality. One re-calibration cycle is the standard SE-empirical norm (Wohlin et al.); unbounded re-coding cycles would license researcher-degree-of-freedom inflation.
+
+**Decision C — Substitution-rule extension (third-backup application).** Pre-register **Vue Storefront** (`https://github.com/vuestorefront/vue-storefront`, Apache-2.0 license) as backup app #3, after NocoDB (drop #1) and Penpot (drop #2). If all three primary drops occur and the sample falls to 5 apps, Vue Storefront is added as the 6th app to maintain a 6-app minimum. Rationale: Vue Storefront adds e-commerce-class diversity (currently absent from the 8-app corpus, which skews toward chat/canvas/code-host); is Vue-framework (different from the React-heavy primary list, additional framework-paradigm coverage); and is well-documented for testing automation. If Vue Storefront also fails onboarding, the manuscript proceeds with N=5 apps and the §6.1 Threats to Validity section reports the reduced sample with reasoned acknowledgment.
 
 ---
 
-**Next action:** finalize this draft into OSF's structured pre-registration form (uses the OSF SE/Empirical SE template). Resolve (A)/(B)/(C) above, then submit Fri 2026-06-19.
+**Next action:** transcribe this draft into OSF's structured pre-registration form (uses the OSF SE/Empirical SE template). All hypotheses, design parameters, analysis plan, exclusion rules, and substitution rules are now locked. Submission is unblocked.

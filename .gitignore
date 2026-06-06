@@ -1,0 +1,41 @@
+# Node / TypeScript
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+.npm
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Python (analysis scripts)
+__pycache__/
+*.pyc
+.venv/
+.mypy_cache/
+.pytest_cache/
+
+# Local secrets / env (never commit)
+.env
+.env.local
+*.key
+
+# Large artifacts -- corpus mirrored to Zenodo at submission, not committed
+data/images/conduit/
+data/images/mattermost/
+data/images/excalidraw/
+data/images/gitlab-ce/
+data/images/rocket-chat/
+data/images/penpot/
+data/images/cal-com/
+data/images/nocodb/
+# (data/images/_offline_smoke/ IS tracked: it is the W2 pipeline-proof artifact)

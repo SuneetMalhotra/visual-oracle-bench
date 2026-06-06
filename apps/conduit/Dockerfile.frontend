@@ -1,0 +1,60 @@
+# apps/conduit/Dockerfile.frontend -- Angular frontend
+#
+# Builds the RealWorld Angular reference client from upstream, pinned to
+# commit SHA. Serves the production build via nginx.
+#
+# Upstream: https://github.com/gothinkster/angular-realworld-example-app
+# Pinned commit: dd99ed2cf39c805d719f943c5d7061a5683d98a8 (main, 2026-05-13)
+#
+# At runtime the API base URL is patched via a small `env.js` injected by
+# nginx-templates, so the same image works against any backend host.
+#
+# Build:  docker build -f Dockerfile.frontend -t voracle/conduit-frontend:pinned .
+# Run:    docker run -p 4100:80 -e API_BASE_URL=http://localhost:3000/api voracle/conduit-frontend:pinned
+
+# ----- Stage 1: build ------------------------------------------------------
+FROM node:20.11.1-alpine AS build
+
+ARG REALWORLD_FRONTEND_SHA=dd99ed2cf39c805d719f943c5d7061a5683d98a8
+
+RUN apk add --no-cache git
+
+WORKDIR /src
+
+RUN git init && \
+    git remote add origin https://github.com/gothinkster/angular-realworld-example-app.git && \
+    git fetch --depth 1 origin "${REALWORLD_FRONTEND_SHA}" && \
+    git checkout FETCH_HEAD
+
+# `npm install` (not `ci`) because upstream uses bun-style lockfile; we accept
+# the slightly-looser dep resolution for reproducibility (commit SHA is pinned).
+RUN npm install --no-audit --no-fund --ignore-scripts && \
+    npx ng build --configuration=production
+
+# ----- Stage 2: runtime ----------------------------------------------------
+FROM nginx:1.27-alpine
+
+COPY --from=build /src/dist/angular-realworld/browser /usr/share/nginx/html
+
+# Minimal nginx config: serve SPA, fall through to index.html for client routes,
+# proxy /api to the backend service so the SPA's relative API calls work
+# inside docker-compose without CORS.
+RUN printf '%s\n' \
+  'server {' \
+  '  listen 80;' \
+  '  server_name _;' \
+  '  root /usr/share/nginx/html;' \
+  '  index index.html;' \
+  '  location /api/ {' \
+  '    proxy_pass ${BACKEND_URL}/;' \
+  '    proxy_set_header Host $host;' \
+  '    proxy_set_header X-Real-IP $remote_addr;' \
+  '  }' \
+  '  location / {' \
+  '    try_files $uri $uri/ /index.html;' \
+  '  }' \
+  '}' > /etc/nginx/templates/default.conf.template
+
+ENV BACKEND_URL=http://backend:3000/api
+
+EXPOSE 80

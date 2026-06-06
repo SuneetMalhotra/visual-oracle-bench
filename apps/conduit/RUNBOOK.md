@@ -1,6 +1,6 @@
 # Conduit (RealWorld) — Onboarding Runbook
 
-**Status:** W2 placeholder. Real onboarding planned 2026-06-15 to 2026-06-21.
+**Status:** W2 — first app onboarded. Pipeline files complete; docker build pending machine with Docker installed.
 
 ## What this app provides for the benchmark
 
@@ -8,27 +8,60 @@ Conduit is the smallest fully-featured social/blog OSS web app. Selected as the 
 - Smallest container footprint
 - Simplest seed data (users + articles + tags + comments)
 - Well-documented official seed scripts
-- React-based frontend (DOM-primary, easy to inject defects)
-- 5+ navigable UI surfaces (home feed, article view, profile, editor, settings)
+- Angular-based reference frontend (DOM-primary, easy to inject defects)
+- 5 navigable UI surfaces: home (`/`), article (`/article/<slug>`), profile (`/profile/<user>`), editor (`/editor`), settings (`/settings`)
 
-## W2 onboarding plan
+## Upstream pins (immutable commit SHAs)
 
-1. Clone upstream: `https://github.com/gothinkster/realworld` (specifically the Vue/React/Node "Reference Apps")
-2. Pin upstream Docker image digest in `Dockerfile`
-3. Write `seed.sh` to populate 5 users, 10 articles, 5 tags, 20 comments
-4. Identify 5 stable UI surfaces (home, article view, profile, editor, settings)
-5. Write `injection-points.yaml` listing 50 defect points across 6 categories (suggested split: 8 layout / 8 color / 8 missing / 8 truncation / 9 zorder / 9 contrast)
-6. Verify Playwright screenshot capture from cold start to all 5 surfaces in <60s
+| Component | Repo | Commit | Date |
+|---|---|---|---|
+| Backend (Express + Prisma + SQLite) | `gothinkster/node-express-realworld-example-app` | `30b68e1e881462b2f4164ea09ab4c4f5699c7b0b` | 2024-01-04 |
+| Frontend (Angular 21) | `gothinkster/angular-realworld-example-app` | `dd99ed2cf39c805d719f943c5d7061a5683d98a8` | 2026-05-13 |
+
+Both are pinned via `ARG` in the Dockerfiles, fetched at build time with `git fetch --depth 1 origin <sha>`. To move the pin, edit the `ARG REALWORLD_*_SHA=` line in each Dockerfile and rebuild.
+
+## Bring-up sequence
+
+```bash
+# 1. Build + start (first run ~5-10 min for npm install / nx build / ng build)
+docker compose -f apps/conduit/docker-compose.yml up --build -d
+
+# 2. Wait for healthcheck (backend exposes /api/tags as health probe)
+docker compose -f apps/conduit/docker-compose.yml ps
+
+# 3. Seed deterministic fixture (5 users, 10 articles, 5 tags, 20 comments)
+./apps/conduit/seed.sh
+
+# 4. Smoke test the injection -> capture pipeline (12 PNGs to data/images/conduit/)
+npx tsx tests/smoke_conduit_pipeline.ts
+
+# 5. Teardown
+docker compose -f apps/conduit/docker-compose.yml down -v
+```
 
 ## Acceptance criteria
 
-- `docker compose up` brings up app on localhost:3000 in <60s
-- `seed.sh` completes in <30s and is idempotent
-- Each of 5 UI surfaces is reachable via `wait_for_selector` from `wait-conditions.yaml`
-- 50 defect-injection points specified with stable selectors
+- `docker compose up` brings backend up on `localhost:3000` and frontend on `localhost:4100` in <10 min cold build, <60s subsequent starts.
+- `seed.sh` completes in <30s, is idempotent (re-running does not duplicate articles or fail).
+- `npx tsx tests/smoke_conduit_pipeline.ts` produces 12 PNGs (6 baseline + 6 defect) under `data/images/conduit/` and writes `_smoke_ledger.json` with the DefectRecord for each shot.
 
-## Known risks (pre-registered)
+## Fixture seeded by `seed.sh`
 
-- React StrictMode double-render may cause flaky baseline screenshots → disable in seed stage
-- Article timestamps relative ("3 minutes ago") → freeze with seed.sh date offset
-- User avatars random → seed deterministic avatars
+| Entity | Count | Identifiers |
+|---|---|---|
+| Users | 5 | alice, bob, carol, dave, eve (all password `voracle-seed-Pa55word!`) |
+| Tags | 5 | ai, testing, opensource, longread, demo |
+| Articles | 10 | 2 per user, deterministic titles (see `seed.sh`) |
+| Comments | 20 | 2 per article, round-robin author rotation |
+
+## Known risks and mitigations (pre-registered)
+
+- **Angular hydration delay** may cause flaky baseline screenshots. Mitigation: `smoke_conduit_pipeline.ts` waits for `networkidle` then 400ms additional settle before screenshot.
+- **Article timestamps** ("3 minutes ago") leak wall-clock into snapshots. Mitigation: seed.sh runs in one batch; the relative-time component renders once and stays stable within a single capture session. For multi-session captures (W7+), use Playwright `page.clock.install()` to freeze time before navigation.
+- **User avatars** are deterministic gravatars based on email (not random) — already addressed by seeded email addresses.
+- **JWT in localStorage** is required for `/editor` and `/settings` routes; `smoke_conduit_pipeline.ts` performs the login via the API and injects the token via `addInitScript` before navigation.
+- **Selectors in `injection-points.yaml` are tied to the pinned frontend SHA**. If the pin is moved, re-verify selectors against the new build before re-running.
+
+## Environmental blockers
+
+- **2026-06-06 (this commit):** Docker not installed on the W2 dev machine. The `tests/smoke_conduit_pipeline.ts` end-to-end run is therefore deferred to the next machine with Docker. The 6 primitives ARE validated by `tests/test_primitives_unit.ts` (passing 6/6 against a synthetic HTML fixture) and the offline pipeline-equivalence test (`tests/smoke_offline_pipeline.ts`) produces 12 PNGs in `data/images/_offline_smoke/` proving baseline-vs-defect deltas are visible.

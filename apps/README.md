@@ -4,7 +4,7 @@
 
 | App | Class | Onboarding week | Status |
 |---|---|---|---|
-| Conduit (RealWorld) | Social/blog | W2 | not started |
+| Conduit (RealWorld) | Social/blog | W2 | **files complete; docker build pending** |
 | Mattermost | Chat/collab | W3 | not started |
 | Excalidraw | Canvas/design | W3 | not started |
 | GitLab CE | Code host | W4 | not started |
@@ -17,11 +17,13 @@
 
 For each app, complete in `apps/{name}/`:
 
-1. **Dockerfile** — pin upstream image digest (not tag). Boot to first paint <60s.
-2. **seed.sh** — scripted seed data: users, content, navigation state.
+1. **Dockerfile** — pin upstream by commit SHA or image digest (NOT a moving tag). Boot to first paint <60s after the first build.
+2. **seed.sh** — scripted seed data: users, content, navigation state. Idempotent.
 3. **RUNBOOK.md** — how to reproduce app state from cold start; viewport assumptions; known-stable UI surfaces.
-4. **injection-points.yaml** — list of 50 defect injection points distributed across 6 categories (suggested 8/8/8/8/9/9 split). Each entry: `{id, category, selector, expected_visible_change}`.
-5. **wait-conditions.yaml** — `wait_for_selector` + post-`networkidle` buffer for each captured UI surface.
+4. **injection-points.yaml** — list of 50 defect injection points distributed across 6 categories (8/8/8/8/9/9 split). Schema: see `apps/conduit/injection-points.yaml` (the W2 reference implementation).
+5. **wait-conditions.yaml** *(optional for apps where `networkidle` + 400ms is insufficient)* — `wait_for_selector` + post-`networkidle` buffer for each captured UI surface.
+
+The Conduit subdir (`apps/conduit/`) is the **W2 reference template** — copy its layout and adapt the upstream pins, seed payload, and selectors for each new app.
 
 ## Substitution rule (pre-registered in OSF)
 

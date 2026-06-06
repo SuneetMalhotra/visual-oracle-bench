@@ -1,0 +1,399 @@
+# apps/conduit/injection-points.yaml
+#
+# 50 defect-injection points for the Conduit RealWorld app, distributed
+# 8/8/8/8/9/9 across the 6 pre-registered defect categories
+# (layout, color, missing, truncation, zorder, contrast).
+#
+# Surfaces covered (5 stable Conduit screens):
+#   home    -> http://localhost:4100/                        (global + your feed)
+#   article -> http://localhost:4100/article/<slug>          (single article view)
+#   profile -> http://localhost:4100/profile/<username>      (author profile)
+#   editor  -> http://localhost:4100/editor                  (new article form)
+#   settings-> http://localhost:4100/settings                (logged-in user settings)
+#
+# Schema:
+#   id                 stable identifier (used as image filename component)
+#   surface            one of: home | article | profile | editor | settings
+#   category           one of: layout | color | missing | truncation | zorder | contrast
+#   primitive          which injection/primitives.ts function to call
+#   selector           CSS selector; for zorder this is selector_a
+#   selector_b         (zorder only) second selector
+#   params             primitive-specific kwargs
+#   expected_change    one-sentence human-readable defect description
+#
+# Notes:
+#   - Selectors are Angular-generated Conduit class names from the
+#     gothinkster/angular-realworld-example-app reference client. They are
+#     stable across the pinned commit (dd99ed2) but MUST be re-verified if
+#     the upstream pin moves.
+#   - For "missing" defects on critical CTAs (e.g. publish button), we
+#     intentionally degrade the screen so the LLM-as-judge sees an obvious
+#     functional regression -- this is the high-kappa-target category.
+
+version: 1
+app: conduit
+pinned_frontend_sha: dd99ed2cf39c805d719f943c5d7061a5683d98a8
+total: 50
+distribution:
+  layout: 8
+  color: 8
+  missing: 8
+  truncation: 8
+  zorder: 9
+  contrast: 9
+
+points:
+
+  # ----- LAYOUT (8) -------------------------------------------------------
+  - id: conduit-layout-001
+    surface: home
+    category: layout
+    primitive: shift_element
+    selector: ".navbar .navbar-brand"
+    params: { dx: 24, dy: 0 }
+    expected_change: "Site brand wordmark shifted 24px right in the navbar."
+  - id: conduit-layout-002
+    surface: home
+    category: layout
+    primitive: shift_element
+    selector: ".banner h1"
+    params: { dx: 0, dy: 16 }
+    expected_change: "Home banner h1 shifted 16px down, overlapping subtitle."
+  - id: conduit-layout-003
+    surface: home
+    category: layout
+    primitive: shift_element
+    selector: ".sidebar"
+    params: { dx: 40, dy: 0 }
+    expected_change: "Tag sidebar shifted 40px right, crowding feed column."
+  - id: conduit-layout-004
+    surface: article
+    category: layout
+    primitive: shift_element
+    selector: ".article-meta"
+    params: { dx: 0, dy: 24 }
+    expected_change: "Article metadata bar shifted 24px down into article body."
+  - id: conduit-layout-005
+    surface: article
+    category: layout
+    primitive: shift_element
+    selector: ".card.comment-form-card"
+    params: { dx: 32, dy: 0 }
+    expected_change: "Comment form card shifted 32px right, out of column alignment."
+  - id: conduit-layout-006
+    surface: profile
+    category: layout
+    primitive: shift_element
+    selector: ".user-img"
+    params: { dx: 48, dy: 0 }
+    expected_change: "Profile avatar shifted 48px right, separated from username."
+  - id: conduit-layout-007
+    surface: editor
+    category: layout
+    primitive: shift_element
+    selector: "button[type='submit']"
+    params: { dx: -64, dy: 0 }
+    expected_change: "Publish button shifted 64px left, breaking form alignment."
+  - id: conduit-layout-008
+    surface: settings
+    category: layout
+    primitive: shift_element
+    selector: ".form-group:nth-of-type(2)"
+    params: { dx: 0, dy: 20 }
+    expected_change: "Settings 'Username' field shifted 20px down, overlapping next field."
+
+  # ----- COLOR (8) --------------------------------------------------------
+  - id: conduit-color-001
+    surface: home
+    category: color
+    primitive: mutate_color
+    selector: ".navbar .navbar-brand"
+    params: { prop: "color", delta_hue: 120 }
+    expected_change: "Brand wordmark color hue-rotated 120 degrees (green tint)."
+  - id: conduit-color-002
+    surface: home
+    category: color
+    primitive: mutate_color
+    selector: ".banner"
+    params: { prop: "backgroundColor", delta_hue: 90 }
+    expected_change: "Home banner background hue-rotated 90 degrees."
+  - id: conduit-color-003
+    surface: home
+    category: color
+    primitive: mutate_color
+    selector: ".nav-pills .nav-link.active"
+    params: { prop: "color", delta_hue: 180 }
+    expected_change: "Active feed tab text color rotated 180 degrees (opposite hue)."
+  - id: conduit-color-004
+    surface: article
+    category: color
+    primitive: mutate_color
+    selector: ".btn.btn-sm.btn-outline-secondary"
+    params: { prop: "borderColor", delta_hue: 60 }
+    expected_change: "Follow button border hue-rotated 60 degrees."
+  - id: conduit-color-005
+    surface: article
+    category: color
+    primitive: mutate_color
+    selector: ".article-content"
+    params: { prop: "color", delta_hue: 45 }
+    expected_change: "Article body text hue-rotated 45 degrees from neutral."
+  - id: conduit-color-006
+    surface: profile
+    category: color
+    primitive: mutate_color
+    selector: ".user-info"
+    params: { prop: "backgroundColor", delta_hue: 75 }
+    expected_change: "Profile header background hue-rotated 75 degrees."
+  - id: conduit-color-007
+    surface: editor
+    category: color
+    primitive: mutate_color
+    selector: "button[type='submit']"
+    params: { prop: "backgroundColor", delta_hue: 150 }
+    expected_change: "Publish button background hue-rotated 150 degrees."
+  - id: conduit-color-008
+    surface: settings
+    category: color
+    primitive: mutate_color
+    selector: ".btn.btn-lg.btn-primary"
+    params: { prop: "backgroundColor", delta_hue: 200 }
+    expected_change: "Settings 'Update' button background hue-rotated 200 degrees."
+
+  # ----- MISSING (8) ------------------------------------------------------
+  - id: conduit-missing-001
+    surface: home
+    category: missing
+    primitive: remove_element
+    selector: ".navbar .nav-item:nth-child(2)"
+    expected_change: "Second navbar link removed entirely."
+  - id: conduit-missing-002
+    surface: home
+    category: missing
+    primitive: remove_element
+    selector: ".sidebar .tag-list"
+    expected_change: "Popular tags list removed from sidebar."
+  - id: conduit-missing-003
+    surface: home
+    category: missing
+    primitive: remove_element
+    selector: ".article-preview:first-of-type .preview-link"
+    expected_change: "First article's read-more link removed."
+  - id: conduit-missing-004
+    surface: article
+    category: missing
+    primitive: remove_element
+    selector: ".article-actions"
+    expected_change: "Article-page follow/favorite action bar removed."
+  - id: conduit-missing-005
+    surface: article
+    category: missing
+    primitive: remove_element
+    selector: ".comment-form-card"
+    expected_change: "Comment-submission form removed from article page."
+  - id: conduit-missing-006
+    surface: profile
+    category: missing
+    primitive: remove_element
+    selector: ".action-btn"
+    expected_change: "Profile 'Follow / Edit Settings' action button removed."
+  - id: conduit-missing-007
+    surface: editor
+    category: missing
+    primitive: remove_element
+    selector: "button[type='submit']"
+    expected_change: "Publish-article submit button removed from editor."
+  - id: conduit-missing-008
+    surface: settings
+    category: missing
+    primitive: remove_element
+    selector: ".btn.btn-outline-danger"
+    expected_change: "Logout button removed from settings page."
+
+  # ----- TRUNCATION (8) ---------------------------------------------------
+  - id: conduit-truncation-001
+    surface: home
+    category: truncation
+    primitive: shrink_container
+    selector: ".article-preview:first-of-type h1"
+    params: { width_pct: 0.5 }
+    expected_change: "First article preview title clipped at right boundary."
+  - id: conduit-truncation-002
+    surface: home
+    category: truncation
+    primitive: shrink_container
+    selector: ".article-preview:first-of-type p"
+    params: { width_pct: 0.6 }
+    expected_change: "First article preview body clipped without ellipsis."
+  - id: conduit-truncation-003
+    surface: home
+    category: truncation
+    primitive: shrink_container
+    selector: ".sidebar"
+    params: { width_pct: 0.5 }
+    expected_change: "Popular tags sidebar clipped, cutting tag pills mid-word."
+  - id: conduit-truncation-004
+    surface: article
+    category: truncation
+    primitive: shrink_container
+    selector: ".article-page .banner h1"
+    params: { width_pct: 0.55 }
+    expected_change: "Article banner title clipped at half-width."
+  - id: conduit-truncation-005
+    surface: article
+    category: truncation
+    primitive: shrink_container
+    selector: ".card-block .card-text"
+    params: { width_pct: 0.65 }
+    expected_change: "First comment body clipped at right edge."
+  - id: conduit-truncation-006
+    surface: profile
+    category: truncation
+    primitive: shrink_container
+    selector: ".user-info .bio"
+    params: { width_pct: 0.5 }
+    expected_change: "Profile bio clipped at half-width without ellipsis."
+  - id: conduit-truncation-007
+    surface: editor
+    category: truncation
+    primitive: shrink_container
+    selector: "input[formcontrolname='title']"
+    params: { width_pct: 0.5 }
+    expected_change: "Article title input clipped at half-width."
+  - id: conduit-truncation-008
+    surface: settings
+    category: truncation
+    primitive: shrink_container
+    selector: "input[formcontrolname='email']"
+    params: { width_pct: 0.5 }
+    expected_change: "Email settings input clipped at half-width."
+
+  # ----- ZORDER (9) -------------------------------------------------------
+  - id: conduit-zorder-001
+    surface: home
+    category: zorder
+    primitive: swap_zindex
+    selector: ".navbar"
+    selector_b: ".banner"
+    expected_change: "Navbar and home banner stacking inverted (banner over nav)."
+  - id: conduit-zorder-002
+    surface: home
+    category: zorder
+    primitive: swap_zindex
+    selector: ".feed-toggle"
+    selector_b: ".sidebar"
+    expected_change: "Feed-toggle and sidebar stacking swapped."
+  - id: conduit-zorder-003
+    surface: home
+    category: zorder
+    primitive: swap_zindex
+    selector: ".article-preview:first-of-type"
+    selector_b: ".article-preview:nth-of-type(2)"
+    expected_change: "First two article previews stacking swapped."
+  - id: conduit-zorder-004
+    surface: article
+    category: zorder
+    primitive: swap_zindex
+    selector: ".article-meta"
+    selector_b: ".article-content"
+    expected_change: "Article meta bar and content stacking inverted."
+  - id: conduit-zorder-005
+    surface: article
+    category: zorder
+    primitive: swap_zindex
+    selector: ".card.comment-form-card"
+    selector_b: ".card:nth-of-type(2)"
+    expected_change: "Comment form and first existing comment stacking swapped."
+  - id: conduit-zorder-006
+    surface: profile
+    category: zorder
+    primitive: swap_zindex
+    selector: ".user-info"
+    selector_b: ".articles-toggle"
+    expected_change: "Profile user-info and tab toggle stacking swapped."
+  - id: conduit-zorder-007
+    surface: editor
+    category: zorder
+    primitive: swap_zindex
+    selector: "input[formcontrolname='title']"
+    selector_b: "textarea[formcontrolname='body']"
+    expected_change: "Editor title and body field stacking swapped."
+  - id: conduit-zorder-008
+    surface: settings
+    category: zorder
+    primitive: swap_zindex
+    selector: ".form-group:nth-of-type(1)"
+    selector_b: ".form-group:nth-of-type(3)"
+    expected_change: "Settings 1st and 3rd form groups stacking swapped."
+  - id: conduit-zorder-009
+    surface: home
+    category: zorder
+    primitive: swap_zindex
+    selector: ".footer"
+    selector_b: ".container.page"
+    expected_change: "Footer and main page-container stacking inverted."
+
+  # ----- CONTRAST (9) -----------------------------------------------------
+  - id: conduit-contrast-001
+    surface: home
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".navbar .nav-link"
+    params: { target_ratio: 2.5 }
+    expected_change: "Navbar link text/background contrast pushed below 3:1."
+  - id: conduit-contrast-002
+    surface: home
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".banner p"
+    params: { target_ratio: 2.5 }
+    expected_change: "Home banner subtitle text contrast below 3:1."
+  - id: conduit-contrast-003
+    surface: home
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".article-preview .author"
+    params: { target_ratio: 2.0 }
+    expected_change: "Article preview author name nearly illegible."
+  - id: conduit-contrast-004
+    surface: article
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".article-content p"
+    params: { target_ratio: 2.5 }
+    expected_change: "Article body text contrast pushed below WCAG AA."
+  - id: conduit-contrast-005
+    surface: article
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".article-meta .date"
+    params: { target_ratio: 2.0 }
+    expected_change: "Article publish-date text nearly invisible."
+  - id: conduit-contrast-006
+    surface: profile
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".user-info .username"
+    params: { target_ratio: 2.5 }
+    expected_change: "Profile username text contrast below 3:1."
+  - id: conduit-contrast-007
+    surface: editor
+    category: contrast
+    primitive: reduce_contrast
+    selector: "input[formcontrolname='title']"
+    params: { target_ratio: 2.5 }
+    expected_change: "Editor title placeholder text near-illegible."
+  - id: conduit-contrast-008
+    surface: settings
+    category: contrast
+    primitive: reduce_contrast
+    selector: "label"
+    params: { target_ratio: 2.5 }
+    expected_change: "Settings field labels near-illegible."
+  - id: conduit-contrast-009
+    surface: settings
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".btn.btn-outline-danger"
+    params: { target_ratio: 2.5 }
+    expected_change: "Logout button text/background contrast below 3:1."

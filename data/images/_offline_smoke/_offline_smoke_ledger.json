@@ -1,0 +1,147 @@
+{
+  "captured_at": "2026-06-06T20:58:28.967Z",
+  "viewport": {
+    "width": 1024,
+    "height": 720
+  },
+  "fixture": "self-contained HTML (no docker, no Conduit)",
+  "note": "These 12 PNGs prove the injection -> capture pipeline works end-to-end. When docker is available, run tests/smoke_conduit_pipeline.ts to get the real Conduit equivalent in data/images/conduit/.",
+  "results": [
+    {
+      "category": "layout",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/_offline_smoke/layout_baseline.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/_offline_smoke/layout_defect.png",
+      "record": {
+        "app": "_offline",
+        "defect_id": "o-layout-1",
+        "category": "layout",
+        "selector": ".navbar .brand",
+        "description": "Element translated by (40, 0) pixels via CSS transform.",
+        "diff_signature": "Bounding box of .navbar .brand shifted 40.0 px from baseline.",
+        "details": {
+          "dx": 40,
+          "dy": 0,
+          "method": "css-transform-translate",
+          "prior_transform": ""
+        }
+      }
+    },
+    {
+      "category": "color",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/_offline_smoke/color_baseline.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/_offline_smoke/color_defect.png",
+      "record": {
+        "app": "_offline",
+        "defect_id": "o-color-1",
+        "category": "color",
+        "selector": ".banner",
+        "description": "Hue of backgroundColor rotated by 120 deg in HSL space.",
+        "diff_signature": "Computed backgroundColor of .banner changed from rgb(79, 70, 229) to rgb(229, 79, 70).",
+        "details": {
+          "prop": "backgroundColor",
+          "delta_hue": 120,
+          "before_rgb": "rgb(79, 70, 229)",
+          "after_rgb": "rgb(229, 79, 70)",
+          "before_hsl": {
+            "h": 243.39622641509433,
+            "s": 0.7535545023696683,
+            "l": 0.5862745098039216,
+            "a": 1
+          },
+          "method": "hsl-rotate-inline-style"
+        }
+      }
+    },
+    {
+      "category": "missing",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/_offline_smoke/missing_baseline.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/_offline_smoke/missing_defect.png",
+      "record": {
+        "app": "_offline",
+        "defect_id": "o-missing-1",
+        "category": "missing",
+        "selector": "#sidebar",
+        "description": "<aside> matching #sidebar removed from DOM.",
+        "diff_signature": "Element previously occupying {\"x\":666.65625,\"y\":216,\"width\":285.34375,\"height\":327} is absent.",
+        "details": {
+          "method": "element.remove",
+          "removed_rect": {
+            "x": 666.65625,
+            "y": 216,
+            "width": 285.34375,
+            "height": 327
+          },
+          "removed_tag": "aside"
+        }
+      }
+    },
+    {
+      "category": "truncation",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/_offline_smoke/truncation_baseline.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/_offline_smoke/truncation_defect.png",
+      "record": {
+        "app": "_offline",
+        "defect_id": "o-trunc-1",
+        "category": "truncation",
+        "selector": "#article-1 p",
+        "description": "Container #article-1 p max-width set to 40% of original; overflow:hidden; no ellipsis.",
+        "diff_signature": "Text in #article-1 p clipped at right boundary without ellipsis indicator.",
+        "details": {
+          "method": "max-width-overflow-hidden-no-ellipsis",
+          "width_pct": 0.4,
+          "original_width_px": 530.65625,
+          "new_max_px": 212,
+          "overflow_confirmed": true
+        }
+      }
+    },
+    {
+      "category": "zorder",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/_offline_smoke/zorder_baseline.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/_offline_smoke/zorder_defect.png",
+      "record": {
+        "app": "_offline",
+        "defect_id": "o-zorder-1",
+        "category": "zorder",
+        "selector": ".navbar ↔ .banner",
+        "description": "Z-index swapped between .navbar and .banner.",
+        "diff_signature": "Element .navbar now appears in front/behind .banner relative to baseline.",
+        "details": {
+          "method": "computed-zindex-swap",
+          "selector_a": ".navbar",
+          "selector_b": ".banner",
+          "before": {
+            "a": "10",
+            "b": "5"
+          },
+          "after": {
+            "a": "5",
+            "b": "10"
+          }
+        }
+      }
+    },
+    {
+      "category": "contrast",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/_offline_smoke/contrast_baseline.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/_offline_smoke/contrast_defect.png",
+      "record": {
+        "app": "_offline",
+        "defect_id": "o-contrast-1",
+        "category": "contrast",
+        "selector": "#footnote",
+        "description": "Text color of #footnote lightened until WCAG contrast ratio dropped from 2.56 to 1.98.",
+        "diff_signature": "Computed contrast ratio of #footnote below WCAG AA 4.5:1 (now 1.98).",
+        "details": {
+          "method": "linear-rgb-walk-toward-bg",
+          "target_ratio": 2,
+          "before_ratio": 2.5640413904962034,
+          "after_ratio": 1.9843654471868373,
+          "before_text_color": "rgb(148, 163, 184)",
+          "after_text_color": "rgb(174, 185, 201)",
+          "background_color": "rgb(255, 255, 255)"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "visual-oracle-bench",
+  "version": "0.2.0-w2",
+  "private": true,
+  "type": "module",
+  "description": "Multi-app empirical benchmark for LLM-as-judge visual regression detection. Article 3 infra.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.11.1"
+  },
+  "scripts": {
+    "smoke:conduit": "tsx tests/smoke_conduit_pipeline.ts",
+    "test:primitives": "tsx tests/test_primitives_unit.ts",
+    "install:browsers": "playwright install chromium"
+  },
+  "dependencies": {
+    "playwright": "1.58.0",
+    "yaml": "2.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.30",
+    "tsx": "4.19.2",
+    "typescript": "5.6.3"
+  }
+}

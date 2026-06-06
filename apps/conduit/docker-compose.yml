@@ -1,0 +1,49 @@
+# apps/conduit/docker-compose.yml
+#
+# Brings up a Conduit instance for screenshot capture:
+#   - backend   : Express + Prisma + SQLite on :3000 (API at /api/*)
+#   - frontend  : Angular SPA on :4100, proxying /api to backend
+#
+# Upstream commit pins (immutable):
+#   backend  = gothinkster/node-express-realworld-example-app @ 30b68e1
+#   frontend = gothinkster/angular-realworld-example-app      @ dd99ed2
+#
+# Usage:
+#   docker compose -f apps/conduit/docker-compose.yml up --build -d
+#   ./apps/conduit/seed.sh
+#   <run tests/smoke_conduit_pipeline.ts>
+#   docker compose -f apps/conduit/docker-compose.yml down -v
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: voracle/conduit-backend:pinned
+    container_name: voracle-conduit-backend
+    ports:
+      - "3000:3000"
+    environment:
+      JWT_SECRET: "voracle-bench-non-secret-dev-key"
+      NODE_ENV: production
+      DATABASE_URL: "file:/data/conduit.db"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/tags"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: voracle/conduit-frontend:pinned
+    container_name: voracle-conduit-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "4100:80"
+    environment:
+      BACKEND_URL: "http://backend:3000/api"

@@ -39,7 +39,7 @@ A prior single-application study (Malhotra 2026, *An Agent Harness for Test Auto
 
 ### 4.2 Defect catalog
 
-- **6 defect categories** (operationalized as injection primitives — see `injection/primitives.py`):
+- **6 defect categories** (operationalized as injection primitives — see `injection/primitives.ts`):
   - `layout` — element bounding box shift ≥8 px on any axis
   - `color` — foreground or background hue shift ≥15° in HSL
   - `missing` — visible interactive element removed from DOM
@@ -144,10 +144,38 @@ Four models exercised under the LLM-as-judge oracle. Model versions pinned in th
 ## 10. What this pre-registration does NOT lock
 
 - The exact thresholds for pixel SSIM and pHash dHash (these are calibrated empirically and the calibration procedure is pre-specified, but the threshold values themselves are not pre-stated).
-- The 80-pair subsample identifiers (stratified random sample drawn after image capture; seed pre-specified).
+- The 80-pair subsample identifiers (stratified random sample drawn after image capture; seed pre-specified below).
 - The two colleague raters' identities (will be acknowledged in manuscript after their consent).
 - Manuscript prose itself (per author's separate authorial-integrity commitment).
 
+## 11. Pre-specified random seeds and operational parameters
+
+- **Calibration set draw seed:** `numpy.random.seed(20260619)` for the 80-pair held-out SSIM/pHash threshold-calibration sample, drawn stratified by app (10 per app).
+- **Primary-sample viewport assignment seed:** `numpy.random.seed(20260620)` for the desktop-vs-mobile viewport selection per pair (one viewport used for primary analysis, the other reserved for sensitivity).
+- **Bootstrap CI seed:** `numpy.random.seed(20260621)`, 1000 BCa resamples per κ estimate.
+- **Image-pair presentation order for human coding:** Fisher-Yates shuffle with seed `20260622`, applied independently per coder to break any defect-injection-order regularity that could leak ground-truth.
+- **Re-run subsample for provider-stability check:** `numpy.random.seed(20260623)`, 100 pairs drawn stratified by app + category, executed at T+30 days after first run.
+- **Stratification axes for all random draws:** application × defect-category. No further axes (e.g., framework) used as strata.
+- **Statistical software pin:** R 4.4.x (latest patch at run time); `lme4` 1.1-x; Python 3.11.x; `numpy` 1.26.x; `scikit-image` 0.24.x for SSIM. Versions frozen at the W7 first-analysis run and reported in manuscript.
+
+## 12. Lock status (as of 2026-06-06, W2 in progress)
+
+This pre-registration is submission-ready pending three items that require firm-lawyer or co-author sign-off before OSF submission on **2026-06-19**:
+
+**Locked and submission-ready:**
+- §1 Background, §2 RQs, §3 Hypotheses (H1–H4 directional, magnitudes specified).
+- §4.2 Defect catalog (6 categories, 50/app split 8/8/8/8/9/9, dual viewport).
+- §4.4 LLM judge list (4 models; specific version pins as listed).
+- §4.5 Total judgment volume (~11,200).
+- §5.1 Primary analyses, §5.2 sensitivity analyses, §5.3 exploratory analyses.
+- §6 Exclusion rules (3 rules, all pre-specified with thresholds).
+- §11 Random seeds (all 5 seeds pre-stated).
+
+**Flagged for explicit OSF-submission decision (review before 2026-06-19):**
+- (A) Gemini 2.5 Pro exact version pin (§4.4) — will be available only at first-judgment run in W7; OSF entry should commit to "version-at-run-time" with mandatory reporting in manuscript.
+- (B) Inter-rater κ target threshold for declaring an inter-coder failure (currently implicit: §4.6 says "Fleiss' κ reported"; should we pre-register a floor below which we declare the coding scheme unreliable and re-run calibration? Proposed: Fleiss' κ ≥ 0.60 across 3 coders on the 80-pair subsample, or expand to 4th coder).
+- (C) Substitution-rule extension: if BOTH Penpot AND NocoDB drop, can we proceed with 6 apps, or do we add Vue Storefront as a backup? Proposed: pre-register Vue Storefront as backup #3 with the same diversity profile (Vue, e-commerce).
+
 ---
 
-**Next action:** finalize this draft into OSF's structured pre-registration form (uses the OSF SE/Empirical SE template). Submit Fri 2026-06-19.
+**Next action:** finalize this draft into OSF's structured pre-registration form (uses the OSF SE/Empirical SE template). Resolve (A)/(B)/(C) above, then submit Fri 2026-06-19.

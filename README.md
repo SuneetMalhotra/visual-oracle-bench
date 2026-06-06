@@ -10,9 +10,11 @@ This benchmark is the external-validity follow-up to the single-application κ =
 
 ## Status
 
-- **2026-06-06:** Repository created. W1 of 16 in progress.
-- **OSF pre-registration:** [draft](preregistration/draft.md); target OSF submission **2026-06-19** (W2 milestone, before any LLM judgments are collected).
-- **v1.0.0 release with full data and code:** target **2026-09-27** (W16, before EMSE submission).
+- **2026-06-06 (W2 in progress).** W1 complete: repo skeleton, OSF draft, manuscript skeleton, ported source assets, MIT + CC-BY-4.0 license split. W2 deliverables in this commit: 6 injection primitives implemented and unit-tested (6/6 passing), Conduit Docker stack pinned to upstream commit SHAs, 50 defect injection points enumerated, end-to-end smoke pipeline producing 12 baseline-vs-defect PNGs.
+- **What works end-to-end today.** `injection/primitives.ts` + `tests/test_primitives_unit.ts` (6/6 pass) + `tests/smoke_offline_pipeline.ts` (12 PNGs proving baseline vs. defect deltas are visible).
+- **What is built but not yet executed.** `apps/conduit/{Dockerfile, Dockerfile.frontend, docker-compose.yml, seed.sh}` and `tests/smoke_conduit_pipeline.ts` — blocked on a machine with Docker installed (the W2 dev machine has none). Build+run sequence documented in `apps/conduit/RUNBOOK.md`.
+- **OSF pre-registration:** [draft](preregistration/draft.md) is submission-ready pending 3 flagged items (§12 of the draft); target OSF submission **2026-06-19** (W2 hard milestone).
+- **v1.0.0 release with full data and code:** target **2026-09-27** (W16, before EMSE submission 2026-09-30).
 
 ## Design (locked at OSF pre-registration)
 
@@ -30,16 +32,47 @@ visual-oracle-bench/
 ├── README.md                         # this file
 ├── LICENSE                           # MIT (code)
 ├── LICENSE-DATA                      # CC-BY 4.0 (data/images, judgments, ground truth)
-├── preregistration/                  # OSF pre-registration documents
-├── apps/                             # 8 app subdirs: Dockerfile, seed scripts, injection points
-├── injection/                        # 6 defect-category mutation primitives
-├── capture/                          # Playwright screenshot capture, dual viewport
-├── oracles/                          # pixel diff, perceptual hash, LLM-as-judge harness
-├── analysis/                         # Cohen's κ, mixed-effects regression, sensitivity
-├── data/                             # judgments, ground truth (images → Zenodo at submission)
-├── figures/                          # generated PDFs from analysis notebooks
-├── tests/                            # pytest for injection + oracle code
-└── scripts/                          # run_all.sh, reproduce.sh
+├── package.json + tsconfig.json      # TypeScript / Playwright toolchain
+├── preregistration/draft.md          # OSF pre-registration draft (lock status in §12)
+├── manuscript/skeleton.md            # section-level outline for W13-W14 author prose
+├── apps/                             # 8 app subdirs (Conduit reference, W2)
+│   ├── README.md
+│   └── conduit/                      # Dockerfile, docker-compose.yml, seed.sh, injection-points.yaml, RUNBOOK.md
+├── injection/                        # 6 defect-category mutation primitives (W2: implemented)
+│   ├── primitives.ts                 # shift_element, mutate_color, remove_element,
+│   │                                 # shrink_container, swap_zindex, reduce_contrast
+│   └── source-seedings-todomvc.ts    # ported antecedent reference catalog
+├── capture/source-render-todomvc.ts  # ported antecedent renderer (template for app captures)
+├── oracles/                          # W7-W8: pixel diff + pHash + LLM-as-judge harness
+├── analysis/source-analysis-kappa.py # ported Cohen's κ + mixed-effects scaffolding
+├── data/images/                      # W6-W7 corpus output; _offline_smoke/ holds W2 demo PNGs
+├── figures/                          # generated PDFs (W10-W12)
+├── tests/
+│   ├── test_primitives_unit.ts       # unit-tests the 6 primitives against synthetic DOM
+│   ├── smoke_offline_pipeline.ts     # offline 12-PNG end-to-end proof (no docker)
+│   └── smoke_conduit_pipeline.ts     # real-Conduit 12-PNG end-to-end (requires docker)
+└── scripts/                          # W16: run_all.sh, reproduce.sh
+```
+
+## Quickstart (W2 — what runs today)
+
+```bash
+# 1. Install deps (Node >= 20.11.1)
+npm install
+npx playwright install chromium
+
+# 2. Run primitive unit tests (no docker required) -- expect 6/6 pass
+npx tsx tests/test_primitives_unit.ts
+
+# 3. Run the offline pipeline smoke test (no docker required)
+#    Produces 12 baseline-vs-defect PNGs in data/images/_offline_smoke/
+npx tsx tests/smoke_offline_pipeline.ts
+
+# 4. (Requires docker) Bring up Conduit and run the real-app smoke test
+docker compose -f apps/conduit/docker-compose.yml up --build -d
+./apps/conduit/seed.sh
+npx tsx tests/smoke_conduit_pipeline.ts        # -> data/images/conduit/
+docker compose -f apps/conduit/docker-compose.yml down -v
 ```
 
 ## Reproducibility commitments

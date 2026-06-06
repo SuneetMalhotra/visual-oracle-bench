@@ -9,9 +9,9 @@
 | Excalidraw | Canvas/design | W3 | **files complete; docker build pending; canvas-content injection uses positional-overlay compromise (32/50 chrome, 18/50 canvas overlays) — see RUNBOOK.md #3** |
 | GitLab CE | Code host | W4 | **files complete; docker build pending** |
 | Rocket.Chat | Chat/collab | W4 | **files complete; docker build pending** |
-| Penpot | Canvas/design | W5 | not started |
-| Cal.com | Scheduling | W5 | not started |
-| NocoDB | Database UI | W5 | not started |
+| Penpot | Canvas/design | W5 | **files complete; docker build pending; SVG canvas-content injection uses positional-overlay compromise (28/50 chrome, 22/50 canvas overlays) — see RUNBOOK.md #3** |
+| Cal.com | Scheduling | W5 | **files complete; docker build pending; selectors inferred from v4.9.0 source pin, post-build verification required; image-digest is verify-on-pull placeholder (see RUNBOOK.md #1) with documented build-from-source fallback** |
+| NocoDB | Database UI | W5 | **files complete; docker build pending; selectors inferred from v0.262 source pin, post-build verification required; grid view has reactive-rendering drift mitigated by 2-frame-stability wait (see RUNBOOK.md #3)** |
 
 ## Per-app onboarding checklist (2-day budget)
 

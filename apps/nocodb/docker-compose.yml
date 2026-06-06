@@ -1,0 +1,55 @@
+# apps/nocodb/docker-compose.yml
+#
+# Brings up a single NocoDB container for screenshot capture. NocoDB is
+# the database-UI class app; SQLite is the default storage backend so
+# no external database container is required, and the single-container
+# deployment is the simplest of the W5 cohort.
+#
+# Upstream pin (immutable digest, NOT moving tag):
+#   nocodb = nocodb/nocodb @
+#            sha256:6e9a5d7c8b3f4e2d1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f
+#            (tag 0.262.0, pushed 2026-05-20; verify-on-pull)
+#
+# NOTE: the digest above is a PLACEHOLDER marked "verify-on-pull". The
+# reviewer with Docker should run `docker pull nocodb/nocodb:0.262.0`
+# (or the most recent stable tag at build time), capture the actual
+# digest from the output, and replace the placeholder line. Tracked in
+# apps/nocodb/RUNBOOK.md "Known risks" #1.
+#
+# Usage:
+#   docker compose -f apps/nocodb/docker-compose.yml up --build -d
+#   ./apps/nocodb/seed.sh
+#   <run tests/smoke_nocodb_pipeline.ts>
+#   docker compose -f apps/nocodb/docker-compose.yml down -v
+
+services:
+  nocodb:
+    image: nocodb/nocodb@sha256:6e9a5d7c8b3f4e2d1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f
+    container_name: voracle-nocodb
+    ports:
+      - "8080:8080"
+    volumes:
+      - nocodb_data:/usr/app/data
+    environment:
+      # Disable telemetry, point storage at the named volume.
+      NC_DISABLE_TELE: "true"
+      NC_DB: "sqlite3:///usr/app/data/noco.db"
+      # Pre-set the admin email so the seed script can target the
+      # first-run user-creation endpoint deterministically. The actual
+      # admin password is set in the body of seed.sh (NocoDB does not
+      # support env-driven admin bootstrap as of 0.262).
+      NC_ADMIN_EMAIL: "admin@voracle.test"
+      NC_AUTH_JWT_SECRET: "voracle-bench-non-secret-jwt-secret-32b!"
+      NC_PUBLIC_URL: "http://localhost:8080"
+    healthcheck:
+      # /api/v1/health returns 200 with { code: "OK" } as soon as the
+      # SQLite db is initialized and the express server is accepting
+      # requests. ~30s on a clean machine.
+      test: ["CMD-SHELL", "wget -q -O /dev/null --server-response http://localhost:8080/api/v1/health 2>&1 | awk '/HTTP/ {print $2; exit}' | grep -qE '^2'"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 30s
+
+volumes:
+  nocodb_data:

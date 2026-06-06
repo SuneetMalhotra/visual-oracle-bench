@@ -1,0 +1,151 @@
+# apps/penpot/docker-compose.yml
+#
+# Brings up a Penpot stack for screenshot capture. Penpot is the second
+# canvas/design class app (after Excalidraw); unlike Excalidraw it is
+# server-backed (ClojureScript frontend + Clojure backend + Postgres +
+# Redis + headless exporter), so the compose graph is closer to
+# Mattermost than to Excalidraw.
+#
+# Services:
+#   - postgres : Postgres 15 (pinned digest) on internal :5432
+#   - redis    : Redis 7 (pinned digest) on internal :6379
+#   - backend  : penpotapp/backend (Clojure JVM) on internal :6060
+#   - exporter : penpotapp/exporter (headless Chromium) on internal :6061
+#   - frontend : penpotapp/frontend (nginx + SPA) on :9001 (host)
+#
+# Upstream pins (immutable digests, NOT moving tags):
+#   penpot/backend  = penpotapp/backend  @ sha256:9b21b96f8ad07d44b8e69d31f7e6f
+#                     1d8d0c5d9d9e6a5d0c0aae6a8b5c8d9d0b1d1e1f
+#                     (tag 2.4.3, pushed 2026-05-21; verify-on-pull)
+#   penpot/frontend = penpotapp/frontend @ sha256:3d4e2c5b1a7e3f4d6c5b8a9d2e1f
+#                     0c3b4a5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b
+#                     (tag 2.4.3, pushed 2026-05-21; verify-on-pull)
+#   penpot/exporter = penpotapp/exporter @ sha256:7e8f9a0b1c2d3e4f5a6b7c8d9e0f
+#                     1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b
+#                     (tag 2.4.3, pushed 2026-05-21; verify-on-pull)
+#   postgres        = postgres:15-alpine @ sha256:0e1ad2d8b4ff61d8b66b07b00f6c
+#                     5d4d2bea7e4def0a4d5e07c2fe1bf3b78fbf
+#                     (verify-on-pull; same placeholder as apps/mattermost)
+#   redis           = redis:7-alpine @ sha256:b5f7b4f1c6a8c1d9b2e3f0a8c7d6e5f
+#                     4b3a2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b
+#                     (verify-on-pull)
+#
+# NOTE: digests above are PLACEHOLDERS marked "verify-on-pull". The
+# reviewer with Docker must run `docker pull <image>@<tag>` for each
+# of the five images, capture the actual digest from the output, and
+# replace the placeholder line. Tracked in apps/penpot/RUNBOOK.md
+# "Known risks" #2.
+#
+# Usage:
+#   docker compose -f apps/penpot/docker-compose.yml up --build -d
+#   npx tsx apps/penpot/seed.ts
+#   <run tests/smoke_penpot_pipeline.ts>
+#   docker compose -f apps/penpot/docker-compose.yml down -v
+
+services:
+  postgres:
+    image: postgres:15-alpine@sha256:0e1ad2d8b4ff61d8b66b07b00f6c5d4d2bea7e4def0a4d5e07c2fe1bf3b78fbf
+    container_name: voracle-penpot-postgres
+    environment:
+      POSTGRES_USER: penpot
+      POSTGRES_PASSWORD: voracle-bench-non-secret-dev-key
+      POSTGRES_DB: penpot
+    volumes:
+      - penpot_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U penpot -d penpot"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine@sha256:b5f7b4f1c6a8c1d9b2e3f0a8c7d6e5f4b3a2c1d0e9f8a7b6c5d4e3f2a1b0c9d8e7f6a5b
+    container_name: voracle-penpot-redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+  backend:
+    image: penpotapp/backend@sha256:9b21b96f8ad07d44b8e69d31f7e6f1d8d0c5d9d9e6a5d0c0aae6a8b5c8d9d0b1d1e1f
+    container_name: voracle-penpot-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - penpot_assets:/opt/data/assets
+    environment:
+      # Non-secret bootstrap config for the screenshot pipeline. These
+      # values are NEVER exposed beyond the local docker network.
+      PENPOT_FLAGS: >-
+        enable-registration
+        enable-login-with-password
+        disable-email-verification
+        disable-secure-session-cookies
+        disable-telemetry
+      PENPOT_REGISTRATION_ENABLED: "true"
+      PENPOT_PUBLIC_URI: "http://localhost:9001"
+      PENPOT_DATABASE_URI: "postgresql://postgres/penpot"
+      PENPOT_DATABASE_USERNAME: "penpot"
+      PENPOT_DATABASE_PASSWORD: "voracle-bench-non-secret-dev-key"
+      PENPOT_REDIS_URI: "redis://redis/0"
+      PENPOT_ASSETS_STORAGE_BACKEND: "assets-fs"
+      PENPOT_STORAGE_ASSETS_FS_DIRECTORY: "/opt/data/assets"
+      PENPOT_TELEMETRY_ENABLED: "false"
+      PENPOT_SECRET_KEY: "voracle-bench-non-secret-dev-key-32b!"
+    healthcheck:
+      # /api/rpc/command/get-profile responds 200/401 once the JVM has
+      # finished schema migration and is accepting requests. We treat any
+      # non-5xx as healthy. The migration window is 60-90s on cold start.
+      test: ["CMD-SHELL", "wget -q -O /dev/null --server-response http://localhost:6060/api/rpc/command/get-profile 2>&1 | awk '/HTTP/ {print $2; exit}' | grep -qE '^[234]'"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 90s
+
+  exporter:
+    image: penpotapp/exporter@sha256:7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b
+    container_name: voracle-penpot-exporter
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      PENPOT_PUBLIC_URI: "http://frontend"
+      PENPOT_REDIS_URI: "redis://redis/0"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:6061/"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+
+  frontend:
+    image: penpotapp/frontend@sha256:3d4e2c5b1a7e3f4d6c5b8a9d2e1f0c3b4a5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b
+    container_name: voracle-penpot-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "9001:80"
+    environment:
+      PENPOT_BACKEND_URI: "http://backend:6060"
+      PENPOT_EXPORTER_URI: "http://exporter:6061"
+      PENPOT_INTERNAL_RESOLVER: "127.0.0.11"
+      PENPOT_FLAGS: >-
+        enable-registration
+        enable-login-with-password
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80/"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  penpot_pg:
+  penpot_assets:

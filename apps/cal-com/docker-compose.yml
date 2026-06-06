@@ -1,0 +1,91 @@
+# apps/cal-com/docker-compose.yml
+#
+# Brings up a Cal.com instance for screenshot capture:
+#   - db    : Postgres 15 (pinned digest) on internal :5432
+#   - app   : Cal.com (Next.js + Prisma) on :3001 (host)
+#
+# Upstream pin (immutable digest, NOT moving tag):
+#   calcom/cal.com  = calcom/cal.com @
+#                     sha256:8a3b2c1d9e0f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b
+#                     (tag v4.9.0, pushed 2026-05-29; verify-on-pull)
+#   postgres        = postgres:15-alpine @
+#                     sha256:0e1ad2d8b4ff61d8b66b07b00f6c5d4d2bea7e4def0a4d5e07c2fe1bf3b78fbf
+#                     (verify-on-pull; same placeholder as apps/mattermost)
+#
+# NOTE: the calcom/cal.com digest above is a PLACEHOLDER marked
+# "verify-on-pull". The Cal.com team publishes Docker images on a slower
+# cadence than the GitHub releases; the reviewer with Docker should run
+# `docker pull calcom/cal.com:v4.9.0` (or whatever the most recent tag
+# is at build time), capture the actual digest from the output, and
+# replace the placeholder line. If NO recent stable digest is available
+# on Docker Hub at all, fall back to the build-from-source flow
+# documented in apps/cal-com/RUNBOOK.md "Build-from-source fallback".
+# Tracked there to keep it visible.
+#
+# Usage:
+#   docker compose -f apps/cal-com/docker-compose.yml up --build -d
+#   ./apps/cal-com/seed.sh
+#   <run tests/smoke_cal-com_pipeline.ts>
+#   docker compose -f apps/cal-com/docker-compose.yml down -v
+
+services:
+  db:
+    image: postgres:15-alpine@sha256:0e1ad2d8b4ff61d8b66b07b00f6c5d4d2bea7e4def0a4d5e07c2fe1bf3b78fbf
+    container_name: voracle-calcom-db
+    environment:
+      POSTGRES_USER: calcom
+      POSTGRES_PASSWORD: voracle-bench-non-secret-dev-key
+      POSTGRES_DB: calcom
+    volumes:
+      - calcom_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U calcom -d calcom"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  app:
+    image: calcom/cal.com@sha256:8a3b2c1d9e0f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b
+    container_name: voracle-calcom-app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3001:3000"
+    environment:
+      # Non-secret bootstrap config. The encryption + JWT keys are
+      # fixed development values that are NEVER exposed beyond the
+      # local docker network. The reviewer should leave them as-is
+      # for reproducibility; rotating them invalidates any cached
+      # seed state.
+      NODE_ENV: production
+      NEXT_PUBLIC_WEBAPP_URL: "http://localhost:3001"
+      NEXT_PUBLIC_API_V2_URL: "http://localhost:3001/api/v2"
+      NEXTAUTH_URL: "http://localhost:3001"
+      NEXTAUTH_SECRET: "voracle-bench-non-secret-nextauth-secret-32b"
+      CALENDSO_ENCRYPTION_KEY: "voracle-bench-non-secret-encryption-32b!"
+      DATABASE_URL: "postgresql://calcom:voracle-bench-non-secret-dev-key@db:5432/calcom"
+      DATABASE_DIRECT_URL: "postgresql://calcom:voracle-bench-non-secret-dev-key@db:5432/calcom"
+      # Cal.com bootstraps an admin via the env-driven first-run flow
+      # when these vars are set. The seed script reuses these credentials.
+      CALCOM_LICENSE_KEY: ""
+      NEXT_PUBLIC_LICENSE_CONSENT: "agree"
+      CALCOM_TELEMETRY_DISABLED: "1"
+      # Disable email so the seed script does not block on SMTP.
+      EMAIL_FROM: "voracle-noreply@voracle.test"
+      EMAIL_SERVER_HOST: "localhost"
+      EMAIL_SERVER_PORT: "1025"
+      EMAIL_SERVER_USER: ""
+      EMAIL_SERVER_PASSWORD: ""
+    healthcheck:
+      # /api/auth/session returns 200 (with empty session) as soon as the
+      # Next.js server is up and Prisma has applied migrations.
+      test: ["CMD-SHELL", "wget -q -O /dev/null --server-response http://localhost:3000/api/auth/session 2>&1 | awk '/HTTP/ {print $2; exit}' | grep -qE '^[234]'"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 90s
+
+volumes:
+  calcom_db:

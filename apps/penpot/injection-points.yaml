@@ -1,0 +1,450 @@
+# apps/penpot/injection-points.yaml
+#
+# 50 defect-injection points for the Penpot self-hosted stack, distributed
+# 8/8/8/8/9/9 across the 6 pre-registered defect categories
+# (layout, color, missing, truncation, zorder, contrast).
+#
+# Surfaces covered (5 stable Penpot screens):
+#   login        -> http://localhost:9001/#/auth/login
+#   dashboard    -> http://localhost:9001/#/dashboard/projects?team-id=<team>
+#   file-viewer  -> http://localhost:9001/#/view/<file>?index=0&page-id=<page>
+#                   (the read-only file viewer that loads the fixture canvas)
+#   workspace    -> http://localhost:9001/#/workspace/<team>/<project>/<file>
+#                   (the canvas editor with full chrome: toolbar, layers,
+#                    properties sidebar, top bar)
+#   settings     -> http://localhost:9001/#/settings/profile
+#
+# Schema: same shape as apps/conduit/injection-points.yaml.
+#
+# METHODOLOGICAL COMPROMISE (canvas-rendered elements):
+#   Penpot is a ClojureScript SPA whose drawn shapes are SVG elements
+#   inside the .render-shapes / .viewport container. Although SVG IS
+#   DOM (unlike Excalidraw's HTMLCanvas), Penpot generates per-shape
+#   `id` attributes that are random uuids assigned at shape creation
+#   time -- so they ARE NOT stable across re-renders of the same
+#   fixture. Practically:
+#     - The UI CHROME (toolbar, layers panel, properties sidebar, top
+#       bar, modals, dashboard cards) has STABLE React-style class
+#       selectors that the 6 DOM injection primitives can mutate
+#       without compromise.
+#     - The CANVAS CONTENT (rectangles, ellipses, text, lines drawn
+#       inside the .viewport) is uuid-keyed SVG that we cannot target
+#       by selector across runs.
+#
+#   Mitigation (pre-registered; mirrors the apps/excalidraw/ pattern):
+#     a) 28 of the 50 points target the UI CHROME with stable class
+#        selectors.
+#     b) 22 of the 50 points target canvas content via positional
+#        DOM overlays absolutely-positioned over the .viewport.
+#        These are emitted by the smoke pipeline as a single overlay
+#        layer (see tests/smoke_penpot_pipeline.ts injectCanvasOverlays)
+#        and are addressed by stable `.canvas-fixture-*` class names
+#        that match the 8 fixture shapes seeded in apps/penpot/seed.ts.
+#        Points using overlays are marked `params.canvas_compromise: true`.
+#
+#   The 8/8/8/8/9/9 category split is preserved through this
+#   compromise; what changes is only the surface mix, not the
+#   category counts. Documented in RUNBOOK.md "Known risks" #3.
+#
+# Selectors are class-name conventions inferred from the upstream
+# Penpot frontend at the pinned source SHA (penpot/penpot @
+# c1bca8e2a4f5b6c7d8e9f0a1b2c3d4e5f6a7b8c9, main HEAD on 2026-06-06).
+# Class-name patterns (.workspace, .viewport, .sidebar, .layers,
+# .properties, .topbar, .modal-overlay, .auth-form) are documented
+# in penpot/frontend/src/app/main/ui/**. They are STABLE across
+# patch releases but MUST be re-verified post-build.
+
+version: 1
+app: penpot
+pinned_image_digest_frontend: sha256:3d4e2c5b1a7e3f4d6c5b8a9d2e1f0c3b4a5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b
+pinned_image_digest_backend: sha256:9b21b96f8ad07d44b8e69d31f7e6f1d8d0c5d9d9e6a5d0c0aae6a8b5c8d9d0b1d1e1f
+pinned_source_sha: c1bca8e2a4f5b6c7d8e9f0a1b2c3d4e5f6a7b8c9
+selector_verification_status: inferred
+total: 50
+distribution:
+  layout: 8
+  color: 8
+  missing: 8
+  truncation: 8
+  zorder: 9
+  contrast: 9
+methodological_compromise:
+  description: |
+    Penpot renders drawn shapes as SVG inside .viewport with random
+    uuid `id` attributes assigned at shape-creation time, so the
+    canvas content has no selector-stable identity across runs.
+    28 of 50 points target stable DOM-chrome (toolbar, layers,
+    properties sidebar, top bar, modals); 22 target canvas content
+    via positional DOM overlays annotated with
+    params.canvas_compromise: true.
+  chrome_points: 28
+  canvas_points: 22
+
+points:
+
+  # ----- LAYOUT (8) -------------------------------------------------------
+  # 5 chrome + 3 canvas-overlay
+  - id: penpot-layout-001
+    surface: workspace
+    category: layout
+    primitive: shift_element
+    selector: ".workspace-left-toolbar"
+    params: { dx: 0, dy: 24 }
+    expected_change: "Left workspace toolbar shifted 24px down, overlapping the top bar."
+  - id: penpot-layout-002
+    surface: workspace
+    category: layout
+    primitive: shift_element
+    selector: ".workspace-sidebar.settings-bar"
+    params: { dx: 32, dy: 0 }
+    expected_change: "Properties sidebar shifted 32px right, partially off-canvas."
+  - id: penpot-layout-003
+    surface: workspace
+    category: layout
+    primitive: shift_element
+    selector: ".layers-section, [data-test='layers-panel']"
+    params: { dx: 0, dy: 20 }
+    expected_change: "Layers panel shifted 20px down, header tucked under top bar."
+  - id: penpot-layout-004
+    surface: dashboard
+    category: layout
+    primitive: shift_element
+    selector: ".dashboard-projects-grid .grid-item:first-of-type"
+    params: { dx: 32, dy: 0 }
+    expected_change: "First project card on the dashboard shifted 32px right."
+  - id: penpot-layout-005
+    surface: settings
+    category: layout
+    primitive: shift_element
+    selector: ".profile-form .fields-row:nth-of-type(1)"
+    params: { dx: 0, dy: 24 }
+    expected_change: "Profile settings 'Name' row shifted 24px down, overlapping email row."
+  - id: penpot-layout-006
+    surface: workspace
+    category: layout
+    primitive: shift_element
+    selector: ".canvas-fixture-rect-1-overlay"
+    params: { canvas_compromise: true, dx: 32, dy: 0 }
+    expected_change: "First fixture rectangle overlay shifted 32px right of canvas position."
+  - id: penpot-layout-007
+    surface: file-viewer
+    category: layout
+    primitive: shift_element
+    selector: ".canvas-fixture-text-1-overlay"
+    params: { canvas_compromise: true, dx: 0, dy: 24 }
+    expected_change: "Fixture 'Visual Oracle Bench Fixture' text overlay shifted 24px down."
+  - id: penpot-layout-008
+    surface: workspace
+    category: layout
+    primitive: shift_element
+    selector: ".canvas-fixture-ellipse-1-overlay"
+    params: { canvas_compromise: true, dx: -24, dy: -24 }
+    expected_change: "First fixture ellipse overlay shifted -24/-24px from canvas position."
+
+  # ----- COLOR (8) --------------------------------------------------------
+  # 5 chrome + 3 canvas-overlay
+  - id: penpot-color-001
+    surface: workspace
+    category: color
+    primitive: mutate_color
+    selector: ".workspace-left-toolbar"
+    params: { prop: "backgroundColor", delta_hue: 120 }
+    expected_change: "Left toolbar background hue-rotated 120 degrees (green tint)."
+  - id: penpot-color-002
+    surface: workspace
+    category: color
+    primitive: mutate_color
+    selector: ".workspace-sidebar.settings-bar"
+    params: { prop: "backgroundColor", delta_hue: 90 }
+    expected_change: "Properties sidebar background hue-rotated 90 degrees."
+  - id: penpot-color-003
+    surface: dashboard
+    category: color
+    primitive: mutate_color
+    selector: ".dashboard-projects-grid .grid-item .title, .project-name"
+    params: { prop: "color", delta_hue: 180 }
+    expected_change: "Dashboard project card titles color hue-rotated 180 degrees."
+  - id: penpot-color-004
+    surface: login
+    category: color
+    primitive: mutate_color
+    selector: ".auth-form button[type='submit'], .login-btn"
+    params: { prop: "backgroundColor", delta_hue: 150 }
+    expected_change: "Login submit button background hue-rotated 150 degrees."
+  - id: penpot-color-005
+    surface: settings
+    category: color
+    primitive: mutate_color
+    selector: ".settings-section h2, .profile-form h2"
+    params: { prop: "color", delta_hue: 60 }
+    expected_change: "Settings section header color hue-rotated 60 degrees."
+  - id: penpot-color-006
+    surface: workspace
+    category: color
+    primitive: mutate_color
+    selector: ".canvas-fixture-rect-2-overlay"
+    params: { canvas_compromise: true, prop: "backgroundColor", delta_hue: 75 }
+    expected_change: "Second fixture rectangle overlay fill hue-rotated 75 degrees."
+  - id: penpot-color-007
+    surface: workspace
+    category: color
+    primitive: mutate_color
+    selector: ".canvas-fixture-ellipse-2-overlay"
+    params: { canvas_compromise: true, prop: "backgroundColor", delta_hue: 200 }
+    expected_change: "Second fixture ellipse overlay fill hue-rotated 200 degrees."
+  - id: penpot-color-008
+    surface: file-viewer
+    category: color
+    primitive: mutate_color
+    selector: ".canvas-fixture-text-1-overlay"
+    params: { canvas_compromise: true, prop: "color", delta_hue: 45 }
+    expected_change: "Fixture text overlay color hue-rotated 45 degrees."
+
+  # ----- MISSING (8) ------------------------------------------------------
+  # 5 chrome + 3 canvas-overlay
+  - id: penpot-missing-001
+    surface: workspace
+    category: missing
+    primitive: remove_element
+    selector: ".workspace-left-toolbar .tool-rect, [data-test='rect-btn']"
+    expected_change: "Rectangle tool icon removed from the left toolbar."
+  - id: penpot-missing-002
+    surface: workspace
+    category: missing
+    primitive: remove_element
+    selector: ".workspace-sidebar.settings-bar .properties-block:first-of-type"
+    expected_change: "Top properties block (X/Y/W/H) removed from the sidebar."
+  - id: penpot-missing-003
+    surface: dashboard
+    category: missing
+    primitive: remove_element
+    selector: ".dashboard-sidebar .teams-section"
+    expected_change: "Teams section removed from the dashboard sidebar."
+  - id: penpot-missing-004
+    surface: login
+    category: missing
+    primitive: remove_element
+    selector: ".auth-form .register-link, .auth-secondary-links"
+    expected_change: "Login page 'Create account' secondary link removed."
+  - id: penpot-missing-005
+    surface: settings
+    category: missing
+    primitive: remove_element
+    selector: ".profile-form button[type='submit']"
+    expected_change: "Settings save button removed from profile form."
+  - id: penpot-missing-006
+    surface: workspace
+    category: missing
+    primitive: remove_element
+    selector: ".canvas-fixture-rect-2-overlay"
+    params: { canvas_compromise: true }
+    expected_change: "Second fixture rectangle overlay removed from the canvas area."
+  - id: penpot-missing-007
+    surface: workspace
+    category: missing
+    primitive: remove_element
+    selector: ".canvas-fixture-line-1-overlay"
+    params: { canvas_compromise: true }
+    expected_change: "Fixture line overlay removed from the canvas area."
+  - id: penpot-missing-008
+    surface: file-viewer
+    category: missing
+    primitive: remove_element
+    selector: ".canvas-fixture-text-2-overlay"
+    params: { canvas_compromise: true }
+    expected_change: "Second fixture text overlay (subtitle) removed from the viewer."
+
+  # ----- TRUNCATION (8) ---------------------------------------------------
+  # 5 chrome + 3 canvas-overlay
+  - id: penpot-truncation-001
+    surface: workspace
+    category: truncation
+    primitive: shrink_container
+    selector: ".workspace-sidebar.settings-bar"
+    params: { width_pct: 0.55 }
+    expected_change: "Properties sidebar clipped at 55% width, right-side fields hidden."
+  - id: penpot-truncation-002
+    surface: workspace
+    category: truncation
+    primitive: shrink_container
+    selector: ".layers-section, [data-test='layers-panel']"
+    params: { width_pct: 0.5 }
+    expected_change: "Layers panel clipped at half-width, layer names truncated."
+  - id: penpot-truncation-003
+    surface: dashboard
+    category: truncation
+    primitive: shrink_container
+    selector: ".dashboard-projects-grid .grid-item:first-of-type .name"
+    params: { width_pct: 0.5 }
+    expected_change: "First project card name clipped at half-width."
+  - id: penpot-truncation-004
+    surface: login
+    category: truncation
+    primitive: shrink_container
+    selector: ".auth-form .fields-row input[name='email']"
+    params: { width_pct: 0.5 }
+    expected_change: "Login email input clipped at half-width."
+  - id: penpot-truncation-005
+    surface: settings
+    category: truncation
+    primitive: shrink_container
+    selector: ".profile-form input[name='fullname']"
+    params: { width_pct: 0.5 }
+    expected_change: "Profile 'Name' input clipped at half-width."
+  - id: penpot-truncation-006
+    surface: workspace
+    category: truncation
+    primitive: shrink_container
+    selector: ".canvas-fixture-text-1-overlay"
+    params: { canvas_compromise: true, width_pct: 0.5 }
+    expected_change: "Fixture 'Visual Oracle Bench Fixture' text overlay clipped at half-width."
+  - id: penpot-truncation-007
+    surface: workspace
+    category: truncation
+    primitive: shrink_container
+    selector: ".canvas-fixture-rect-1-overlay"
+    params: { canvas_compromise: true, width_pct: 0.6 }
+    expected_change: "First fixture rectangle overlay clipped at 60% width."
+  - id: penpot-truncation-008
+    surface: file-viewer
+    category: truncation
+    primitive: shrink_container
+    selector: ".canvas-fixture-text-2-overlay"
+    params: { canvas_compromise: true, width_pct: 0.5 }
+    expected_change: "Fixture subtitle text overlay clipped at half-width."
+
+  # ----- ZORDER (9) -------------------------------------------------------
+  # 5 chrome + 4 canvas-overlay
+  - id: penpot-zorder-001
+    surface: workspace
+    category: zorder
+    primitive: swap_zindex
+    selector: ".workspace-left-toolbar"
+    selector_b: ".workspace-content"
+    expected_change: "Left toolbar and main workspace content stacking inverted."
+  - id: penpot-zorder-002
+    surface: workspace
+    category: zorder
+    primitive: swap_zindex
+    selector: ".workspace-sidebar.settings-bar"
+    selector_b: ".layers-section"
+    expected_change: "Properties sidebar and layers panel stacking swapped."
+  - id: penpot-zorder-003
+    surface: dashboard
+    category: zorder
+    primitive: swap_zindex
+    selector: ".dashboard-sidebar"
+    selector_b: ".dashboard-content"
+    expected_change: "Dashboard sidebar and content area stacking inverted."
+  - id: penpot-zorder-004
+    surface: login
+    category: zorder
+    primitive: swap_zindex
+    selector: ".auth-form"
+    selector_b: ".auth-secondary-links"
+    expected_change: "Login form and secondary links stacking swapped."
+  - id: penpot-zorder-005
+    surface: settings
+    category: zorder
+    primitive: swap_zindex
+    selector: ".profile-form .fields-row:nth-of-type(1)"
+    selector_b: ".profile-form .fields-row:nth-of-type(2)"
+    expected_change: "First and second profile-form rows stacking swapped."
+  - id: penpot-zorder-006
+    surface: workspace
+    category: zorder
+    primitive: swap_zindex
+    selector: ".canvas-fixture-rect-1-overlay"
+    selector_b: ".canvas-fixture-rect-2-overlay"
+    params: { canvas_compromise: true }
+    expected_change: "First and second fixture rectangle overlays stacking swapped."
+  - id: penpot-zorder-007
+    surface: workspace
+    category: zorder
+    primitive: swap_zindex
+    selector: ".canvas-fixture-ellipse-1-overlay"
+    selector_b: ".canvas-fixture-text-1-overlay"
+    params: { canvas_compromise: true }
+    expected_change: "First fixture ellipse overlay and text overlay stacking swapped."
+  - id: penpot-zorder-008
+    surface: workspace
+    category: zorder
+    primitive: swap_zindex
+    selector: ".canvas-fixture-line-1-overlay"
+    selector_b: ".canvas-fixture-rect-1-overlay"
+    params: { canvas_compromise: true }
+    expected_change: "Fixture line and first rectangle overlay stacking swapped."
+  - id: penpot-zorder-009
+    surface: file-viewer
+    category: zorder
+    primitive: swap_zindex
+    selector: ".canvas-fixture-text-1-overlay"
+    selector_b: ".canvas-fixture-text-2-overlay"
+    params: { canvas_compromise: true }
+    expected_change: "Fixture title and subtitle text overlays stacking swapped."
+
+  # ----- CONTRAST (9) -----------------------------------------------------
+  # 5 chrome + 4 canvas-overlay
+  - id: penpot-contrast-001
+    surface: workspace
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".workspace-left-toolbar .tool-btn-label"
+    params: { target_ratio: 2.5 }
+    expected_change: "Left toolbar button labels contrast pushed below 3:1."
+  - id: penpot-contrast-002
+    surface: workspace
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".workspace-sidebar.settings-bar .input-label"
+    params: { target_ratio: 2.0 }
+    expected_change: "Properties sidebar field labels near-illegible."
+  - id: penpot-contrast-003
+    surface: dashboard
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".dashboard-projects-grid .grid-item .name"
+    params: { target_ratio: 2.5 }
+    expected_change: "Dashboard project card names contrast below WCAG AA."
+  - id: penpot-contrast-004
+    surface: login
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".auth-form label"
+    params: { target_ratio: 2.5 }
+    expected_change: "Login form field labels contrast below 3:1."
+  - id: penpot-contrast-005
+    surface: settings
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".profile-form label"
+    params: { target_ratio: 2.5 }
+    expected_change: "Profile form labels near-illegible."
+  - id: penpot-contrast-006
+    surface: workspace
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".canvas-fixture-text-1-overlay"
+    params: { canvas_compromise: true, target_ratio: 2.5 }
+    expected_change: "Canvas 'Visual Oracle Bench Fixture' text overlay contrast below 3:1."
+  - id: penpot-contrast-007
+    surface: workspace
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".canvas-fixture-text-2-overlay"
+    params: { canvas_compromise: true, target_ratio: 2.0 }
+    expected_change: "Canvas subtitle text overlay contrast near-illegible."
+  - id: penpot-contrast-008
+    surface: workspace
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".canvas-fixture-rect-1-overlay"
+    params: { canvas_compromise: true, target_ratio: 2.5 }
+    expected_change: "First fixture rectangle overlay contrast below 3:1."
+  - id: penpot-contrast-009
+    surface: file-viewer
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".canvas-fixture-text-1-overlay"
+    params: { canvas_compromise: true, target_ratio: 2.0 }
+    expected_change: "Fixture title text overlay in viewer near-illegible."

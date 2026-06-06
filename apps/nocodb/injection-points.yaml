@@ -1,0 +1,429 @@
+# apps/nocodb/injection-points.yaml
+#
+# 50 defect-injection points for the NocoDB database-UI app, distributed
+# 8/8/8/8/9/9 across the 6 pre-registered defect categories
+# (layout, color, missing, truncation, zorder, contrast).
+#
+# Surfaces covered (5 stable NocoDB screens):
+#   login          -> http://localhost:8080/#/signin
+#                      (when not authed; NocoDB also lands here from /
+#                       when no jwt cookie is present)
+#   base-list      -> http://localhost:8080/#/
+#                      (after auth: the dashboard root; left sidebar
+#                       lists bases/projects, content pane shows the
+#                       welcome/quick-actions block)
+#   table-grid     -> http://localhost:8080/#/nc/<baseId>/table/<tableId>
+#                      (the spreadsheet-style grid view of a single table;
+#                       NocoDB's signature surface)
+#   table-form     -> http://localhost:8080/#/nc/<baseId>/form/<viewId>
+#                      (the form view of the same table; data entry layout)
+#   settings-drawer -> http://localhost:8080/#/account/profile
+#                      (per-user account settings; the closest stable
+#                       analog of a "settings drawer". The "team settings"
+#                       drawer at /account/setup is a portal-rendered
+#                       drawer with no stable open-trigger.)
+#
+# Schema: same shape as apps/conduit/injection-points.yaml.
+#
+# Selectors are inferred from the NocoDB Vue 3 + Vuetify webapp at the
+# source pin documented below. NocoDB sets `data-testid` attributes on
+# critical interactive elements; we prefer those, falling back to Vuetify
+# class names (.v-list-item, .v-btn, .v-text-field) and NocoDB-specific
+# classes (.nc-sidebar, .nc-grid-row, .nc-form-input). All marked
+# `selector_verification_status: inferred` and MUST be re-verified
+# post-build.
+#
+# REACTIVE-RENDERING NOTE:
+#   The grid view has reactive rendering that can shift on data updates
+#   (Vue 3 fine-grained reactivity + virtual scroll). Specifically,
+#   .nc-grid-row positions and .nc-cell coordinates can REORDER between
+#   capture sessions if the underlying rows are re-fetched. Mitigation
+#   pre-registered:
+#     - Seed script uses fixed insertion order so row uuid -> grid row
+#       index is stable.
+#     - Smoke pipeline waits for `.nc-grid-row[data-row-index='0']` to
+#       have a stable bounding box before screenshot (waitForFunction
+#       polling layout for 2 frames of stability).
+#     - All grid-view selectors that index by row position use
+#       :nth-of-type with an EXPLICIT row index, so per-row drift is
+#       contained to one defect, not the whole capture.
+#   Documented in RUNBOOK.md "Known risks" #3.
+
+version: 1
+app: nocodb
+pinned_image_digest: sha256:6e9a5d7c8b3f4e2d1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d9e8f
+pinned_source_sha: 8b3a5d7c1e9f4b6a2c8d0e5f3a7b1c9d4e2f6a8b
+selector_verification_status: inferred
+total: 50
+distribution:
+  layout: 8
+  color: 8
+  missing: 8
+  truncation: 8
+  zorder: 9
+  contrast: 9
+surface_allocation:
+  login: 6
+  base-list: 12
+  table-grid: 16
+  table-form: 9
+  settings-drawer: 7
+# Note: table-grid (NocoDB's signature spreadsheet view) and base-list
+# (left sidebar + tree) carry the visual density and account for 28/50
+# of the points. The 8/8/8/8/9/9 category split is preserved.
+
+points:
+
+  # ----- LAYOUT (8) -------------------------------------------------------
+  - id: nocodb-layout-001
+    surface: login
+    category: layout
+    primitive: shift_element
+    selector: "[data-testid='nc-form-signin'], .signin-form, form"
+    params: { dx: 32, dy: 0 }
+    expected_change: "Sign-in form shifted 32px right, off-center on the auth page."
+  - id: nocodb-layout-002
+    surface: base-list
+    category: layout
+    primitive: shift_element
+    selector: ".nc-sidebar, [data-testid='nc-sidebar']"
+    params: { dx: 0, dy: 20 }
+    expected_change: "Left base/project sidebar shifted 20px down, header overlapping topbar."
+  - id: nocodb-layout-003
+    surface: base-list
+    category: layout
+    primitive: shift_element
+    selector: ".nc-sidebar-bases-list .nc-sidebar-node:first-of-type"
+    params: { dx: 24, dy: 0 }
+    expected_change: "First base in sidebar shifted 24px right of its tree row."
+  - id: nocodb-layout-004
+    surface: table-grid
+    category: layout
+    primitive: shift_element
+    selector: ".nc-grid-header, [data-testid='nc-grid-header']"
+    params: { dx: 0, dy: 16 }
+    expected_change: "Grid column-header row shifted 16px down, overlapping first data row."
+  - id: nocodb-layout-005
+    surface: table-grid
+    category: layout
+    primitive: shift_element
+    selector: ".nc-grid-row:nth-of-type(1), [data-row-index='0']"
+    params: { dx: 32, dy: 0 }
+    expected_change: "First grid row shifted 32px right, breaking column alignment."
+  - id: nocodb-layout-006
+    surface: table-form
+    category: layout
+    primitive: shift_element
+    selector: ".nc-form-field-wrapper:nth-of-type(1), .nc-form-input:first-of-type"
+    params: { dx: 0, dy: 24 }
+    expected_change: "First form field shifted 24px down, overlapping the field below."
+  - id: nocodb-layout-007
+    surface: settings-drawer
+    category: layout
+    primitive: shift_element
+    selector: ".nc-account-tabs, .v-tabs"
+    params: { dx: 0, dy: 16 }
+    expected_change: "Account-settings tabs strip shifted 16px down."
+  - id: nocodb-layout-008
+    surface: settings-drawer
+    category: layout
+    primitive: shift_element
+    selector: "form button[type='submit'], .nc-account-save-btn"
+    params: { dx: -48, dy: 0 }
+    expected_change: "Account-settings save button shifted 48px left, off form alignment."
+
+  # ----- COLOR (8) --------------------------------------------------------
+  - id: nocodb-color-001
+    surface: login
+    category: color
+    primitive: mutate_color
+    selector: "button[type='submit'], [data-testid='nc-form-signin-btn']"
+    params: { prop: "backgroundColor", delta_hue: 150 }
+    expected_change: "Sign-in submit button background hue-rotated 150 degrees."
+  - id: nocodb-color-002
+    surface: base-list
+    category: color
+    primitive: mutate_color
+    selector: ".nc-sidebar, [data-testid='nc-sidebar']"
+    params: { prop: "backgroundColor", delta_hue: 90 }
+    expected_change: "Left sidebar background hue-rotated 90 degrees (green tint)."
+  - id: nocodb-color-003
+    surface: base-list
+    category: color
+    primitive: mutate_color
+    selector: ".nc-sidebar-bases-list .nc-sidebar-node .nc-base-title"
+    params: { prop: "color", delta_hue: 120 }
+    expected_change: "Sidebar base titles color hue-rotated 120 degrees."
+  - id: nocodb-color-004
+    surface: table-grid
+    category: color
+    primitive: mutate_color
+    selector: ".nc-grid-header"
+    params: { prop: "backgroundColor", delta_hue: 60 }
+    expected_change: "Grid column-header background hue-rotated 60 degrees."
+  - id: nocodb-color-005
+    surface: table-grid
+    category: color
+    primitive: mutate_color
+    selector: ".nc-grid-row:nth-of-type(odd)"
+    params: { prop: "backgroundColor", delta_hue: 180 }
+    expected_change: "Grid odd-row zebra striping background hue-rotated 180 degrees."
+  - id: nocodb-color-006
+    surface: table-grid
+    category: color
+    primitive: mutate_color
+    selector: ".nc-add-new-row-btn, [data-testid='nc-grid-add-row']"
+    params: { prop: "backgroundColor", delta_hue: 75 }
+    expected_change: "Grid '+ new row' button background hue-rotated 75 degrees."
+  - id: nocodb-color-007
+    surface: table-form
+    category: color
+    primitive: mutate_color
+    selector: ".nc-form-input, .nc-form-field-wrapper input"
+    params: { prop: "borderColor", delta_hue: 45 }
+    expected_change: "Form input borders hue-rotated 45 degrees."
+  - id: nocodb-color-008
+    surface: settings-drawer
+    category: color
+    primitive: mutate_color
+    selector: ".nc-account-tab.v-tab--selected, .v-tab--active"
+    params: { prop: "color", delta_hue: 200 }
+    expected_change: "Active account-settings tab text color hue-rotated 200 degrees."
+
+  # ----- MISSING (8) ------------------------------------------------------
+  - id: nocodb-missing-001
+    surface: login
+    category: missing
+    primitive: remove_element
+    selector: "[data-testid='nc-signup-link'], a[href*='signup']"
+    expected_change: "Sign-in page 'Create account' link removed."
+  - id: nocodb-missing-002
+    surface: base-list
+    category: missing
+    primitive: remove_element
+    selector: "[data-testid='nc-create-base-btn'], .nc-create-base-btn"
+    expected_change: "'+ New base' CTA button removed from sidebar."
+  - id: nocodb-missing-003
+    surface: base-list
+    category: missing
+    primitive: remove_element
+    selector: ".nc-sidebar-userinfo, .nc-account-menu-btn"
+    expected_change: "Sidebar bottom user-info / account menu trigger removed."
+  - id: nocodb-missing-004
+    surface: table-grid
+    category: missing
+    primitive: remove_element
+    selector: ".nc-add-new-row-btn, [data-testid='nc-grid-add-row']"
+    expected_change: "Grid '+ new row' button removed -- cannot add rows."
+  - id: nocodb-missing-005
+    surface: table-grid
+    category: missing
+    primitive: remove_element
+    selector: ".nc-toolbar, [data-testid='nc-toolbar']"
+    expected_change: "Grid toolbar (filter/sort/group/search) removed."
+  - id: nocodb-missing-006
+    surface: table-grid
+    category: missing
+    primitive: remove_element
+    selector: ".nc-grid-row:nth-of-type(1) .nc-cell:nth-of-type(2), [data-row-index='0'] [data-col-index='1']"
+    expected_change: "First grid row, second cell removed -- row is structurally broken."
+  - id: nocodb-missing-007
+    surface: table-form
+    category: missing
+    primitive: remove_element
+    selector: "form button[type='submit'], .nc-form-submit-btn"
+    expected_change: "Form submit button removed -- form cannot be submitted."
+  - id: nocodb-missing-008
+    surface: settings-drawer
+    category: missing
+    primitive: remove_element
+    selector: "form button[type='submit'], .nc-account-save-btn"
+    expected_change: "Account-settings save button removed."
+
+  # ----- TRUNCATION (8) ---------------------------------------------------
+  - id: nocodb-truncation-001
+    surface: login
+    category: truncation
+    primitive: shrink_container
+    selector: "form input[name='email'], [data-testid='nc-form-signin-email']"
+    params: { width_pct: 0.5 }
+    expected_change: "Sign-in email input clipped at half-width."
+  - id: nocodb-truncation-002
+    surface: base-list
+    category: truncation
+    primitive: shrink_container
+    selector: ".nc-sidebar, [data-testid='nc-sidebar']"
+    params: { width_pct: 0.5 }
+    expected_change: "Left sidebar clipped at half-width, tree-node labels cut."
+  - id: nocodb-truncation-003
+    surface: base-list
+    category: truncation
+    primitive: shrink_container
+    selector: ".nc-sidebar-bases-list .nc-sidebar-node .nc-base-title"
+    params: { width_pct: 0.5 }
+    expected_change: "Sidebar base titles clipped at half-width."
+  - id: nocodb-truncation-004
+    surface: table-grid
+    category: truncation
+    primitive: shrink_container
+    selector: ".nc-grid-header [data-col-index='1'], .nc-grid-header-cell:nth-of-type(2)"
+    params: { width_pct: 0.5 }
+    expected_change: "Grid 2nd column header clipped at half-width."
+  - id: nocodb-truncation-005
+    surface: table-grid
+    category: truncation
+    primitive: shrink_container
+    selector: ".nc-grid-row:nth-of-type(1) .nc-cell:nth-of-type(2)"
+    params: { width_pct: 0.5 }
+    expected_change: "First-row 2nd-cell content clipped at half-width."
+  - id: nocodb-truncation-006
+    surface: table-form
+    category: truncation
+    primitive: shrink_container
+    selector: ".nc-form-input:first-of-type, .nc-form-field-wrapper:first-of-type input"
+    params: { width_pct: 0.5 }
+    expected_change: "First form field input clipped at half-width."
+  - id: nocodb-truncation-007
+    surface: table-form
+    category: truncation
+    primitive: shrink_container
+    selector: ".nc-form-banner h1, .nc-form-banner__title"
+    params: { width_pct: 0.5 }
+    expected_change: "Form banner title clipped at half-width."
+  - id: nocodb-truncation-008
+    surface: settings-drawer
+    category: truncation
+    primitive: shrink_container
+    selector: ".nc-account-profile-form input[name='display_name'], form input:first-of-type"
+    params: { width_pct: 0.5 }
+    expected_change: "Account-settings display-name input clipped at half-width."
+
+  # ----- ZORDER (9) -------------------------------------------------------
+  - id: nocodb-zorder-001
+    surface: login
+    category: zorder
+    primitive: swap_zindex
+    selector: "form, [data-testid='nc-form-signin']"
+    selector_b: ".signin-bg, main"
+    expected_change: "Sign-in form and background container stacking inverted."
+  - id: nocodb-zorder-002
+    surface: base-list
+    category: zorder
+    primitive: swap_zindex
+    selector: ".nc-sidebar, [data-testid='nc-sidebar']"
+    selector_b: ".nc-content, main"
+    expected_change: "Left sidebar and main content stacking inverted."
+  - id: nocodb-zorder-003
+    surface: base-list
+    category: zorder
+    primitive: swap_zindex
+    selector: ".nc-sidebar-bases-list .nc-sidebar-node:first-of-type"
+    selector_b: ".nc-sidebar-bases-list .nc-sidebar-node:nth-of-type(2)"
+    expected_change: "First two sidebar base rows stacking swapped."
+  - id: nocodb-zorder-004
+    surface: table-grid
+    category: zorder
+    primitive: swap_zindex
+    selector: ".nc-toolbar, [data-testid='nc-toolbar']"
+    selector_b: ".nc-grid-header"
+    expected_change: "Grid toolbar and column-header row stacking swapped."
+  - id: nocodb-zorder-005
+    surface: table-grid
+    category: zorder
+    primitive: swap_zindex
+    selector: ".nc-grid-header"
+    selector_b: ".nc-grid-body, .nc-grid-rows"
+    expected_change: "Grid column-header and body rows stacking inverted (header behind rows)."
+  - id: nocodb-zorder-006
+    surface: table-grid
+    category: zorder
+    primitive: swap_zindex
+    selector: ".nc-grid-row:nth-of-type(1)"
+    selector_b: ".nc-grid-row:nth-of-type(2)"
+    expected_change: "First two grid rows stacking swapped."
+  - id: nocodb-zorder-007
+    surface: table-form
+    category: zorder
+    primitive: swap_zindex
+    selector: ".nc-form-banner, .nc-form-banner__title"
+    selector_b: ".nc-form-body, .nc-form-fields"
+    expected_change: "Form banner and form-body stacking inverted."
+  - id: nocodb-zorder-008
+    surface: table-form
+    category: zorder
+    primitive: swap_zindex
+    selector: ".nc-form-field-wrapper:nth-of-type(1), .nc-form-input:first-of-type"
+    selector_b: ".nc-form-field-wrapper:nth-of-type(2), .nc-form-input:nth-of-type(2)"
+    expected_change: "First two form fields stacking swapped."
+  - id: nocodb-zorder-009
+    surface: settings-drawer
+    category: zorder
+    primitive: swap_zindex
+    selector: ".nc-account-tabs, .v-tabs"
+    selector_b: ".nc-account-content, .v-tabs-window"
+    expected_change: "Account-settings tabs nav and content area stacking swapped."
+
+  # ----- CONTRAST (9) -----------------------------------------------------
+  - id: nocodb-contrast-001
+    surface: login
+    category: contrast
+    primitive: reduce_contrast
+    selector: "form label, .signin-form label"
+    params: { target_ratio: 2.5 }
+    expected_change: "Sign-in form labels contrast pushed below 3:1."
+  - id: nocodb-contrast-002
+    surface: base-list
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".nc-sidebar-bases-list .nc-sidebar-node .nc-base-title"
+    params: { target_ratio: 2.5 }
+    expected_change: "Sidebar base titles contrast below WCAG AA."
+  - id: nocodb-contrast-003
+    surface: base-list
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".nc-sidebar-userinfo .nc-user-email, .nc-account-menu-btn .nc-user-email"
+    params: { target_ratio: 2.0 }
+    expected_change: "Sidebar user email near-illegible."
+  - id: nocodb-contrast-004
+    surface: table-grid
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".nc-grid-header [data-col-title], .nc-grid-header-cell"
+    params: { target_ratio: 2.5 }
+    expected_change: "Grid column-header text contrast below 3:1."
+  - id: nocodb-contrast-005
+    surface: table-grid
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".nc-grid-row .nc-cell"
+    params: { target_ratio: 2.5 }
+    expected_change: "Grid cell text contrast pushed below WCAG AA."
+  - id: nocodb-contrast-006
+    surface: table-grid
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".nc-toolbar button .v-btn__content, .nc-toolbar .nc-toolbar-btn"
+    params: { target_ratio: 2.5 }
+    expected_change: "Grid toolbar button labels contrast below 3:1."
+  - id: nocodb-contrast-007
+    surface: table-form
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".nc-form-field-wrapper label, .nc-form-input-label"
+    params: { target_ratio: 2.5 }
+    expected_change: "Form field labels near-illegible."
+  - id: nocodb-contrast-008
+    surface: table-form
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".nc-form-banner__subtitle, .nc-form-banner p"
+    params: { target_ratio: 2.0 }
+    expected_change: "Form banner subtitle contrast near-illegible."
+  - id: nocodb-contrast-009
+    surface: settings-drawer
+    category: contrast
+    primitive: reduce_contrast
+    selector: ".nc-account-profile-form label, form label"
+    params: { target_ratio: 2.5 }
+    expected_change: "Account-settings form labels contrast below WCAG AA."

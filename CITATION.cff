@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+type: software
+title: "Visual Oracle Bench — Multi-Application Empirical Evaluation of LLM-as-Judge Visual Regression Detection"
+abstract: >-
+  Companion software, datasets, and analysis pipeline for the Empirical
+  Software Engineering submission "Beyond TodoMVC: A Multi-Application
+  Empirical Evaluation of LLM-as-Judge Visual Regression Detection Across
+  8 Open-Source Web Applications." Includes the 6-primitive defect-injection
+  library, per-app capture orchestrator across 8 OSS web apps, pixel SSIM
+  and perceptual-hash oracles, and LLM-as-judge wrappers for four vision
+  models (GPT, Claude Sonnet 4.5, Gemini 2.5 Pro, Llama 3.2 Vision) with
+  both API-key and OAuth/subscription access paths.
+authors:
+  - family-names: Malhotra
+    given-names: Suneet
+    orcid: "https://orcid.org/0009-0003-8707-9590"
+    website: "https://suneetmalhotra.com"
+license: MIT
+repository-code: "https://github.com/SuneetMalhotra/visual-oracle-bench"
+url: "https://github.com/SuneetMalhotra/visual-oracle-bench"
+keywords:
+  - software-testing
+  - llm-as-judge
+  - visual-regression
+  - empirical-software-engineering
+  - reproducibility
+identifiers:
+  - description: "OSF Pre-registration (registered 2026-06-06)"
+    type: doi
+    value: "10.17605/OSF.IO/NKD6J"
+preferred-citation:
+  type: generic
+  title: "Visual Oracle Bench: OSF Pre-Registration"
+  authors:
+    - family-names: Malhotra
+      given-names: Suneet
+      orcid: "https://orcid.org/0009-0003-8707-9590"
+  doi: "10.17605/OSF.IO/NKD6J"
+  url: "https://osf.io/nkd6j/"
+  year: 2026
+  month: 6

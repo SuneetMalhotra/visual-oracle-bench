@@ -1,9 +1,13 @@
-# OSF Pre-Registration Draft — Visual Oracle Bench
+# OSF Pre-Registration — Visual Oracle Bench
 **Project:** Multi-Application Empirical Evaluation of LLM-as-Judge Visual Regression Detection Across Open-Source Web Applications
 **Author:** Suneet Malhotra (sole author)
 **Affiliation:** independent practitioner (Sr. Manager Test Engineering, Motorola Solutions — affiliation for identification only)
-**Pre-registration target submission to OSF:** 2026-06-19 (W2 milestone)
+
+**REGISTERED:** 2026-06-06 — [OSF DOI 10.17605/OSF.IO/NKD6J](https://osf.io/nkd6j/)
+**OSF Project:** https://osf.io/jp2rx/
 **Manuscript target submission to EMSE (Empirical Software Engineering, Springer):** 2026-09-30
+
+This draft was the source of the OSF registration content; the live registration at the DOI above is the immutable authoritative version.
 
 ---
 

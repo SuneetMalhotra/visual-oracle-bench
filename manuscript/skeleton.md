@@ -7,6 +7,8 @@ This skeleton exists to:
 2. Force pre-W12 thinking about what each section needs (so the analysis serves the manuscript, not the other way around)
 3. Surface gaps in the empirical plan (if a section has no clear bullet plan, the analysis plan is probably missing something)
 
+**Pre-registration:** [OSF DOI 10.17605/OSF.IO/NKD6J](https://osf.io/nkd6j/) — registered 2026-06-06, BEFORE any LLM judgments were collected. Methodology section MUST cite this DOI; reviewers will check the registration timestamp against the W7 first-judgment date.
+
 **Target venue:** Empirical Software Engineering (EMSE, Springer)
 **Article type:** Research Article (NOT Applied Research Report — Article 2 took that slot at JSS)
 **Length target:** 8,000-10,000 words (EMSE Research Articles run longer than IEEE Software magazine pieces)

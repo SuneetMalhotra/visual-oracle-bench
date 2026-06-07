@@ -6,6 +6,8 @@ Companion infrastructure for the manuscript:
 
 > Malhotra, S. *Beyond TodoMVC: A Multi-Application Empirical Evaluation of LLM-as-Judge Visual Regression Detection Across 8 Open-Source Web Applications*. Empirical Software Engineering (target submission 2026-09-30).
 
+**Pre-registration:** [OSF DOI 10.17605/OSF.IO/NKD6J](https://osf.io/nkd6j/) — registered and locked 2026-06-06, BEFORE any LLM judgments were collected. Reviewers can verify the design, hypotheses, exclusion rules, statistical plan, and random seeds at the OSF registration.
+
 This benchmark is the external-validity follow-up to the single-application κ = 0.667 visual-assertion result reported in the antecedent agent-harness work ([github.com/SuneetMalhotra/agent-harness](https://github.com/SuneetMalhotra/agent-harness), v1.2.0).
 
 ## Status

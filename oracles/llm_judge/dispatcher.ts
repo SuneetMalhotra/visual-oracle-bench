@@ -330,7 +330,12 @@ export async function runDispatch(
     judges: [...judges.entries()].map(([name, j]) => ({ name, modelVersion: j.modelId })),
     budget_usd: budgetUsd,
     concurrency_per_judge: concurrency,
-    pre_registration: 'preregistration/draft.md §4.4, §6, §12 Decision A',
+    pre_registration: {
+      osf_doi: '10.17605/OSF.IO/NKD6J',
+      osf_url: 'https://osf.io/nkd6j/',
+      registered_at: '2026-06-06',
+      local_draft: 'preregistration/draft.md §4.4, §6, §12 Decision A',
+    },
   };
   writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
   console.log(`[dispatcher] metadata -> ${metadataPath}`);

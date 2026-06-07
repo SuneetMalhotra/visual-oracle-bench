@@ -16,6 +16,7 @@
   "include": [
     "injection/**/*.ts",
     "capture/**/*.ts",
+    "oracles/**/*.ts",
     "tests/**/*.ts"
   ]
 }

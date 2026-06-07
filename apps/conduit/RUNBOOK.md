@@ -65,3 +65,13 @@ docker compose -f apps/conduit/docker-compose.yml down -v
 ## Environmental blockers
 
 - **2026-06-06 (this commit):** Docker not installed on the W2 dev machine. The `tests/smoke_conduit_pipeline.ts` end-to-end run is therefore deferred to the next machine with Docker. The 6 primitives ARE validated by `tests/test_primitives_unit.ts` (passing 6/6 against a synthetic HTML fixture) and the offline pipeline-equivalence test (`tests/smoke_offline_pipeline.ts`) produces 12 PNGs in `data/images/_offline_smoke/` proving baseline-vs-defect deltas are visible.
+
+## Called from `scripts/capture_corpus.ts` (W6 orchestrator contract)
+
+The W6 corpus orchestrator (`scripts/capture_corpus.ts`) drives the all-50-points capture against this app via the per-app driver `capture/drivers/conduit.ts`. The orchestrator assumes:
+
+- **Stable docker-compose service names.** `apps/conduit/docker-compose.yml` exposes the frontend on `localhost:4100` (env override `CONDUIT_FRONTEND_URL`) and the backend on `localhost:3000` (env override `CONDUIT_BACKEND_URL`). The driver fetches `GET <FRONTEND_URL>/` for the healthcheck.
+- **Healthcheck wait command.** `while ! curl -sf http://localhost:4100/; do sleep 2; done` (covers the Angular build + first-paint window inside the container).
+- **Seed-script invocation.** `./apps/conduit/seed.sh` (idempotent; safe to re-run between capture sessions). The orchestrator runs this once per app before the capture loop unless `--assume-running` is passed.
+- **Capture-loop expectations.** The driver iterates all 50 injection points from `injection-points.yaml`, capturing one `data/images/conduit/baseline/<id>.png` + one `data/images/conduit/defect/<id>.png` per point and writing the per-app ledger to `data/images/conduit/_capture_ledger.json`. Concurrency within an app defaults to 4 (override via `--concurrency`). For `/editor` and `/settings` surfaces the driver logs in as `alice` via `POST /api/users/login` and injects the JWT into localStorage before navigation -- same auth pattern as the 6-point smoke test.
+- **Teardown.** `docker compose -f apps/conduit/docker-compose.yml down -v` after the per-app capture completes, unless `--keep-up` is passed.

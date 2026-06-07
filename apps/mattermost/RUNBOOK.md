@@ -77,3 +77,13 @@ docker compose -f apps/mattermost/docker-compose.yml down -v
 ## Environmental blockers
 
 - **2026-06-06 (W3 commit):** Docker not installed on the W3 dev machine. As with Conduit, the `tests/smoke_mattermost_pipeline.ts` end-to-end run is deferred to the next machine with Docker. The 6 injection primitives ARE validated by `tests/test_primitives_unit.ts` (6/6 passing) and `tests/smoke_offline_pipeline.ts` (12 offline PNGs proving the primitive deltas are visible against synthetic markup).
+
+## Called from `scripts/capture_corpus.ts` (W6 orchestrator contract)
+
+The W6 corpus orchestrator (`scripts/capture_corpus.ts`) drives the all-50-points capture against Mattermost via the per-app driver `capture/drivers/mattermost.ts`. The orchestrator assumes:
+
+- **Stable docker-compose service names.** `apps/mattermost/docker-compose.yml` exposes Mattermost on `localhost:8065` (env override `MM_BASE_URL`); the Postgres container is internal-only. The driver fetches `GET <BASE_URL>/api/v4/system/ping` for the healthcheck.
+- **Healthcheck wait command.** `while ! curl -sf http://localhost:8065/api/v4/system/ping; do sleep 3; done` (covers the JVM-equivalent Go boot + Postgres-ready window, ~30-60s on a warm image).
+- **Seed-script invocation.** `./apps/mattermost/seed.sh` (idempotent against either fresh-volume or already-seeded state; see Known risks #1). The orchestrator runs this once per app before the capture loop unless `--assume-running` is passed.
+- **Capture-loop expectations.** The driver iterates all 50 injection points from `injection-points.yaml`, capturing one `data/images/mattermost/baseline/<id>.png` + one `data/images/mattermost/defect/<id>.png` per point. Per-surface auth: `login` is captured unauthenticated; `channel-list`/`channel-view`/`profile-modal` use the `alice` token; `settings` (admin console) uses the `admin` token. Both tokens are harvested via `POST /api/v4/users/login` and injected as `MMAUTHTOKEN` cookies before navigation (same auth pattern as `tests/smoke_mattermost_pipeline.ts`). For `profile-modal`, the driver clicks `.post:not(.post--system) .post__header .profile-icon` and waits for `.user-popover` -- same scripted flow as the smoke test. Concurrency within an app defaults to 4 (override via `--concurrency`).
+- **Teardown.** `docker compose -f apps/mattermost/docker-compose.yml down -v` after the per-app capture completes, unless `--keep-up` is passed. Always tear down with `-v` to avoid Known risks #1 (first-user-bootstrap race) on the next session.

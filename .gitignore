@@ -48,3 +48,5 @@ data/images/_pairs_manifest.json
 # W7 LLM-judge dispatcher outputs (parquet + jsonl + metadata json).
 # Mirrored to Zenodo at v1.0.0; not committed.
 results/
+logs/
+results/

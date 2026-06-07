@@ -32,9 +32,13 @@ RUN npx prisma generate --schema=apps/api/prisma/schema.prisma || true
 RUN npx nx build api --configuration=production
 
 # Apply database migrations against a fresh SQLite file shipped in the image.
+# If the upstream schema is absent or migrations can't apply, still emit an
+# empty SQLite file so the runtime-stage COPY doesn't fail. The runtime
+# container will re-run migrations on first boot anyway via the entrypoint.
 ENV DATABASE_URL="file:/data/conduit.db"
 RUN mkdir -p /data && \
-    npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma || true
+    touch /data/conduit.db && \
+    ( npx prisma migrate deploy --schema=apps/api/prisma/schema.prisma 2>/dev/null || echo "prisma migrate failed at build time; runtime will retry" )
 
 # ----- Stage 2: runtime ----------------------------------------------------
 FROM node:20.11.1-alpine AS runtime

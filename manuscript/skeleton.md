@@ -9,6 +9,12 @@ This skeleton exists to:
 
 **Pre-registration:** [OSF DOI 10.17605/OSF.IO/NKD6J](https://osf.io/nkd6j/) — registered 2026-06-06, BEFORE any LLM judgments were collected. Methodology section MUST cite this DOI; reviewers will check the registration timestamp against the W7 first-judgment date.
 
+**Reporting structure (added 2026-06-06 evening):** This paper reports two phases.
+- **Phase 1 — Methodological Pilot (this session, 2026-06-06).** End-to-end harness validation on a *synthetic-HTML* corpus: 400 image pairs (50 per nominal app × 8 nominal apps) rendered from a deterministic synthetic-HTML fixture, with the same injection primitives and capture-pairs-manifest contract used for Phase 2. Judges: openai-codex (GPT-family), claude-oauth (Sonnet), llama (Llama 3.2-Vision local). Result use: methodological pilot ONLY. Phase 1 is NOT the registered experiment; it validates the dispatcher + manifest + judge plumbing at scale (1,200 judgments) before live-Docker capture. Numbers from Phase 1 are reported in §4 only as engineering-validation evidence, with an explicit disclaimer that they do NOT answer the pre-registered RQ1-RQ4.
+- **Phase 2 — Pre-Registered Experiment (deferred).** The OSF-registered design: live-Docker capture across 8 OSS web applications (Conduit, Mattermost, Excalidraw, GitLab CE, Rocket.Chat, Penpot, Cal.com, NocoDB), with all 4 pre-registered judges (Phase 2 adds Gemini back). Blocked on Dockerfile debugging across 8 apps (W2 subagent built Dockerfiles by reading upstream source without running them — at least 2 apps have build-stage bugs). Target: a future Docker-up session.
+
+The Phase 1 / Phase 2 split is explicitly NOT a pre-registration amendment — the OSF registration remains intact for what it registered. Phase 1 is a separately-framed methodological pilot that uses the same infrastructure.
+
 **Target venue:** Empirical Software Engineering (EMSE, Springer)
 **Article type:** Research Article (NOT Applied Research Report — Article 2 took that slot at JSS)
 **Length target:** 8,000-10,000 words (EMSE Research Articles run longer than IEEE Software magazine pieces)
@@ -95,6 +101,7 @@ Five sub-sections, mirroring the OSF pre-registration:
 - 8 apps with rationale for each (diversity dimensions: class × framework × rendering paradigm)
 - Substitution rule (pre-registered: drop NocoDB, Penpot if W5 slips)
 - Docker setup approach (pinned digests, seed scripts, RUNBOOK convention)
+- **Phase 1 disclosure (~1 paragraph):** Phase 1 substitutes a deterministic synthetic-HTML fixture for live Docker capture. Per-app labels in Phase 1 are nominal (carried through the manifest for orchestrator-contract reasons) but do NOT reflect live application screenshots. Reviewers should treat Phase 1 results as a pilot of the harness, not as evidence about real-application visual regression.
 
 ### 3.3 Defect taxonomy and injection
 - Table 1 (locked in pre-reg): the 6 categories with operational definitions, mutation primitives, diff signatures, inter-coder κ targets
@@ -195,6 +202,7 @@ Standard four-axis structure (internal, external, construct, conclusion):
 - 8 apps is more than antecedent's 1 but still less than population of all web apps
 - Web-only (no mobile, no hardware-in-the-loop); mitigation: Article 2 (separate paper) covered cross-modal
 - 6 defect categories (not exhaustive); mitigation: pre-registration explicitly bounded the taxonomy
+- **Phase 1 boundary (~1 paragraph):** Phase 1 evidence is generated against a synthetic-HTML fixture, not live applications. The most acute external-validity question for Phase 1 results — whether real-application screenshots produce comparable per-app variance, contrast-saturation patterns, or LLM-judge behavior — is OUT OF SCOPE for Phase 1 and is the precise question Phase 2 is designed to answer. Until Phase 2 completes, Phase 1 κ values should not be cited as cross-application generalization evidence.
 
 ### 6.3 Construct validity
 - Cohen's κ as agreement metric: known limitations; mitigation: Krippendorff's α reported alongside

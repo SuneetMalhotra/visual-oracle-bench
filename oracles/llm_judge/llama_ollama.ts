@@ -7,8 +7,17 @@
 // Calls Ollama's HTTP API at http://localhost:11434/api/generate by default
 // (POST with model name, prompt, base64 images). On unreachable Ollama the
 // wrapper throws a clear error pointing at `ollama serve` / `ollama pull`.
+//
+// Single-image limitation workaround (discovered Phase 1 W7 dispatch 2026-06-06):
+// llama3.2-vision:11b refuses requests with more than one image
+// ("this model only supports one image while more than one image requested").
+// We composite the baseline and defect images side-by-side into a single PNG
+// (sharp) with a centered labeled separator, preserving the comparison
+// semantics that Claude/OpenAI receive natively. The composite is built in
+// memory per request; no side effects on disk.
 
 import { readFileSync, existsSync } from 'node:fs';
+import sharp from 'sharp';
 import { Judge, JudgeRequest, JudgeResponse, parseVerdictJson } from './types.js';
 import { PRICING_LLAMA_OLLAMA, computeCostUsd } from './cost_constants.js';
 
@@ -72,13 +81,20 @@ export class LlamaOllamaJudge implements Judge {
     if (!existsSync(req.baselinePath)) throw new Error(`baseline not found: ${req.baselinePath}`);
     if (!existsSync(req.defectPath)) throw new Error(`defect not found: ${req.defectPath}`);
 
-    const baselineB64 = readFileSync(req.baselinePath).toString('base64');
-    const defectB64 = readFileSync(req.defectPath).toString('base64');
+    // Composite baseline + defect side-by-side into ONE image. llama3.2-vision:11b
+    // does not accept multi-image requests; this is the documented workaround.
+    const compositeB64 = await this.compositeBaselineAndDefect(
+      req.baselinePath,
+      req.defectPath,
+    );
 
     const userText =
       `prompt_id=${req.promptId}\n` +
-      `Two images attached: first=baseline (clean), second=defect-candidate.\n` +
-      `Judge the defect-candidate image. Output exactly one JSON object per the system instructions.`;
+      `ONE image attached: it shows the baseline (LEFT half, labeled "BASELINE") ` +
+      `and the defect-candidate (RIGHT half, labeled "DEFECT-CANDIDATE") side-by-side, ` +
+      `separated by a vertical divider. ` +
+      `Judge the defect-candidate (RIGHT) against the baseline (LEFT). ` +
+      `Output exactly one JSON object per the system instructions.`;
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), this.timeoutMs);
@@ -93,7 +109,7 @@ export class LlamaOllamaJudge implements Judge {
           prompt: userText,
           stream: false,
           format: 'json',
-          images: [baselineB64, defectB64],
+          images: [compositeB64], // single composite per llama3.2-vision limitation
           options: { temperature: 0, num_predict: 200 },
         }),
         signal: controller.signal,
@@ -147,5 +163,76 @@ export class LlamaOllamaJudge implements Judge {
     } finally {
       clearTimeout(timer);
     }
+  }
+
+  /**
+   * Build a side-by-side composite (baseline LEFT, defect RIGHT) with a
+   * 4px black vertical divider and a 24px label band on top of each half.
+   * Returns base64 PNG. The composite is normalized to a consistent height
+   * (both images resized to the same height as the taller original, keeping
+   * aspect ratios via 'contain' fit with a white background).
+   */
+  private async compositeBaselineAndDefect(
+    baselinePath: string,
+    defectPath: string,
+  ): Promise<string> {
+    const baselineMeta = await sharp(baselinePath).metadata();
+    const defectMeta = await sharp(defectPath).metadata();
+    const targetHeight = Math.max(baselineMeta.height ?? 0, defectMeta.height ?? 0);
+    if (targetHeight === 0) {
+      throw new Error(
+        `LlamaOllamaJudge: could not read image dimensions ` +
+          `(baseline=${baselineMeta.height}, defect=${defectMeta.height})`,
+      );
+    }
+    const labelBandHeight = 28;
+    const dividerWidth = 4;
+
+    const baselineResized = await sharp(baselinePath)
+      .resize({ height: targetHeight, fit: 'contain', background: '#ffffff' })
+      .png()
+      .toBuffer();
+    const defectResized = await sharp(defectPath)
+      .resize({ height: targetHeight, fit: 'contain', background: '#ffffff' })
+      .png()
+      .toBuffer();
+
+    const baselineDims = await sharp(baselineResized).metadata();
+    const defectDims = await sharp(defectResized).metadata();
+    const baselineW = baselineDims.width ?? 0;
+    const defectW = defectDims.width ?? 0;
+    const totalWidth = baselineW + dividerWidth + defectW;
+    const totalHeight = labelBandHeight + targetHeight;
+
+    // Label band SVG (BASELINE | DEFECT-CANDIDATE), sized to the full width.
+    const labelSvg = Buffer.from(
+      `<svg width="${totalWidth}" height="${labelBandHeight}" xmlns="http://www.w3.org/2000/svg">` +
+        `<rect x="0" y="0" width="${baselineW}" height="${labelBandHeight}" fill="#1f6feb"/>` +
+        `<rect x="${baselineW}" y="0" width="${dividerWidth}" height="${labelBandHeight}" fill="#000000"/>` +
+        `<rect x="${baselineW + dividerWidth}" y="0" width="${defectW}" height="${labelBandHeight}" fill="#cf222e"/>` +
+        `<text x="${baselineW / 2}" y="${labelBandHeight - 8}" font-family="sans-serif" font-size="16" ` +
+        `font-weight="bold" fill="white" text-anchor="middle">BASELINE (LEFT)</text>` +
+        `<text x="${baselineW + dividerWidth + defectW / 2}" y="${labelBandHeight - 8}" font-family="sans-serif" ` +
+        `font-size="16" font-weight="bold" fill="white" text-anchor="middle">DEFECT-CANDIDATE (RIGHT)</text>` +
+        `</svg>`,
+    );
+
+    const composite = await sharp({
+      create: {
+        width: totalWidth,
+        height: totalHeight,
+        channels: 4,
+        background: '#000000',
+      },
+    })
+      .composite([
+        { input: labelSvg, top: 0, left: 0 },
+        { input: baselineResized, top: labelBandHeight, left: 0 },
+        { input: defectResized, top: labelBandHeight, left: baselineW + dividerWidth },
+      ])
+      .png()
+      .toBuffer();
+
+    return composite.toString('base64');
   }
 }

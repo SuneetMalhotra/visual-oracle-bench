@@ -13,6 +13,7 @@
     "test:primitives": "tsx tests/test_primitives_unit.ts",
     "test:oracles": "tsx tests/test_oracles_unit.ts",
     "test:llm_judges": "tsx tests/test_llm_judge_stubs.ts",
+    "test:llama_composite": "tsx tests/test_llama_composite_unit.ts",
     "oracles:pixel": "tsx oracles/pixel_diff.ts",
     "oracles:phash": "tsx oracles/phash.ts",
     "oracles:judge:dispatch": "tsx oracles/llm_judge/dispatcher.ts",

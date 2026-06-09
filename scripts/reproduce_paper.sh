@@ -15,6 +15,8 @@
 #     ~7 GB) needed for the Llama judge.
 #   - Authenticate Claude OAuth / OpenAI Codex subscriptions for the
 #     LLM-as-judge dispatcher (W7).
+#   - Run the Phase 1 analysis pipeline (requires pyarrow + pandas +
+#     numpy in the .venv-analysis venv; see analysis/analyze_judgments.py).
 #
 # To go from this dry run to the full ~11,200-judgment results.json:
 #
@@ -45,10 +47,13 @@ npm run test:primitives
 echo "==> [reproduce] 4/6 unit tests for 3 oracles (offline: pixel + pHash + LLM stub)"
 npm run test:oracles
 
-echo "==> [reproduce] 5/6 LLM judge stubs (offline; no API calls)"
+echo "==> [reproduce] 5/7 LLM judge stubs (offline; no API calls)"
 npm run test:llm_judges
 
-echo "==> [reproduce] 6/6 offline 12-PNG end-to-end smoke (no docker)"
+echo "==> [reproduce] 6/7 Llama composite unit test (sharp side-by-side workaround)"
+npm run test:llama_composite
+
+echo "==> [reproduce] 7/7 offline 12-PNG end-to-end smoke (no docker)"
 npx tsx tests/smoke_offline_pipeline.ts
 
 echo
@@ -66,9 +71,14 @@ echo "    # tears down. Wall-clock: ~3-5 hours for 800 pairs across 8 apps."
 echo "  npx tsx scripts/capture_pairs_manifest.ts"
 echo "    # aggregates 8 per-app ledgers into data/images/_pairs_manifest.json"
 echo "  npm run oracles:judge:dispatch -- --pairs data/images/_pairs_manifest.json"
-echo "    # ~11,200 judgments via 6 LLM judges (gpt4o, claude, claude-oauth,"
-echo "    # openai-codex, gemini, llama). See oracles/llm_judge/dispatcher.ts"
-echo "    # for budget caps + concurrency knobs."
+echo "    # 6 judge wrappers exist (gpt4o, claude, claude-oauth, openai-codex,"
+echo "    # gemini, llama). Default Phase 1 dispatch uses 3 subscription-path"
+echo "    # judges (openai-codex + claude-oauth + llama) for \$0 cost."
+echo "    # API-key variants available via --judges gpt4o,claude,gemini,llama."
+echo "    # See oracles/llm_judge/dispatcher.ts for budget caps + concurrency."
+echo "  .venv-analysis/bin/python3 analysis/analyze_judgments.py"
+echo "    # Phase 1 analysis: pairwise Cohen's k + Fleiss' k + per-app +"
+echo "    # per-category + accuracy vs ground-truth. Outputs to analysis/results/."
 echo
 echo "Real-app capture (W6) and judgment dispatch (W7) require:"
 echo "  - Docker daemon running"

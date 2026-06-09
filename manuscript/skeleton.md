@@ -41,30 +41,43 @@ Title locked in W1 OSF pre-registration; do NOT change post-W2 without amendment
 
 ## ABSTRACT (~250-300 words; W14 final draft)
 
-What each abstract sentence should cover (one bullet = one sentence target):
-- Motivation: visual-assertion oracles are a 2024-2026 LLM-as-judge growth area for SE testing; antecedent work reports κ=0.667 on TodoMVC but external validity is unknown
-- Method: 8 OSS web apps × 50 seeded defects × 6 categories = 800 image pairs; 4 LLMs (GPT-4o, Claude Sonnet 4.5, Gemini 2.5 Pro, Llama 3.2 Vision) × 3 oracle classes (pixel SSIM, pHash, LLM-as-judge)
-- Ground truth: sole-author coding of 800 + 2-rater inter-rater on 80-pair subsample
-- Headline finding 1: [TBD W10 — mean per-app κ across 8 apps; comparison to TodoMVC baseline 0.667]
-- Headline finding 2: [TBD W10 — mixed-effects regression result; which random effect dominates]
-- Headline finding 3: [TBD W10 — LLM-LLM κ vs LLM-human κ correlation; replication of negative finding from antecedent]
-- Implication: practitioners can deploy LLM-as-judge oracles only after per-app calibration; cross-app generalization is bounded
-- Artifact: open-source benchmark + reproducibility package + Zenodo-archived corpus
+**Two abstracts depending on which phase ships first.** Both are pre-registered; the Phase 1 abstract is what gets submitted for the methodological-pilot venue (this paper); the Phase 2 abstract is what gets submitted for the pre-registered full experiment when live-Docker capture completes.
 
-NOTE: Numbers in headline findings unknown until W10. Abstract drafted W14 after results frozen.
+### Phase 1 abstract (THIS paper — methodological pilot)
+
+One bullet = one sentence target:
+- Motivation: visual-assertion oracles are a 2024–2026 LLM-as-Judge growth area for SE testing; antecedent work reports κ=0.667 on TodoMVC but external-validity evaluations require infrastructure that does not yet exist as reusable benchmarks
+- Contribution: we present Visual Oracle Bench, a multi-application LLM-as-Judge evaluation benchmark with pre-registered design (OSF DOI 10.17605/OSF.IO/NKD6J), an open-source harness (injection primitives, capture orchestrator, dispatcher, three pre-registered judges), and a Phase 1 methodological pilot demonstrating end-to-end operability
+- Method (Phase 1): a synthetic-HTML fixture renders 400 baseline + 400 defect image pairs across 6 defect categories (color, layout, missing, truncation, z-order, contrast); three vision LLM judges (GPT-family via OpenAI Codex CLI, Claude Sonnet 4.5 via Claude OAuth, Llama 3.2 Vision 11B via local Ollama) are dispatched against all 400 pairs; ground truth is by construction (every pair contains a seeded defect)
+- Failure-mode finding: Llama 3.2 Vision 11B refuses multi-image requests; we document the workaround (side-by-side composite) and report it as a model-integration limitation reviewers should account for in future benchmarks
+- Headline result 1: [TBD — per-judge accuracy vs ground-truth defect detection (pre-registered metric)]
+- Headline result 2: [TBD — pairwise Cohen's κ between the three judges (pre-registered metric)]
+- Headline result 3: [TBD — Fleiss' κ across all three judges + per-defect-category breakdown]
+- Limitation: Phase 1 corpus is synthetic-HTML, not live-application; per-app generalization (RQ1) is OUT OF SCOPE and reserved for the pre-registered Phase 2 experiment
+- Artifact: open-source benchmark, reproducibility manifest, Zenodo-archived corpus, OSF pre-registration timestamp predating any LLM judgments
+
+### Phase 2 abstract (FUTURE paper — pre-registered full experiment)
+
+[Same bullets as original 8-app pre-registered design — kept as the W2 OSF-locked target. See preregistration/draft.md for the registered hypotheses, sample, analysis plan. This abstract gets drafted when Phase 2 corpus capture completes (timeline blocked on 8-app Dockerfile debugging).]
+
+NOTE: Numbers in Phase 1 headline results filled in by W8 analysis script output (analysis/results/phase1_analysis_<ts>.md).
 
 ---
 
 ## 1. INTRODUCTION (~1,500 words)
 
+**Phase 1 framing — what THIS paper does and does not claim:**
+
 - The visual-assertion problem in modern web GUI testing
-- Why LLM-as-judge oracles emerged as 2024-2026 industry practice (production drivers: speed, semantic checks pixel-diff misses)
+- Why LLM-as-Judge oracles emerged as 2024–2026 industry practice (production drivers: speed, semantic checks pixel-diff misses)
 - The external-validity gap in the existing literature: most published evaluations are single-application or small-corpus (cite Article 2's own κ=0.667 acknowledgment, He et al. 2025 LLM-as-Judge survey, BEWT 2026)
-- The four research questions of this paper (one paragraph per RQ, summarized from pre-registration)
-- Three contributions of this paper:
-  - (1) the multi-application benchmark itself (8 apps, 800 image pairs, public)
-  - (2) the empirical answer to RQ1 (does κ generalize)
-  - (3) the methodological contribution (random-effects design for cross-app generalization in LLM-as-judge SE evaluation)
+- **The infrastructure gap that precedes the empirical gap**: even before we can answer "does κ generalize across apps?", the field lacks a reusable, pre-registered, reproducible benchmark harness for multi-application LLM-as-Judge visual-regression evaluation. This paper closes the *infrastructure* gap as Phase 1; the empirical answer is reserved for the pre-registered Phase 2.
+- The four pre-registered research questions (RQ1–RQ4 from OSF DOI 10.17605/OSF.IO/NKD6J), each scoped explicitly to Phase 2; Phase 1 reports infrastructure validation only
+- **Three contributions of THIS (Phase 1) paper**:
+  - (1) **The reusable benchmark harness**: open-source injection primitives, capture orchestrator, dispatcher, three pre-registered LLM judges (OpenAI Codex CLI, Claude OAuth, local Ollama Llama 3.2 Vision), and the pre-registered manifest contract
+  - (2) **The Phase 1 methodological-pilot evidence**: 400-pair synthetic-HTML corpus with by-construction ground truth, 1,200 judgments (3 judges × 400 pairs), per-judge accuracy + pairwise Cohen's κ + Fleiss' κ across all three judges, and an honest catalog of failure modes (including the discovered Llama-vision-single-image limitation and the documented workaround)
+  - (3) **The OSF-pre-registered design lock**: pre-registration timestamp predates any LLM judgment, with the full hypothesis/analysis/sample-size plan publicly committed before Phase 2 data collection — a methodological commitment uncommon in LLM-eval SE work
+- **What this paper explicitly DOES NOT do**: it does not answer RQ1 (cross-app generalization of κ); it does not evaluate on live-application corpora; it does not produce the random-effects regression that the OSF pre-reg targets. Those are the deliverables of the pre-registered Phase 2 paper (deferred; live-Docker capture infrastructure blocked at submission time)
 - Paper structure roadmap
 
 ---

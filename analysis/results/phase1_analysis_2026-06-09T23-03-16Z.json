@@ -1,0 +1,428 @@
+{
+  "bootstrap_resamples": 1000,
+  "bootstrap_seed": 42,
+  "cost": {
+    "claude-oauth": {
+      "mean_per_call_usd": 0.0,
+      "n": 400,
+      "total_usd": 0.0
+    },
+    "llama": {
+      "mean_per_call_usd": 0.0,
+      "n": 400,
+      "total_usd": 0.0
+    },
+    "openai-codex": {
+      "mean_per_call_usd": 0.0,
+      "n": 400,
+      "total_usd": 0.0
+    }
+  },
+  "data_inputs": {
+    "files": [
+      {
+        "judges": {
+          "claude-oauth": 400,
+          "llama": 400,
+          "openai-codex": 400
+        },
+        "path": "/Users/suneetmalhotra/work/visual-oracle-bench/results/judgments_2026-06-07T02-50-09-790Z.parquet",
+        "rows": 1200,
+        "timestamp": "2026-06-07T02:50:09.790000+00:00",
+        "used_for_judges": [
+          "claude-oauth",
+          "openai-codex"
+        ]
+      },
+      {
+        "judges": {
+          "llama": 400
+        },
+        "path": "/Users/suneetmalhotra/work/visual-oracle-bench/results/judgments_2026-06-09T22-16-41-218Z.parquet",
+        "rows": 400,
+        "timestamp": "2026-06-09T22:16:41.218000+00:00",
+        "used_for_judges": [
+          "llama"
+        ]
+      }
+    ],
+    "judges": {
+      "claude-oauth": {
+        "rows": 400,
+        "source_parquet": "/Users/suneetmalhotra/work/visual-oracle-bench/results/judgments_2026-06-07T02-50-09-790Z.parquet",
+        "source_timestamp": "2026-06-07T02:50:09.790000+00:00"
+      },
+      "llama": {
+        "rows": 400,
+        "source_parquet": "/Users/suneetmalhotra/work/visual-oracle-bench/results/judgments_2026-06-09T22-16-41-218Z.parquet",
+        "source_timestamp": "2026-06-09T22:16:41.218000+00:00"
+      },
+      "openai-codex": {
+        "rows": 400,
+        "source_parquet": "/Users/suneetmalhotra/work/visual-oracle-bench/results/judgments_2026-06-07T02-50-09-790Z.parquet",
+        "source_timestamp": "2026-06-07T02:50:09.790000+00:00"
+      }
+    }
+  },
+  "expected_judges": [
+    "openai-codex",
+    "claude-oauth",
+    "llama"
+  ],
+  "failure_modes": {
+    "claude-oauth": {
+      "n_invalid_verdict": 0,
+      "n_malformed": 0,
+      "n_retried": 0,
+      "n_total": 400
+    },
+    "llama": {
+      "n_invalid_verdict": 0,
+      "n_malformed": 0,
+      "n_retried": 0,
+      "n_total": 400
+    },
+    "openai-codex": {
+      "n_invalid_verdict": 0,
+      "n_malformed": 0,
+      "n_retried": 0,
+      "n_total": 400
+    }
+  },
+  "fleiss_kappa": {
+    "ci95": [
+      -0.349526801731955,
+      -0.2651300205182895
+    ],
+    "judges": [
+      "claude-oauth",
+      "llama",
+      "openai-codex"
+    ],
+    "kappa": -0.3090808874190437,
+    "n_categories": 2,
+    "n_subjects": 400
+  },
+  "generated_at": "2026-06-09T23:03:16.339044+00:00",
+  "ground_truth_assumption": "Every pair in data/images/_pairs_manifest.json is a baseline-vs-defect pair with a defect injected; ground_truth = 'fail' for all pairs. Precision is undefined without negatives.",
+  "latency": {
+    "claude-oauth": {
+      "mean_ms": 4013.74,
+      "median_ms": 1582.5,
+      "n": 400,
+      "p95_ms": 13753.449999999997
+    },
+    "llama": {
+      "mean_ms": 18956.6525,
+      "median_ms": 21573.5,
+      "n": 400,
+      "p95_ms": 32940.65
+    },
+    "openai-codex": {
+      "mean_ms": 8816.035,
+      "median_ms": 5709.5,
+      "n": 400,
+      "p95_ms": 28926.549999999916
+    }
+  },
+  "manifest_join": {
+    "judgment_rows_matched": 1200,
+    "judgment_rows_total": 1200,
+    "judgment_rows_unmatched": 0,
+    "manifest_pairs_total": 400
+  },
+  "pairwise_cohen_kappa": [
+    {
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "judge_a": "claude-oauth",
+      "judge_b": "llama",
+      "kappa": 0.0,
+      "n_pairs": 400
+    },
+    {
+      "ci95": [
+        0.21883426963115923,
+        0.49858214921401145
+      ],
+      "judge_a": "claude-oauth",
+      "judge_b": "openai-codex",
+      "kappa": 0.3613754989253917,
+      "n_pairs": 400
+    },
+    {
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "judge_a": "llama",
+      "judge_b": "openai-codex",
+      "kappa": 0.0,
+      "n_pairs": 400
+    }
+  ],
+  "per_app_accuracy": {
+    "claude-oauth": {
+      "cal-com": {
+        "accuracy": 0.46,
+        "n_fail": 23,
+        "n_valid": 50
+      },
+      "conduit": {
+        "accuracy": 0.64,
+        "n_fail": 32,
+        "n_valid": 50
+      },
+      "excalidraw": {
+        "accuracy": 1.0,
+        "n_fail": 50,
+        "n_valid": 50
+      },
+      "gitlab-ce": {
+        "accuracy": 1.0,
+        "n_fail": 50,
+        "n_valid": 50
+      },
+      "mattermost": {
+        "accuracy": 1.0,
+        "n_fail": 50,
+        "n_valid": 50
+      },
+      "nocodb": {
+        "accuracy": 1.0,
+        "n_fail": 50,
+        "n_valid": 50
+      },
+      "penpot": {
+        "accuracy": 1.0,
+        "n_fail": 50,
+        "n_valid": 50
+      },
+      "rocket-chat": {
+        "accuracy": 1.0,
+        "n_fail": 50,
+        "n_valid": 50
+      }
+    },
+    "llama": {
+      "cal-com": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "conduit": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "excalidraw": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "gitlab-ce": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "mattermost": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "nocodb": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "penpot": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "rocket-chat": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 50
+      }
+    },
+    "openai-codex": {
+      "cal-com": {
+        "accuracy": 0.7,
+        "n_fail": 35,
+        "n_valid": 50
+      },
+      "conduit": {
+        "accuracy": 0.72,
+        "n_fail": 36,
+        "n_valid": 50
+      },
+      "excalidraw": {
+        "accuracy": 0.72,
+        "n_fail": 36,
+        "n_valid": 50
+      },
+      "gitlab-ce": {
+        "accuracy": 0.92,
+        "n_fail": 46,
+        "n_valid": 50
+      },
+      "mattermost": {
+        "accuracy": 1.0,
+        "n_fail": 50,
+        "n_valid": 50
+      },
+      "nocodb": {
+        "accuracy": 1.0,
+        "n_fail": 50,
+        "n_valid": 50
+      },
+      "penpot": {
+        "accuracy": 1.0,
+        "n_fail": 50,
+        "n_valid": 50
+      },
+      "rocket-chat": {
+        "accuracy": 1.0,
+        "n_fail": 50,
+        "n_valid": 50
+      }
+    }
+  },
+  "per_category_accuracy": {
+    "claude-oauth": {
+      "color": {
+        "accuracy": 0.890625,
+        "n_fail": 57,
+        "n_valid": 64
+      },
+      "contrast": {
+        "accuracy": 0.8055555555555556,
+        "n_fail": 58,
+        "n_valid": 72
+      },
+      "layout": {
+        "accuracy": 0.765625,
+        "n_fail": 49,
+        "n_valid": 64
+      },
+      "missing": {
+        "accuracy": 1.0,
+        "n_fail": 64,
+        "n_valid": 64
+      },
+      "truncation": {
+        "accuracy": 1.0,
+        "n_fail": 64,
+        "n_valid": 64
+      },
+      "zorder": {
+        "accuracy": 0.875,
+        "n_fail": 63,
+        "n_valid": 72
+      }
+    },
+    "llama": {
+      "color": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 64
+      },
+      "contrast": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 72
+      },
+      "layout": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 64
+      },
+      "missing": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 64
+      },
+      "truncation": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 64
+      },
+      "zorder": {
+        "accuracy": 0.0,
+        "n_fail": 0,
+        "n_valid": 72
+      }
+    },
+    "openai-codex": {
+      "color": {
+        "accuracy": 0.84375,
+        "n_fail": 54,
+        "n_valid": 64
+      },
+      "contrast": {
+        "accuracy": 1.0,
+        "n_fail": 72,
+        "n_valid": 72
+      },
+      "layout": {
+        "accuracy": 0.84375,
+        "n_fail": 54,
+        "n_valid": 64
+      },
+      "missing": {
+        "accuracy": 1.0,
+        "n_fail": 64,
+        "n_valid": 64
+      },
+      "truncation": {
+        "accuracy": 1.0,
+        "n_fail": 64,
+        "n_valid": 64
+      },
+      "zorder": {
+        "accuracy": 0.625,
+        "n_fail": 45,
+        "n_valid": 72
+      }
+    }
+  },
+  "per_judge_classification": {
+    "claude-oauth": {
+      "accuracy_vs_truth": 0.8875,
+      "n_invalid_verdict": 0,
+      "n_malformed": 0,
+      "n_predicted_fail": 355,
+      "n_predicted_pass": 45,
+      "n_total": 400,
+      "n_valid": 400,
+      "precision_vs_truth": null,
+      "recall_vs_truth": 0.8875
+    },
+    "llama": {
+      "accuracy_vs_truth": 0.0,
+      "n_invalid_verdict": 0,
+      "n_malformed": 0,
+      "n_predicted_fail": 0,
+      "n_predicted_pass": 400,
+      "n_total": 400,
+      "n_valid": 400,
+      "precision_vs_truth": null,
+      "recall_vs_truth": 0.0
+    },
+    "openai-codex": {
+      "accuracy_vs_truth": 0.8825,
+      "n_invalid_verdict": 0,
+      "n_malformed": 0,
+      "n_predicted_fail": 353,
+      "n_predicted_pass": 47,
+      "n_total": 400,
+      "n_valid": 400,
+      "precision_vs_truth": null,
+      "recall_vs_truth": 0.8825
+    }
+  },
+  "tldr": "Accuracy vs all-fail ground truth: `claude-oauth` 88.8% (n_valid=400); `llama` 0.0% (n_valid=400); `openai-codex` 88.2% (n_valid=400). Pairwise agreement: `claude-oauth`/`llama` kappa=0.000 (n=400); `claude-oauth`/`openai-codex` kappa=0.361 (n=400); `llama`/`openai-codex` kappa=0.000 (n=400). Fleiss' kappa across 3 judges = -0.309 on n=400 subjects."
+}

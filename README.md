@@ -102,7 +102,7 @@ npm run oracles:judge:dispatch -- --pairs data/images/_pairs_manifest.json
 - LLM provider versions pinned at run time.
 - All random seeds stated.
 - Single-command end-to-end reproduction at v1.0.0 release tag.
-- Image corpus mirrored to Zenodo (DOI minted at submission).
+- Image corpus mirrored to Zenodo (Zenodo concept DOI 10.5281/zenodo.20620870 / version DOI 10.5281/zenodo.20620871).
 
 ## License
 

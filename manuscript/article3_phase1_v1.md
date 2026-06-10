@@ -8,7 +8,7 @@
 **GitHub:** [@SuneetMalhotra](https://github.com/SuneetMalhotra)
 **LinkedIn:** [linkedin.com/in/suneet-m](https://www.linkedin.com/in/suneet-m)
 **Pre-registration:** OSF DOI [10.17605/OSF.IO/NKD6J](https://osf.io/nkd6j/) (registered 2026-06-06, prior to any LLM judgment collection)
-**Companion repository:** [github.com/SuneetMalhotra/visual-oracle-bench](https://github.com/SuneetMalhotra/visual-oracle-bench) (MIT code, CC-BY 4.0 data; Zenodo DOI to be minted at submission)
+**Companion repository:** [github.com/SuneetMalhotra/visual-oracle-bench](https://github.com/SuneetMalhotra/visual-oracle-bench) (MIT code, CC-BY 4.0 data; 10.5281/zenodo.20620871)
 **Target venue:** Empirical Software Engineering (EMSE) — Methodological Articles track
 **Manuscript draft date:** 2026-06-09
 

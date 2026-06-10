@@ -1,6 +1,6 @@
 # Suggested Reviewers — EMSE Submission (Phase 1 Methodological Pilot)
 
-**Manuscript:** *Beyond TodoMVC: A Multi-Application Empirical Evaluation of LLM-as-Judge Visual Regression Detection Across 8 Open-Source Web Applications*
+**Manuscript:** *Visual Oracle Bench: A Pre-Registered Methodological Pilot for Multi-Application LLM-as-Judge Visual Regression Detection*
 **Author:** Suneet Malhotra (sole author, no prior co-authors)
 **Pre-registration:** OSF DOI 10.17605/OSF.IO/NKD6J
 **List compiled:** 2026-06-09

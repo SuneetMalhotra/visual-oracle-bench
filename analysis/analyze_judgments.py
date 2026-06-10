@@ -443,12 +443,23 @@ def build_fleiss_matrix(
 # ---------------------------------------------------------------------------
 
 def accuracy_breakdown(
-    df: pd.DataFrame, group_col: str
+    df: pd.DataFrame,
+    group_col: str,
+    *,
+    rng: Optional[np.random.Generator] = None,
+    n_resamples: int = 1000,
 ) -> Dict[str, Dict[str, Dict[str, float]]]:
     """
-    Returns {judge: {group_value: {"n_valid": int, "n_fail": int, "accuracy": float}}}.
+    Returns {judge: {group_value: {"n_valid": int, "n_fail": int, "accuracy": float,
+                                   "ci_lo": float, "ci_hi": float}}}.
     Uses only rows where verdict is valid (not malformed, in {fail, pass}).
+    Bootstrap CIs computed via percentile resampling over the subgroup's
+    binary correctness vector (1 if verdict == 'fail', else 0). At
+    n_resamples=1000 + seed-pinned RNG, identical inputs produce identical CIs.
+    For n_valid <= 1 the CI is reported as the point estimate (degenerate).
     """
+    if rng is None:
+        rng = np.random.default_rng(42)
     out: Dict[str, Dict[str, Dict[str, float]]] = {}
     valid = df[
         (~df["malformed"].astype(bool)) & df["verdict"].isin(VERDICT_CATEGORIES)
@@ -458,10 +469,22 @@ def accuracy_breakdown(
         for grp, sub_g in sub_j.groupby(group_col):
             n_valid = int(len(sub_g))
             n_fail = int((sub_g["verdict"] == "fail").sum())
+            acc = (n_fail / n_valid) if n_valid else float("nan")
+            if n_valid <= 1:
+                ci_lo = ci_hi = acc
+            else:
+                correctness = (sub_g["verdict"] == "fail").to_numpy(dtype=int)
+                # Resample n_valid items with replacement, n_resamples times
+                idx = rng.integers(0, n_valid, size=(n_resamples, n_valid))
+                resampled = correctness[idx].mean(axis=1)
+                ci_lo = float(np.quantile(resampled, 0.025))
+                ci_hi = float(np.quantile(resampled, 0.975))
             per_group[str(grp)] = {
                 "n_valid": n_valid,
                 "n_fail": n_fail,
-                "accuracy": (n_fail / n_valid) if n_valid else float("nan"),
+                "accuracy": acc,
+                "ci_lo": ci_lo,
+                "ci_hi": ci_hi,
             }
         out[judge] = per_group
     return out
@@ -661,11 +684,17 @@ def render_markdown(report: Dict[str, object]) -> str:
         lines.append(f"| {app} | " + " | ".join(cells) + " |")
     lines.append("")
 
-    # ---- Per-category breakdown
+    # ---- Per-category breakdown (with 95% bootstrap CIs)
     lines.append("## Per-category breakdown\n")
+    lines.append(
+        "Accuracy and 95% percentile-bootstrap CIs (1,000 resamples, seed 42). "
+        "At per-category n=64-72, the CIs are wide; cross-judge differences "
+        "within overlapping CIs should NOT be interpreted as evidence of "
+        "judge-specific weakness.\n"
+    )
     cat_judges = sorted(report["per_category_accuracy"].keys())
     cats = sorted({c for j in cat_judges for c in report["per_category_accuracy"][j].keys()})
-    header = "| Category | " + " | ".join(f"`{j}` accuracy (n)" for j in cat_judges) + " |"
+    header = "| Category | " + " | ".join(f"`{j}` (n) accuracy [95% CI]" for j in cat_judges) + " |"
     sep = "|---|" + "|".join(["---:"] * len(cat_judges)) + "|"
     lines.append(header)
     lines.append(sep)
@@ -676,7 +705,10 @@ def render_markdown(report: Dict[str, object]) -> str:
             if cell is None:
                 cells.append("n/a")
             else:
-                cells.append(f"{fmt_pct(cell['accuracy'])} ({cell['n_valid']})")
+                cells.append(
+                    f"{fmt_pct(cell['accuracy'])} (n={cell['n_valid']}) "
+                    f"[{fmt_pct(cell['ci_lo'])}, {fmt_pct(cell['ci_hi'])}]"
+                )
         lines.append(f"| {cat} | " + " | ".join(cells) + " |")
     lines.append("")
 

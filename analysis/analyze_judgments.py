@@ -75,7 +75,12 @@ import pyarrow.parquet as pq
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RESULTS_DIR = REPO_ROOT / "results"
 OUTPUT_DIR = REPO_ROOT / "analysis" / "results"
-MANIFEST_PATH = REPO_ROOT / "data" / "images" / "_pairs_manifest.json"
+_MANIFEST_V2 = REPO_ROOT / "data" / "images" / "_pairs_manifest_v2.json"
+_MANIFEST_V1 = REPO_ROOT / "data" / "images" / "_pairs_manifest.json"
+# v2 (2026-06-10) adds 200 true-negative control pairs + per-pair
+# expected_verdict; prefer it when available so precision / specificity /
+# F1 / MCC can be reported. v1 falls back if v2 is absent.
+MANIFEST_PATH = _MANIFEST_V2 if _MANIFEST_V2.exists() else _MANIFEST_V1
 
 PARQUET_GLOB = "judgments_*.parquet"
 # Filename embeds the dispatcher start timestamp in this format:
@@ -85,7 +90,12 @@ TIMESTAMP_RE = re.compile(
 )
 
 VERDICT_CATEGORIES = ["fail", "pass"]  # binary verdict universe
-GROUND_TRUTH = "fail"  # by manifest construction (see docstring)
+# Judges excluded from the "comparable" cross-judge analysis because their
+# input modality differs from the others (Llama 3.2 Vision was fed a
+# side-by-side composite as a multi-image workaround). Per the
+# 2026-06-10 hostile-review BLOCKER 3 fix, Llama is reported in the
+# integration-failure-mode appendix but NOT in headline kappa / Fleiss.
+LLAMA_JUDGE_NAMES = {"llama", "llama_ollama", "llama-ollama", "llama-vision"}
 
 
 # ---------------------------------------------------------------------------
@@ -129,19 +139,32 @@ def select_latest_per_judge(
     parquets: List[Tuple[Path, Optional[datetime]]]
 ) -> Tuple[pd.DataFrame, Dict[str, Dict[str, object]]]:
     """
-    Read all parquets and return a merged DataFrame containing, for each
-    judgeName, only the rows from the latest-timestamped parquet that has
-    that judge. Also returns a per-judge provenance dict for reporting.
+    Read all parquets and return a merged DataFrame.
+
+    Latest-wins is applied at (judgeName, baselinePath, defectPath) granularity
+    so that a partial later parquet does NOT erase a judge's earlier rows
+    on disjoint pairs. Concretely (2026-06-10): tonight's control-only
+    parquet contains Claude+Codex judgments for 200 control pairs, while
+    the 2026-06-07 parquet contains Claude+Codex judgments for 400 defect
+    pairs. Per-judge latest-wins would silently drop the 800 defect rows
+    when the new parquet lands. Per-(judge, pair) latest-wins keeps all
+    1200 disjoint rows plus the new 400.
+
+    Within the same (judge, pair) tuple, the row from the latest-timestamped
+    parquet wins (so the 2026-06-09 Llama re-run supersedes the 2026-06-07
+    broken Llama rows on the same defect pairs).
     """
-    # judgeName -> (timestamp, source_path, rows_df)
-    latest_for_judge: Dict[str, Tuple[datetime, Path, pd.DataFrame]] = {}
+    # (judgeName, baselinePath, defectPath) -> (timestamp, source_path, row_series)
+    latest_for_tuple: Dict[
+        Tuple[str, str, str], Tuple[datetime, Path, pd.Series]
+    ] = {}
 
     file_summary: List[Dict[str, object]] = []
 
     for path, ts in parquets:
         try:
             df = pq.read_table(path).to_pandas()
-        except Exception as exc:  # surface, don't swallow
+        except Exception as exc:
             file_summary.append(
                 {
                     "path": str(path),
@@ -163,37 +186,47 @@ def select_latest_per_judge(
                 "rows": int(len(df)),
                 "judges": per_judge_counts,
                 "used_for_judges": [],  # filled in below
+                "rows_won": 0,  # filled in below
             }
         )
 
-        # A parquet with no parseable timestamp is sorted last; treat its ts as
-        # "the floor" so that it only wins if nothing else covers that judge.
         effective_ts = ts or datetime.min.replace(tzinfo=timezone.utc)
 
-        for judge, sub in df.groupby("judgeName"):
-            prior = latest_for_judge.get(judge)
+        for _, row in df.iterrows():
+            key = (row["judgeName"], row["baselinePath"], row["defectPath"])
+            prior = latest_for_tuple.get(key)
             if prior is None or effective_ts > prior[0]:
-                latest_for_judge[judge] = (effective_ts, path, sub.reset_index(drop=True))
+                latest_for_tuple[key] = (effective_ts, path, row)
 
-    # Mark which file ended up being used for each judge.
-    chosen_paths: Dict[str, Path] = {j: t[1] for j, t in latest_for_judge.items()}
+    # Tally per-file row-wins + per-judge usage.
+    by_file_wins: Dict[Path, int] = defaultdict(int)
+    by_file_judges_used: Dict[Path, set] = defaultdict(set)
+    for (judge, _, _), (_, path, _) in latest_for_tuple.items():
+        by_file_wins[path] += 1
+        by_file_judges_used[path].add(judge)
     for entry in file_summary:
-        used = [j for j, p in chosen_paths.items() if str(p) == entry["path"]]
-        entry["used_for_judges"] = sorted(used)
+        p = Path(entry["path"])
+        entry["rows_won"] = int(by_file_wins.get(p, 0))
+        entry["used_for_judges"] = sorted(by_file_judges_used.get(p, set()))
 
-    if not latest_for_judge:
+    if not latest_for_tuple:
         return pd.DataFrame(), {"files": file_summary, "judges": {}}
 
-    merged = pd.concat(
-        [t[2] for t in latest_for_judge.values()], ignore_index=True
-    )
+    merged = pd.DataFrame([t[2] for t in latest_for_tuple.values()]).reset_index(drop=True)
 
     judge_provenance: Dict[str, Dict[str, object]] = {}
-    for judge, (ts, path, sub) in latest_for_judge.items():
+    for judge, sub in merged.groupby("judgeName"):
+        # Per-judge provenance now lists ALL source parquets contributing
+        # rows for that judge (no longer single-sourced).
+        sources: Dict[str, int] = defaultdict(int)
+        for (jname, b, d), (_, path, _) in latest_for_tuple.items():
+            if jname == judge:
+                sources[str(path)] += 1
         judge_provenance[judge] = {
-            "source_parquet": str(path),
-            "source_timestamp": ts.isoformat() if ts != datetime.min.replace(tzinfo=timezone.utc) else None,
             "rows": int(len(sub)),
+            "source_parquets": [
+                {"path": p, "rows": n} for p, n in sorted(sources.items())
+            ],
         }
 
     return merged, {"files": file_summary, "judges": judge_provenance}
@@ -209,6 +242,14 @@ def load_manifest(path: Path) -> pd.DataFrame:
         raise ValueError(f"Manifest at {path} missing 'results' list")
     rows = []
     for entry in raw["results"]:
+        # Manifest v1 had no expected_verdict (all pairs implicitly defects);
+        # manifest v2 (2026-06-10) tags every pair 'fail' or 'pass'.
+        ev = entry.get("expected_verdict", "fail")
+        if ev not in ("fail", "pass"):
+            raise ValueError(
+                f"Manifest entry {entry.get('defect_id')} has invalid "
+                f"expected_verdict={ev!r}; must be 'fail' or 'pass'"
+            )
         rows.append(
             {
                 "baselinePath": entry["baseline"],
@@ -217,13 +258,16 @@ def load_manifest(path: Path) -> pd.DataFrame:
                 "defect_id": entry["defect_id"],
                 "manifest_category": entry["category"],
                 "surface": entry["surface"],
+                "expected_verdict": ev,
             }
         )
     df = pd.DataFrame(rows)
-    if df.duplicated(subset=["baselinePath", "defectPath"]).any():
-        dups = df[df.duplicated(subset=["baselinePath", "defectPath"], keep=False)]
+    if df.duplicated(subset=["defect_id"]).any():
+        # We can no longer dedup by (baseline, defect) because v2 control
+        # pairs intentionally set defect == baseline; dedup by defect_id.
+        dups = df[df.duplicated(subset=["defect_id"], keep=False)]
         raise ValueError(
-            f"Manifest has duplicate (baseline,defect) pairs:\n{dups.head()}"
+            f"Manifest has duplicate defect_id values:\n{dups.head()}"
         )
     return df
 
@@ -237,12 +281,17 @@ def join_judgments_to_manifest(
     )
     unmatched = int((joined["_merge"] == "left_only").sum())
     matched = joined[joined["_merge"] == "both"].drop(columns=["_merge"]).copy()
-    matched["ground_truth"] = GROUND_TRUTH
+    # Ground truth is now per-pair from the manifest (v2: 'fail' for
+    # 400 defect pairs, 'pass' for 200 control pairs). v1 manifests
+    # default every pair to 'fail' inside load_manifest().
+    matched["ground_truth"] = matched["expected_verdict"]
     diagnostics = {
         "judgment_rows_total": int(before),
         "judgment_rows_matched": int(len(matched)),
         "judgment_rows_unmatched": unmatched,
         "manifest_pairs_total": int(len(manifest)),
+        "manifest_defect_pairs": int((manifest["expected_verdict"] == "fail").sum()),
+        "manifest_control_pairs": int((manifest["expected_verdict"] == "pass").sum()),
     }
     return matched, diagnostics
 
@@ -263,11 +312,19 @@ def is_valid_verdict(row: pd.Series) -> bool:
 def per_judge_classification(
     df: pd.DataFrame,
 ) -> Dict[str, Dict[str, object]]:
-    """For each judge, compute: n_total, n_valid, n_malformed, n_invalid_verdict,
-    accuracy (=recall vs all-fail GT), precision (=None, undefined)."""
+    """For each judge, compute the full binary-classifier metric pack:
+    n_total, n_valid, n_malformed, n_invalid_verdict, confusion matrix
+    (TP/FP/TN/FN), accuracy, precision, recall (sensitivity), specificity
+    (true negative rate), F1, balanced accuracy, MCC, FPR, FNR.
+
+    Per-row `ground_truth` column is required (added by
+    join_judgments_to_manifest from the per-pair `expected_verdict`).
+    A metric is reported as NaN when its denominator is zero (e.g.
+    precision when the judge never predicts 'fail').
+    """
     out: Dict[str, Dict[str, object]] = {}
     for judge, sub in df.groupby("judgeName"):
-        n_total = len(sub)
+        n_total = int(len(sub))
         malformed_mask = sub["malformed"].astype(bool)
         verdict_in_set = sub["verdict"].isin(VERDICT_CATEGORIES)
         valid_mask = (~malformed_mask) & verdict_in_set
@@ -275,24 +332,77 @@ def per_judge_classification(
         n_invalid = int(((~malformed_mask) & (~verdict_in_set)).sum())
         n_valid = int(valid_mask.sum())
 
-        if n_valid > 0:
-            preds = sub.loc[valid_mask, "verdict"]
-            n_fail = int((preds == "fail").sum())
-            accuracy = n_fail / n_valid
+        valid = sub[valid_mask]
+        gt = valid["ground_truth"]
+        pred = valid["verdict"]
+        TP = int(((pred == "fail") & (gt == "fail")).sum())
+        FN = int(((pred == "pass") & (gt == "fail")).sum())
+        FP = int(((pred == "fail") & (gt == "pass")).sum())
+        TN = int(((pred == "pass") & (gt == "pass")).sum())
+
+        n_pos = TP + FN  # ground-truth positives (defect pairs)
+        n_neg = TN + FP  # ground-truth negatives (control pairs)
+        n_pred_fail = TP + FP
+        n_pred_pass = TN + FN
+
+        def _safe_div(num: float, den: float) -> float:
+            return float(num) / float(den) if den else float("nan")
+
+        accuracy = _safe_div(TP + TN, n_valid)
+        recall_sensitivity = _safe_div(TP, n_pos)
+        specificity = _safe_div(TN, n_neg)
+        precision = _safe_div(TP, n_pred_fail)
+        fpr = _safe_div(FP, n_neg)
+        fnr = _safe_div(FN, n_pos)
+        if (precision + recall_sensitivity) > 0 and np.isfinite(precision) and np.isfinite(
+            recall_sensitivity
+        ):
+            f1 = 2 * precision * recall_sensitivity / (precision + recall_sensitivity)
         else:
-            n_fail = 0
-            accuracy = float("nan")
+            f1 = float("nan")
+        if np.isfinite(recall_sensitivity) and np.isfinite(specificity):
+            balanced_accuracy = (recall_sensitivity + specificity) / 2
+        else:
+            balanced_accuracy = float("nan")
+        mcc_denom_sq = (
+            (TP + FP) * (TP + FN) * (TN + FP) * (TN + FN)
+        )
+        mcc = (
+            (TP * TN - FP * FN) / float(mcc_denom_sq) ** 0.5
+            if mcc_denom_sq > 0
+            else float("nan")
+        )
 
         out[judge] = {
-            "n_total": int(n_total),
+            "n_total": n_total,
             "n_valid": n_valid,
             "n_malformed": n_malformed,
             "n_invalid_verdict": n_invalid,
-            "n_predicted_fail": n_fail,
-            "n_predicted_pass": n_valid - n_fail,
+            "confusion_matrix": {
+                "TP": TP,
+                "FP": FP,
+                "TN": TN,
+                "FN": FN,
+                "n_ground_truth_positives": n_pos,
+                "n_ground_truth_negatives": n_neg,
+                "n_predicted_fail": n_pred_fail,
+                "n_predicted_pass": n_pred_pass,
+            },
+            "accuracy": accuracy,
+            "recall_sensitivity": recall_sensitivity,
+            "specificity_tnr": specificity,
+            "precision": precision,
+            "f1": f1,
+            "balanced_accuracy": balanced_accuracy,
+            "mcc": mcc,
+            "false_positive_rate": fpr,
+            "false_negative_rate": fnr,
+            # Back-compat aliases for older report consumers:
+            "n_predicted_fail": n_pred_fail,
+            "n_predicted_pass": n_pred_pass,
             "accuracy_vs_truth": accuracy,
-            "recall_vs_truth": accuracy,  # same thing when GT is all-fail
-            "precision_vs_truth": None,    # undefined: no true negatives
+            "recall_vs_truth": recall_sensitivity,
+            "precision_vs_truth": precision if np.isfinite(precision) else None,
         }
     return out
 
@@ -468,19 +578,24 @@ def accuracy_breakdown(
         per_group: Dict[str, Dict[str, float]] = {}
         for grp, sub_g in sub_j.groupby(group_col):
             n_valid = int(len(sub_g))
+            # Correctness is verdict == per-pair ground_truth. For defect
+            # categories (gt == 'fail') this is recall; for the control
+            # category (gt == 'pass') this is specificity. The CI is over
+            # the per-pair correctness vector regardless.
+            correct_mask = (sub_g["verdict"] == sub_g["ground_truth"]).to_numpy(dtype=int)
+            n_correct = int(correct_mask.sum())
             n_fail = int((sub_g["verdict"] == "fail").sum())
-            acc = (n_fail / n_valid) if n_valid else float("nan")
+            acc = (n_correct / n_valid) if n_valid else float("nan")
             if n_valid <= 1:
                 ci_lo = ci_hi = acc
             else:
-                correctness = (sub_g["verdict"] == "fail").to_numpy(dtype=int)
-                # Resample n_valid items with replacement, n_resamples times
                 idx = rng.integers(0, n_valid, size=(n_resamples, n_valid))
-                resampled = correctness[idx].mean(axis=1)
+                resampled = correct_mask[idx].mean(axis=1)
                 ci_lo = float(np.quantile(resampled, 0.025))
                 ci_hi = float(np.quantile(resampled, 0.975))
             per_group[str(grp)] = {
                 "n_valid": n_valid,
+                "n_correct": n_correct,
                 "n_fail": n_fail,
                 "accuracy": acc,
                 "ci_lo": ci_lo,
@@ -571,13 +686,16 @@ def render_markdown(report: Dict[str, object]) -> str:
     lines.append("# Phase 1 Analysis — Visual Oracle Bench (synthetic-HTML pilot)\n")
     lines.append(f"_Generated: {report['generated_at']}_  ")
     lines.append(f"_Bootstrap seed: {report['bootstrap_seed']} | resamples: {report['bootstrap_resamples']}_\n")
-    lines.append(
-        "Ground-truth assumption: every pair in `data/images/_pairs_manifest.json` "
-        "is a baseline-vs-defect pair where a defect was injected. The "
-        "ground-truth verdict for every pair is therefore `'fail'`. "
-        "Precision is undefined without negative examples and is reported as `n/a`; "
-        "accuracy and recall coincide.\n"
-    )
+    gt_src = report.get("ground_truth_source", "")
+    lines.append(f"Ground-truth source: {gt_src}\n")
+    nc_rationale = report.get("noncomparable_rationale")
+    if nc_rationale:
+        lines.append(
+            f"**Comparable-judges note.** {nc_rationale} Comparable: "
+            f"`{', '.join(report.get('comparable_judges', []))}`. "
+            f"Non-comparable (appendix only): "
+            f"`{', '.join(report.get('noncomparable_judges', [])) or 'none'}`.\n"
+        )
 
     # ---- Data inputs
     lines.append("## Data inputs\n")
@@ -620,30 +738,47 @@ def render_markdown(report: Dict[str, object]) -> str:
     tldr = report.get("tldr", "")
     lines.append(tldr + "\n")
 
-    # ---- Per-judge accuracy
-    lines.append("## Per-judge accuracy vs ground truth\n")
-    lines.append("Ground truth = `fail` for all pairs (manifest construction). "
-                 "`accuracy` = `recall` = fraction of valid verdicts that were `fail`. "
-                 "`precision` is undefined (no true negatives).\n")
-    lines.append("| Judge | n_total | n_valid | n_fail | n_pass | accuracy / recall | precision |")
-    lines.append("|---|---:|---:|---:|---:|---:|---:|")
+    # ---- Per-judge oracle metrics (full confusion matrix)
+    lines.append("## Per-judge oracle metrics\n")
+    lines.append(
+        "Confusion matrix is computed against per-pair `ground_truth` "
+        "(from manifest v2: `fail` for 400 defect pairs, `pass` for 200 "
+        "control pairs). TP/FN/FP/TN refer to the binary `fail` decision: "
+        "TP = correctly flagged a defect, FP = false alarm on a control, "
+        "FN = missed a defect, TN = correctly cleared a control.\n"
+    )
+    lines.append(
+        "| Judge | n_valid | TP | FP | TN | FN | accuracy | recall | specificity | precision | F1 | MCC | bal_acc |"
+    )
+    lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
     for judge in sorted(report["per_judge_classification"].keys()):
         c = report["per_judge_classification"][judge]
+        cm = c.get("confusion_matrix", {})
         lines.append(
-            f"| `{judge}` | {c['n_total']} | {c['n_valid']} | "
-            f"{c['n_predicted_fail']} | {c['n_predicted_pass']} | "
-            f"{fmt_pct(c['accuracy_vs_truth'])} | n/a |"
+            f"| `{judge}` | {c['n_valid']} | {cm.get('TP', 0)} | {cm.get('FP', 0)} | "
+            f"{cm.get('TN', 0)} | {cm.get('FN', 0)} | "
+            f"{fmt_pct(c.get('accuracy', float('nan')))} | "
+            f"{fmt_pct(c.get('recall_sensitivity', float('nan')))} | "
+            f"{fmt_pct(c.get('specificity_tnr', float('nan')))} | "
+            f"{fmt_pct(c.get('precision', float('nan')))} | "
+            f"{fmt_k(c.get('f1', float('nan')))} | "
+            f"{fmt_k(c.get('mcc', float('nan')))} | "
+            f"{fmt_pct(c.get('balanced_accuracy', float('nan')))} |"
         )
     lines.append("")
 
-    # ---- Pairwise kappa
-    lines.append("## Inter-judge agreement (Cohen's kappa)\n")
-    lines.append("Pairwise nominal kappa over `{fail, pass}` on the intersection "
-                 "of pairs both judges produced a valid verdict for. CIs are "
-                 "percentile bootstrap over pair indices.\n")
+    # ---- Pairwise kappa (comparable judges only)
+    lines.append("## Inter-judge agreement (Cohen's kappa) — comparable judges\n")
+    lines.append(
+        "Pairwise nominal kappa over `{fail, pass}` on the intersection "
+        "of pairs both judges produced a valid verdict for, including BOTH "
+        "defect and control pairs. CIs are percentile bootstrap over pair "
+        "indices (seed and resample count above). Non-comparable judges "
+        "(Llama) appear in a separate appendix table below.\n"
+    )
     lines.append("| Judge A | Judge B | n_pairs | kappa | 95% CI | Landis-Koch |")
     lines.append("|---|---|---:|---:|---|---|")
-    for entry in report["pairwise_cohen_kappa"]:
+    for entry in report.get("pairwise_cohen_kappa_comparable", []):
         ci_lo, ci_hi = entry["ci95"]
         ci_str = "n/a" if not (np.isfinite(ci_lo) and np.isfinite(ci_hi)) else f"[{ci_lo:.3f}, {ci_hi:.3f}]"
         lines.append(
@@ -653,8 +788,8 @@ def render_markdown(report: Dict[str, object]) -> str:
         )
     lines.append("")
 
-    fk = report["fleiss_kappa"]
-    if fk["n_subjects"] > 0:
+    fk = report.get("fleiss_kappa_comparable", {})
+    if fk.get("n_subjects", 0) > 0:
         ci_lo, ci_hi = fk["ci95"]
         ci_str = "n/a" if not (np.isfinite(ci_lo) and np.isfinite(ci_hi)) else f"[{ci_lo:.3f}, {ci_hi:.3f}]"
         lines.append(
@@ -663,7 +798,31 @@ def render_markdown(report: Dict[str, object]) -> str:
             f"{fmt_k(fk['kappa'])}** — 95% CI {ci_str} ({landis_koch(fk['kappa'])}).\n"
         )
     else:
-        lines.append("**Fleiss' kappa:** n/a (no pair had a valid verdict from every judge).\n")
+        note = fk.get("note", "no pair had a valid verdict from every judge")
+        lines.append(f"**Fleiss' kappa (comparable judges):** n/a — {note}.\n")
+
+    # ---- Non-comparable kappa (Llama vs comparable, integration-failure appendix)
+    nc_pairs = report.get("pairwise_cohen_kappa_noncomparable_cross", [])
+    if nc_pairs:
+        lines.append("## Appendix A: non-comparable cross-modal kappa (Llama vs comparable judges)\n")
+        lines.append(
+            "These rows are reported for the integration-failure-mode appendix "
+            "only. The Llama judge was fed a side-by-side composite PNG "
+            "(see manuscript §4.8, Llama composite workaround). The composite "
+            "format confounds capability with input modality, so these kappa "
+            "values are NOT evidence of a model-quality difference.\n"
+        )
+        lines.append("| Judge A | Judge B | n_pairs | kappa | 95% CI | Landis-Koch |")
+        lines.append("|---|---|---:|---:|---|---|")
+        for entry in nc_pairs:
+            ci_lo, ci_hi = entry["ci95"]
+            ci_str = "n/a" if not (np.isfinite(ci_lo) and np.isfinite(ci_hi)) else f"[{ci_lo:.3f}, {ci_hi:.3f}]"
+            lines.append(
+                f"| `{entry['judge_a']}` | `{entry['judge_b']}` | "
+                f"{entry['n_pairs']} | {fmt_k(entry['kappa'])} | {ci_str} | "
+                f"{landis_koch(entry['kappa'])} |"
+            )
+        lines.append("")
 
     # ---- Per-app breakdown
     lines.append("## Per-app breakdown\n")
@@ -687,10 +846,14 @@ def render_markdown(report: Dict[str, object]) -> str:
     # ---- Per-category breakdown (with 95% bootstrap CIs)
     lines.append("## Per-category breakdown\n")
     lines.append(
-        "Accuracy and 95% percentile-bootstrap CIs (1,000 resamples, seed 42). "
-        "At per-category n=64-72, the CIs are wide; cross-judge differences "
-        "within overlapping CIs should NOT be interpreted as evidence of "
-        "judge-specific weakness.\n"
+        "Per-cell value = fraction of valid verdicts that matched the per-pair "
+        "`ground_truth`. For the six defect categories (color/contrast/layout/"
+        "missing/truncation/zorder) this is **recall** (sensitivity) at "
+        "n=64-72 pairs/category. For the `control` category (n=200) this is "
+        "**specificity** (true negative rate). 95% percentile-bootstrap CIs "
+        "with seed 42, 1000 resamples. At per-category n=64-72, CIs are wide; "
+        "cross-judge differences within overlapping CIs should NOT be "
+        "interpreted as evidence of judge-specific weakness.\n"
     )
     cat_judges = sorted(report["per_category_accuracy"].keys())
     cats = sorted({c for j in cat_judges for c in report["per_category_accuracy"][j].keys()})
@@ -758,26 +921,18 @@ def render_markdown(report: Dict[str, object]) -> str:
 EXPECTED_JUDGES = ["openai-codex", "claude-oauth", "llama"]
 
 
-def compute_report(
+def _compute_pairwise(
     df: pd.DataFrame,
-    inputs_meta: Dict[str, object],
-    manifest_join_diag: Dict[str, int],
-    *,
-    seed: int,
+    judges: List[str],
+    rng: np.random.Generator,
     n_resamples: int,
-) -> Dict[str, object]:
-    rng = np.random.default_rng(seed)
-
-    per_judge = per_judge_classification(df)
-
-    # Pairwise Cohen
-    judges = sorted(df["judgeName"].unique().tolist())
-    pairwise: List[Dict[str, object]] = []
+) -> List[Dict[str, object]]:
+    out: List[Dict[str, object]] = []
     for i, ja in enumerate(judges):
         for jb in judges[i + 1 :]:
             a, b, n = build_paired_matrix(df, ja, jb)
             if n == 0:
-                pairwise.append(
+                out.append(
                     {
                         "judge_a": ja,
                         "judge_b": jb,
@@ -794,7 +949,7 @@ def compute_report(
                 return cohen_kappa(_aa[idx].tolist(), _bb[idx].tolist(), VERDICT_CATEGORIES)
 
             point, lo, hi = bootstrap_ci(est, n, n_resamples, rng)
-            pairwise.append(
+            out.append(
                 {
                     "judge_a": ja,
                     "judge_b": jb,
@@ -803,62 +958,131 @@ def compute_report(
                     "ci95": [lo, hi],
                 }
             )
+    return out
 
-    # Fleiss across all judges
-    fleiss_judges = judges
-    fleiss_mat, fleiss_pairs = build_fleiss_matrix(df, fleiss_judges)
+
+def _compute_fleiss_block(
+    df: pd.DataFrame,
+    judges: List[str],
+    rng: np.random.Generator,
+    n_resamples: int,
+) -> Dict[str, object]:
+    if len(judges) < 3:
+        # Fleiss requires >= 3 raters; below that it collapses to Cohen.
+        return {
+            "judges": judges,
+            "n_subjects": 0,
+            "n_categories": len(VERDICT_CATEGORIES),
+            "kappa": float("nan"),
+            "ci95": [float("nan"), float("nan")],
+            "note": "Fleiss undefined for fewer than 3 raters; see pairwise Cohen.",
+        }
+    fleiss_mat, _ = build_fleiss_matrix(df, judges)
     if fleiss_mat.shape[0] == 0:
-        fleiss_block = {
-            "judges": fleiss_judges,
+        return {
+            "judges": judges,
             "n_subjects": 0,
             "n_categories": len(VERDICT_CATEGORIES),
             "kappa": float("nan"),
             "ci95": [float("nan"), float("nan")],
         }
-    else:
-        point = fleiss_kappa(fleiss_mat)
+    point = fleiss_kappa(fleiss_mat)
 
-        def est_fleiss(idx: np.ndarray, _m=fleiss_mat) -> float:
-            return fleiss_kappa(_m[idx])
+    def est_fleiss(idx: np.ndarray, _m=fleiss_mat) -> float:
+        return fleiss_kappa(_m[idx])
 
-        _, lo, hi = bootstrap_ci(est_fleiss, fleiss_mat.shape[0], n_resamples, rng)
-        fleiss_block = {
-            "judges": fleiss_judges,
-            "n_subjects": int(fleiss_mat.shape[0]),
-            "n_categories": int(fleiss_mat.shape[1]),
-            "kappa": point,
-            "ci95": [lo, hi],
-        }
+    _, lo, hi = bootstrap_ci(est_fleiss, fleiss_mat.shape[0], n_resamples, rng)
+    return {
+        "judges": judges,
+        "n_subjects": int(fleiss_mat.shape[0]),
+        "n_categories": int(fleiss_mat.shape[1]),
+        "kappa": point,
+        "ci95": [lo, hi],
+    }
 
-    # Breakdowns
+
+def compute_report(
+    df: pd.DataFrame,
+    inputs_meta: Dict[str, object],
+    manifest_join_diag: Dict[str, int],
+    *,
+    seed: int,
+    n_resamples: int,
+) -> Dict[str, object]:
+    rng = np.random.default_rng(seed)
+
+    per_judge = per_judge_classification(df)
+
+    judges = sorted(df["judgeName"].unique().tolist())
+    # Llama is split out into a non-comparable bucket because its input
+    # modality (side-by-side composite PNG) differs from the others
+    # (paired images). Headline kappa / Fleiss use comparable judges only.
+    comparable_judges = [j for j in judges if j not in LLAMA_JUDGE_NAMES]
+    noncomparable_judges = [j for j in judges if j in LLAMA_JUDGE_NAMES]
+
+    pairwise_all = _compute_pairwise(df, judges, rng, n_resamples)
+    pairwise_comparable = _compute_pairwise(
+        df, comparable_judges, np.random.default_rng(seed), n_resamples
+    )
+    pairwise_noncomparable_cross: List[Dict[str, object]] = []
+    for nc in noncomparable_judges:
+        for cj in comparable_judges:
+            ja, jb = sorted([nc, cj])
+            entry = next(
+                (
+                    e
+                    for e in pairwise_all
+                    if e["judge_a"] == ja and e["judge_b"] == jb
+                ),
+                None,
+            )
+            if entry is not None:
+                pairwise_noncomparable_cross.append(entry)
+
+    fleiss_all = _compute_fleiss_block(df, judges, rng, n_resamples)
+    fleiss_comparable = _compute_fleiss_block(
+        df, comparable_judges, np.random.default_rng(seed + 1), n_resamples
+    )
+
     per_app = accuracy_breakdown(df, "app")
     per_cat = accuracy_breakdown(df, "manifest_category")
     latency = latency_stats(df)
     cost = cost_stats(df)
     failures = failure_mode_stats(df)
 
-    # TL;DR
-    acc_bits = []
-    for judge in sorted(per_judge.keys()):
-        acc = per_judge[judge]["accuracy_vs_truth"]
-        acc_bits.append(f"`{judge}` {fmt_pct(acc)} (n_valid={per_judge[judge]['n_valid']})")
-    pairwise_bits = []
-    for entry in pairwise:
+    # TL;DR: lead with comparable-judge headline metrics.
+    headline_bits = []
+    for judge in sorted(comparable_judges):
+        c = per_judge.get(judge, {})
+        if not c:
+            continue
+        headline_bits.append(
+            f"`{judge}` acc={fmt_pct(c.get('accuracy', float('nan')))} "
+            f"recall={fmt_pct(c.get('recall_sensitivity', float('nan')))} "
+            f"spec={fmt_pct(c.get('specificity_tnr', float('nan')))} "
+            f"prec={fmt_pct(c.get('precision', float('nan')))} "
+            f"F1={fmt_k(c.get('f1', float('nan')))} "
+            f"MCC={fmt_k(c.get('mcc', float('nan')))} "
+            f"(n_valid={c.get('n_valid', 0)})"
+        )
+    kappa_bits = []
+    for entry in pairwise_comparable:
         if entry["n_pairs"] == 0:
             continue
-        pairwise_bits.append(
+        kappa_bits.append(
             f"`{entry['judge_a']}`/`{entry['judge_b']}` kappa={fmt_k(entry['kappa'])} "
             f"(n={entry['n_pairs']})"
         )
     fleiss_str = ""
-    if fleiss_block["n_subjects"] > 0:
+    if fleiss_comparable["n_subjects"] > 0:
         fleiss_str = (
-            f" Fleiss' kappa across {len(fleiss_block['judges'])} judges = "
-            f"{fmt_k(fleiss_block['kappa'])} on n={fleiss_block['n_subjects']} subjects."
+            f" Fleiss' kappa across {len(fleiss_comparable['judges'])} comparable judges = "
+            f"{fmt_k(fleiss_comparable['kappa'])} on n={fleiss_comparable['n_subjects']} subjects."
         )
     tldr = (
-        "Accuracy vs all-fail ground truth: " + "; ".join(acc_bits) + ". "
-        "Pairwise agreement: " + ("; ".join(pairwise_bits) if pairwise_bits else "n/a")
+        "[comparable judges only — Llama excluded per modality-confound disclosure] "
+        "Per-judge: " + "; ".join(headline_bits) + ". "
+        "Pairwise Cohen kappa: " + ("; ".join(kappa_bits) if kappa_bits else "n/a")
         + "." + fleiss_str
     )
 
@@ -866,18 +1090,32 @@ def compute_report(
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "bootstrap_seed": seed,
         "bootstrap_resamples": n_resamples,
-        "ground_truth_assumption": (
-            "Every pair in data/images/_pairs_manifest.json is a baseline-vs-defect "
-            "pair with a defect injected; ground_truth = 'fail' for all pairs. "
-            "Precision is undefined without negatives."
+        "ground_truth_source": (
+            "Per-pair `expected_verdict` from manifest v2 "
+            "(_pairs_manifest_v2.json): 'fail' for 400 defect pairs, "
+            "'pass' for 200 control pairs (baseline == defect). "
+            "Precision, specificity, F1, MCC are now defined."
         ),
         "expected_judges": EXPECTED_JUDGES,
+        "comparable_judges": comparable_judges,
+        "noncomparable_judges": noncomparable_judges,
+        "noncomparable_rationale": (
+            "Llama judges were fed a side-by-side composite PNG (multi-image "
+            "workaround for Ollama's single-image input limit); other "
+            "judges received paired images. Per-judge metrics are kept "
+            "for the integration-failure appendix but Llama is excluded "
+            "from headline pairwise / Fleiss kappa."
+        ),
         "data_inputs": inputs_meta,
         "manifest_join": manifest_join_diag,
         "tldr": tldr,
         "per_judge_classification": per_judge,
-        "pairwise_cohen_kappa": pairwise,
-        "fleiss_kappa": fleiss_block,
+        "pairwise_cohen_kappa_comparable": pairwise_comparable,
+        "pairwise_cohen_kappa_noncomparable_cross": pairwise_noncomparable_cross,
+        "pairwise_cohen_kappa": pairwise_comparable,  # legacy alias for older consumers
+        "fleiss_kappa_comparable": fleiss_comparable,
+        "fleiss_kappa_all": fleiss_all,
+        "fleiss_kappa": fleiss_comparable,  # legacy alias
         "per_app_accuracy": per_app,
         "per_category_accuracy": per_cat,
         "latency": latency,
@@ -977,10 +1215,14 @@ def main(argv: Optional[List[str]] = None) -> int:
                     "Report will still be generated for the available judges."
                 )
             for judge, prov in sorted(inputs_meta["judges"].items()):
-                print(
-                    f"  {judge}: {prov['rows']} rows from "
-                    f"{Path(prov['source_parquet']).name} (ts={prov['source_timestamp']})"
-                )
+                sources = prov.get("source_parquets", [])
+                if sources:
+                    src_str = ", ".join(
+                        f"{Path(s['path']).name}={s['rows']}" for s in sources
+                    )
+                else:
+                    src_str = "(no source)"
+                print(f"  {judge}: {prov['rows']} rows from [{src_str}]")
         return 0
 
     if not parquets:

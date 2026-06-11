@@ -148,16 +148,21 @@ export class OpenAICodexJudge implements Judge {
             .reverse()
             .find((l) => l.trim().startsWith('{') && l.trim().endsWith('}')) ?? raw;
         const parsed = parseVerdictJson(jsonLine);
-        if (code !== 0 || !parsed) {
+        // parseVerdictJson never returns null — it returns malformed:true on
+        // parse failure. The old `!parsed` check was always false, so parse
+        // failures leaked through with malformed:false and a defaulted 'fail'
+        // verdict (bug found 2026-06-10; all 200 codex control rows in the
+        // 06-10 parquet had empty stdout and were recorded as valid 'fail').
+        if (code !== 0 || parsed.malformed) {
           resolve({
             verdict: 'fail',
-            rationale: parsed?.rationale ?? `codex exited ${code}; unparseable`,
+            rationale: code !== 0 ? `codex exited ${code}; unparseable` : parsed.rationale,
             rawResponse: raw,
             latencyMs,
             costUsd: 0,
             modelVersion: this.modelId,
             timestamp,
-            malformed: !parsed,
+            malformed: true,
           });
           return;
         }

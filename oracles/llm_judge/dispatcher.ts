@@ -59,6 +59,20 @@ export interface DispatcherOptions {
   outDir?: string;
   /** When true, log the plan but do not call any judge. */
   dryRun?: boolean;
+  /**
+   * Fail-fast gate against dead CLI sessions / blanket rate-limit responses
+   * (introduced 2026-06-10 after a 2-hour dispatch silently fabricated 200
+   * verdicts from an expired Codex OAuth refresh token). After the first
+   * `failFastMinSamples` per-judge judgments, abort the entire batch if the
+   * malformed-after-retry rate exceeds `failFastThreshold`. Set
+   * `failFast=false` to disable (e.g. when intentionally running against a
+   * known-flaky provider).
+   */
+  failFast?: boolean;
+  /** Per-judge sample count after which the fail-fast gate engages. Default 20. */
+  failFastMinSamples?: number;
+  /** Fraction of malformed-after-retry that triggers abort. Default 0.25 (25%). */
+  failFastThreshold?: number;
 }
 
 export interface PairManifestEntry {
@@ -67,6 +81,12 @@ export interface PairManifestEntry {
   baseline: string;
   /** Absolute path to defect PNG. */
   defect: string;
+  /**
+   * Ground-truth expected verdict for this pair. Manifest v2 (2026-06-10)
+   * tags every pair: 'fail' for defect pairs, 'pass' for control pairs
+   * (baseline == defect). v1 manifests without the field default to 'fail'.
+   */
+  expectedVerdict?: 'pass' | 'fail';
 }
 
 export interface JudgmentRecord extends JudgeResponse {
@@ -74,6 +94,7 @@ export interface JudgmentRecord extends JudgeResponse {
   baselinePath: string;
   defectPath: string;
   category: string;
+  expectedVerdict: string;
   retried: boolean;
 }
 
@@ -199,6 +220,7 @@ async function judgeWithRetry(
       baselinePath: pair.baseline,
       defectPath: pair.defect,
       category: pair.category ?? 'unknown',
+      expectedVerdict: pair.expectedVerdict ?? 'fail',
       retried: false,
     };
   }
@@ -226,6 +248,7 @@ async function judgeWithRetry(
     baselinePath: pair.baseline,
     defectPath: pair.defect,
     category: pair.category ?? 'unknown',
+    expectedVerdict: pair.expectedVerdict ?? 'fail',
     retried,
   };
 }
@@ -246,6 +269,7 @@ async function persistRecords(records: JudgmentRecord[], outDir: string, ts: str
       baselinePath: { type: 'UTF8' },
       defectPath: { type: 'UTF8' },
       category: { type: 'UTF8' },
+      expectedVerdict: { type: 'UTF8' },
       verdict: { type: 'UTF8' },
       rationale: { type: 'UTF8' },
       rawResponse: { type: 'UTF8' },
@@ -265,6 +289,7 @@ async function persistRecords(records: JudgmentRecord[], outDir: string, ts: str
         baselinePath: r.baselinePath,
         defectPath: r.defectPath,
         category: r.category,
+        expectedVerdict: r.expectedVerdict,
         verdict: r.verdict,
         rationale: r.rationale,
         rawResponse: r.rawResponse,
@@ -357,11 +382,22 @@ export async function runDispatch(
   let cumulativeCost = 0;
   let aborted = false;
   let abortReason: string | undefined;
+  const failFast = opts.failFast ?? true;
+  const failFastMinSamples = opts.failFastMinSamples ?? 20;
+  const failFastThreshold = opts.failFastThreshold ?? 0.25;
+  if (failFast) {
+    console.log(
+      `[dispatcher] fail-fast gate: after ${failFastMinSamples} judgments per judge, ` +
+        `abort if malformed-after-retry rate > ${(failFastThreshold * 100).toFixed(0)}%`,
+    );
+  }
 
   // Run each judge's pair-list with its own concurrency lane.
   for (const [judgeName, judge] of judges) {
     if (aborted) break;
     console.log(`[dispatcher] -- judge ${judgeName} (${judge.modelId}) --`);
+    let judgeMalformed = 0;
+    let judgeTotal = 0;
     await boundedConcurrentMap(
       pairs,
       concurrency,
@@ -369,14 +405,33 @@ export async function runDispatch(
       (record) => {
         records.push(record);
         cumulativeCost += record.costUsd ?? 0;
+        judgeTotal += 1;
+        if (record.malformed) judgeMalformed += 1;
         if (cumulativeCost > budgetUsd) {
           aborted = true;
           abortReason = `cumulative cost $${cumulativeCost.toFixed(2)} exceeded budget $${budgetUsd}`;
           console.error(`[dispatcher] BUDGET ABORT: ${abortReason}`);
           return false;
         }
+        if (failFast && judgeTotal >= failFastMinSamples) {
+          const rate = judgeMalformed / judgeTotal;
+          if (rate > failFastThreshold) {
+            aborted = true;
+            abortReason =
+              `judge=${judgeName}: ${judgeMalformed}/${judgeTotal} malformed-after-retry ` +
+              `(${(rate * 100).toFixed(0)}% > ${(failFastThreshold * 100).toFixed(0)}%); ` +
+              `likely dead CLI session, expired OAuth token, or sustained rate-limit. ` +
+              `Inspect ${judgeName} CLI auth and the last few rawResponse fields, then re-run.`;
+            console.error(`[dispatcher] FAIL-FAST ABORT: ${abortReason}`);
+            return false;
+          }
+        }
         return true;
       },
+    );
+    console.log(
+      `[dispatcher]    ${judgeName}: ${judgeTotal} processed, ${judgeMalformed} malformed ` +
+        `(${judgeTotal ? ((judgeMalformed / judgeTotal) * 100).toFixed(1) : 0}%)`,
     );
   }
 
@@ -410,8 +465,22 @@ function parseArgs(argv: string[]): {
   budget: number;
   outDir: string;
   dryRun: boolean;
+  filterCategory: string | null;
+  filterExpectedVerdict: 'pass' | 'fail' | null;
 } {
-  const out = {
+  const out: {
+    pairs: string;
+    judges: string[];
+    concurrency: number;
+    budget: number;
+    outDir: string;
+    dryRun: boolean;
+    filterCategory: string | null;
+    filterExpectedVerdict: 'pass' | 'fail' | null;
+    failFast: boolean;
+    failFastMinSamples: number;
+    failFastThreshold: number;
+  } = {
     pairs: '',
     // Default judges use OAuth/subscription paths (no API keys) per
     // user preference. Reviewer can override with --judges to pick the
@@ -421,6 +490,11 @@ function parseArgs(argv: string[]): {
     budget: 1500,
     outDir: resolve(process.cwd(), 'results'),
     dryRun: false,
+    filterCategory: null,
+    filterExpectedVerdict: null,
+    failFast: true,
+    failFastMinSamples: 20,
+    failFastThreshold: 0.25,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -430,6 +504,16 @@ function parseArgs(argv: string[]): {
     else if (a === '--budget') out.budget = parseFloat(argv[++i]);
     else if (a === '--out-dir') out.outDir = resolve(argv[++i]);
     else if (a === '--dry-run') out.dryRun = true;
+    else if (a === '--filter-category') out.filterCategory = argv[++i];
+    else if (a === '--filter-expected-verdict') {
+      const v = argv[++i];
+      if (v !== 'pass' && v !== 'fail') {
+        throw new Error(`--filter-expected-verdict must be 'pass' or 'fail', got '${v}'`);
+      }
+      out.filterExpectedVerdict = v;
+    } else if (a === '--no-fail-fast') out.failFast = false;
+    else if (a === '--fail-fast-min-samples') out.failFastMinSamples = parseInt(argv[++i], 10);
+    else if (a === '--fail-fast-threshold') out.failFastThreshold = parseFloat(argv[++i]);
   }
   return out;
 }
@@ -461,11 +545,36 @@ async function cli(): Promise<void> {
     console.error(`no pairs found in ${args.pairs}`);
     process.exit(2);
   }
-  const pairs = rawPairs.map((p) => ({
-    category: p.category,
-    baseline: resolve(p.baseline),
-    defect: resolve(p.defect),
-  }));
+  let pairs = rawPairs.map((p) => {
+    // Accept either snake_case (manifest convention, matches defect_id) or
+    // camelCase (TypeScript convention) for the ground-truth verdict field.
+    const rawExpected =
+      p.expectedVerdict ?? (p as unknown as { expected_verdict?: string }).expected_verdict;
+    return {
+      category: p.category,
+      baseline: resolve(p.baseline),
+      defect: resolve(p.defect),
+      expectedVerdict: (rawExpected ?? 'fail') as 'pass' | 'fail',
+    };
+  });
+  if (args.filterCategory) {
+    const before = pairs.length;
+    pairs = pairs.filter((p) => p.category === args.filterCategory);
+    console.log(
+      `[dispatcher] --filter-category=${args.filterCategory}: ${before} -> ${pairs.length} pairs`,
+    );
+  }
+  if (args.filterExpectedVerdict) {
+    const before = pairs.length;
+    pairs = pairs.filter((p) => p.expectedVerdict === args.filterExpectedVerdict);
+    console.log(
+      `[dispatcher] --filter-expected-verdict=${args.filterExpectedVerdict}: ${before} -> ${pairs.length} pairs`,
+    );
+  }
+  if (pairs.length === 0) {
+    console.error('[dispatcher] no pairs left after filtering; aborting.');
+    process.exit(2);
+  }
 
   const judges = buildJudgesFromNames(args.judges);
   const summary = await runDispatch(pairs, judges, {
@@ -473,6 +582,9 @@ async function cli(): Promise<void> {
     budgetUsd: args.budget,
     outDir: args.outDir,
     dryRun: args.dryRun,
+    failFast: args.failFast,
+    failFastMinSamples: args.failFastMinSamples,
+    failFastThreshold: args.failFastThreshold,
   });
   console.log(JSON.stringify(summary, null, 2));
   if (summary.aborted) process.exit(3);

@@ -143,16 +143,22 @@ export class ClaudeOAuthJudge implements Judge {
         const latencyMs = Date.now() - t0;
         const raw = stdout.trim();
         const parsed = parseVerdictJson(raw);
-        if (code !== 0 || !parsed) {
+        // parseVerdictJson never returns null — it returns malformed:true on
+        // parse failure. The old `!parsed` check was always false, so parse
+        // failures leaked through the success branch with malformed:false and
+        // a defaulted 'fail' verdict (bug found 2026-06-10: 317/400 claude
+        // rows and 225/400 codex rows in the 06-07 parquet were silent parse
+        // failures counted as valid verdicts).
+        if (code !== 0 || parsed.malformed) {
           resolve({
             verdict: 'fail',
-            rationale: parsed?.rationale ?? `claude -p exited ${code}; unparseable`,
+            rationale: code !== 0 ? `claude -p exited ${code}; unparseable` : parsed.rationale,
             rawResponse: raw,
             latencyMs,
             costUsd: 0,
             modelVersion: this.modelId,
             timestamp,
-            malformed: !parsed,
+            malformed: true,
           });
           return;
         }

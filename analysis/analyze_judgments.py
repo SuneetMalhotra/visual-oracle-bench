@@ -272,10 +272,48 @@ def load_manifest(path: Path) -> pd.DataFrame:
     return df
 
 
+def _flag_silent_fabrications(judgments: pd.DataFrame) -> Tuple[pd.DataFrame, int]:
+    """Mutate rows that look like silent-fabrication artifacts (judge
+    wrapper bug pre-2026-06-10) to malformed=True so all downstream
+    valid-mask logic correctly excludes them.
+
+    Detection signals (any one is sufficient):
+      - rationale begins with 'MALFORMED' (parseVerdictJson fallback)
+      - rawResponse is empty after strip (dead CLI subprocess)
+      - rawResponse contains 'session limit' (Claude Max rate limit)
+      - rawResponse contains 'refresh_token' (Codex CLI OAuth failure)
+
+    Returns the mutated df + the count of rows re-flagged.
+    """
+    if judgments.empty:
+        return judgments, 0
+    df = judgments.copy()
+    rationale = df.get("rationale", pd.Series([""] * len(df))).astype(str)
+    raw = df.get("rawResponse", pd.Series([""] * len(df))).astype(str)
+    raw_lower = raw.str.lower()
+    silent = (
+        rationale.str.startswith("MALFORMED")
+        | (raw.str.strip() == "")
+        | raw_lower.str.contains("session limit", regex=False)
+        | raw_lower.str.contains("refresh_token", regex=False)
+    )
+    already_malformed = df["malformed"].astype(bool)
+    newly_flagged = int((silent & ~already_malformed).sum())
+    if newly_flagged:
+        df.loc[silent, "malformed"] = True
+    return df, newly_flagged
+
+
 def join_judgments_to_manifest(
     judgments: pd.DataFrame, manifest: pd.DataFrame
 ) -> Tuple[pd.DataFrame, Dict[str, int]]:
     before = len(judgments)
+    judgments, silent_flagged = _flag_silent_fabrications(judgments)
+    if silent_flagged:
+        print(
+            f"[analyzer] WARN: re-flagged {silent_flagged} rows as malformed=True "
+            f"based on silent-fabrication signature (pre-2026-06-10 judge wrapper bug)"
+        )
     joined = judgments.merge(
         manifest, on=["baselinePath", "defectPath"], how="left", indicator=True
     )
@@ -301,12 +339,34 @@ def join_judgments_to_manifest(
 # ---------------------------------------------------------------------------
 
 def is_valid_verdict(row: pd.Series) -> bool:
-    """Llama's broken run sets malformed=True; treat any malformed row as
-    'no verdict' for the purposes of agreement / accuracy. Verdicts not in
-    {fail, pass} are also dropped."""
+    """Drop any row that's malformed, has an invalid verdict label, or
+    matches a known silent-fabrication signature.
+
+    The silent-fabrication detection (2026-06-11) is a backup for rows
+    written by pre-2026-06-10 judge wrappers that defaulted
+    `malformed=False` even when the underlying provider returned empty
+    stdout or a rate-limit / auth-error string. The corresponding parquet
+    rows carry `rationale='MALFORMED: ...'` or a `rawResponse` body that's
+    empty / contains 'session limit' / contains 'refresh_token'. Newer
+    runs from patched judges set `malformed=True` directly and won't
+    reach this branch.
+    """
     if bool(row.get("malformed", False)):
         return False
-    return row.get("verdict") in VERDICT_CATEGORIES
+    if row.get("verdict") not in VERDICT_CATEGORIES:
+        return False
+    rationale = str(row.get("rationale") or "")
+    if rationale.startswith("MALFORMED"):
+        return False
+    raw = str(row.get("rawResponse") or "")
+    if not raw.strip():
+        return False
+    raw_lower = raw.lower()
+    if "session limit" in raw_lower:
+        return False
+    if "refresh_token" in raw_lower:
+        return False
+    return True
 
 
 def per_judge_classification(

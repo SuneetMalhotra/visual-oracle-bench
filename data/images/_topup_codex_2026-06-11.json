@@ -1,0 +1,2089 @@
+{
+  "version": 2,
+  "generated_at": "2026-06-07T02:16:13.404Z",
+  "total_apps": 8,
+  "total_pairs": 200,
+  "per_app": [
+    {
+      "app": "conduit",
+      "ok": 50,
+      "included": 50,
+      "fail": 0,
+      "missing": false,
+      "control": 25,
+      "total": 75
+    },
+    {
+      "app": "mattermost",
+      "ok": 50,
+      "included": 50,
+      "fail": 0,
+      "missing": false,
+      "control": 25,
+      "total": 75
+    },
+    {
+      "app": "excalidraw",
+      "ok": 50,
+      "included": 50,
+      "fail": 0,
+      "missing": false,
+      "control": 25,
+      "total": 75
+    },
+    {
+      "app": "gitlab-ce",
+      "ok": 50,
+      "included": 50,
+      "fail": 0,
+      "missing": false,
+      "control": 25,
+      "total": 75
+    },
+    {
+      "app": "rocket-chat",
+      "ok": 50,
+      "included": 50,
+      "fail": 0,
+      "missing": false,
+      "control": 25,
+      "total": 75
+    },
+    {
+      "app": "penpot",
+      "ok": 50,
+      "included": 50,
+      "fail": 0,
+      "missing": false,
+      "control": 25,
+      "total": 75
+    },
+    {
+      "app": "cal-com",
+      "ok": 50,
+      "included": 50,
+      "fail": 0,
+      "missing": false,
+      "control": 25,
+      "total": 75
+    },
+    {
+      "app": "nocodb",
+      "ok": 50,
+      "included": 50,
+      "fail": 0,
+      "missing": false,
+      "control": 25,
+      "total": 75
+    }
+  ],
+  "include_failed": false,
+  "pre_registration_target_pairs": 400,
+  "pre_registration_target_pngs": 800,
+  "results": [
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-001",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-color-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-color-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-color-001"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-002",
+      "category": "control",
+      "surface": "event-types",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-color-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-color-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-color-003"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-003",
+      "category": "control",
+      "surface": "booking-page",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-color-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-color-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-color-005"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-004",
+      "category": "control",
+      "surface": "bookings-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-color-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-color-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-color-007"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-005",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-contrast-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-contrast-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-contrast-001"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-006",
+      "category": "control",
+      "surface": "event-types",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-contrast-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-contrast-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-contrast-003"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-007",
+      "category": "control",
+      "surface": "booking-page",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-contrast-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-contrast-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-contrast-005"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-008",
+      "category": "control",
+      "surface": "bookings-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-contrast-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-contrast-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-contrast-007"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-009",
+      "category": "control",
+      "surface": "admin-settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-contrast-009.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-contrast-009.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-contrast-009"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-010",
+      "category": "control",
+      "surface": "event-types",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-layout-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-layout-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-layout-002"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-011",
+      "category": "control",
+      "surface": "booking-page",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-layout-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-layout-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-layout-004"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-012",
+      "category": "control",
+      "surface": "bookings-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-layout-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-layout-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-layout-006"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-013",
+      "category": "control",
+      "surface": "admin-settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-layout-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-layout-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-layout-008"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-014",
+      "category": "control",
+      "surface": "event-types",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-missing-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-missing-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-missing-002"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-015",
+      "category": "control",
+      "surface": "booking-page",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-missing-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-missing-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-missing-004"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-016",
+      "category": "control",
+      "surface": "booking-page",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-missing-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-missing-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-missing-006"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-017",
+      "category": "control",
+      "surface": "admin-settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-missing-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-missing-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-missing-008"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-018",
+      "category": "control",
+      "surface": "event-types",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-truncation-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-truncation-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-truncation-002"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-019",
+      "category": "control",
+      "surface": "booking-page",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-truncation-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-truncation-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-truncation-004"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-020",
+      "category": "control",
+      "surface": "bookings-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-truncation-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-truncation-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-truncation-006"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-021",
+      "category": "control",
+      "surface": "admin-settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-truncation-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-truncation-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-truncation-008"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-022",
+      "category": "control",
+      "surface": "event-types",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-zorder-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-zorder-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-zorder-002"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-023",
+      "category": "control",
+      "surface": "booking-page",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-zorder-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-zorder-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-zorder-004"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-024",
+      "category": "control",
+      "surface": "booking-page",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-zorder-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-zorder-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-zorder-006"
+    },
+    {
+      "app": "cal-com",
+      "defect_id": "cal-com-control-025",
+      "category": "control",
+      "surface": "admin-settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-zorder-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/cal-com/baseline/cal-com-zorder-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "cal-com-zorder-008"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-001",
+      "category": "control",
+      "surface": "home",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-color-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-color-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-color-001"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-002",
+      "category": "control",
+      "surface": "home",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-color-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-color-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-color-003"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-003",
+      "category": "control",
+      "surface": "article",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-color-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-color-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-color-005"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-004",
+      "category": "control",
+      "surface": "editor",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-color-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-color-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-color-007"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-005",
+      "category": "control",
+      "surface": "home",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-contrast-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-contrast-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-contrast-001"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-006",
+      "category": "control",
+      "surface": "home",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-contrast-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-contrast-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-contrast-003"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-007",
+      "category": "control",
+      "surface": "article",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-contrast-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-contrast-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-contrast-005"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-008",
+      "category": "control",
+      "surface": "editor",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-contrast-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-contrast-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-contrast-007"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-009",
+      "category": "control",
+      "surface": "settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-contrast-009.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-contrast-009.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-contrast-009"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-010",
+      "category": "control",
+      "surface": "home",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-layout-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-layout-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-layout-002"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-011",
+      "category": "control",
+      "surface": "article",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-layout-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-layout-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-layout-004"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-012",
+      "category": "control",
+      "surface": "profile",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-layout-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-layout-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-layout-006"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-013",
+      "category": "control",
+      "surface": "settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-layout-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-layout-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-layout-008"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-014",
+      "category": "control",
+      "surface": "home",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-missing-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-missing-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-missing-002"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-015",
+      "category": "control",
+      "surface": "article",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-missing-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-missing-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-missing-004"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-016",
+      "category": "control",
+      "surface": "profile",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-missing-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-missing-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-missing-006"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-017",
+      "category": "control",
+      "surface": "settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-missing-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-missing-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-missing-008"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-018",
+      "category": "control",
+      "surface": "home",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-truncation-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-truncation-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-truncation-002"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-019",
+      "category": "control",
+      "surface": "article",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-truncation-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-truncation-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-truncation-004"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-020",
+      "category": "control",
+      "surface": "profile",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-truncation-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-truncation-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-truncation-006"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-021",
+      "category": "control",
+      "surface": "settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-truncation-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-truncation-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-truncation-008"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-022",
+      "category": "control",
+      "surface": "home",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-zorder-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-zorder-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-zorder-002"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-023",
+      "category": "control",
+      "surface": "article",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-zorder-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-zorder-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-zorder-004"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-024",
+      "category": "control",
+      "surface": "profile",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-zorder-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-zorder-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-zorder-006"
+    },
+    {
+      "app": "conduit",
+      "defect_id": "conduit-control-025",
+      "category": "control",
+      "surface": "settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-zorder-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/conduit/baseline/conduit-zorder-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "conduit-zorder-008"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-001",
+      "category": "control",
+      "surface": "toolbar-visible",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-color-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-color-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-color-001"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-002",
+      "category": "control",
+      "surface": "toolbar-visible",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-color-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-color-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-color-003"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-003",
+      "category": "control",
+      "surface": "library-open",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-color-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-color-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-color-005"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-004",
+      "category": "control",
+      "surface": "settings-drawer",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-color-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-color-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-color-007"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-005",
+      "category": "control",
+      "surface": "toolbar-visible",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-contrast-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-contrast-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-contrast-001"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-006",
+      "category": "control",
+      "surface": "toolbar-visible",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-contrast-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-contrast-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-contrast-003"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-007",
+      "category": "control",
+      "surface": "library-open",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-contrast-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-contrast-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-contrast-005"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-008",
+      "category": "control",
+      "surface": "export-modal",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-contrast-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-contrast-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-contrast-007"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-009",
+      "category": "control",
+      "surface": "toolbar-visible",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-contrast-009.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-contrast-009.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-contrast-009"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-010",
+      "category": "control",
+      "surface": "toolbar-visible",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-layout-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-layout-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-layout-002"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-011",
+      "category": "control",
+      "surface": "library-open",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-layout-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-layout-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-layout-004"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-012",
+      "category": "control",
+      "surface": "export-modal",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-layout-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-layout-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-layout-006"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-013",
+      "category": "control",
+      "surface": "settings-drawer",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-layout-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-layout-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-layout-008"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-014",
+      "category": "control",
+      "surface": "toolbar-visible",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-missing-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-missing-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-missing-002"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-015",
+      "category": "control",
+      "surface": "library-open",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-missing-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-missing-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-missing-004"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-016",
+      "category": "control",
+      "surface": "export-modal",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-missing-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-missing-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-missing-006"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-017",
+      "category": "control",
+      "surface": "empty-canvas",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-missing-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-missing-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-missing-008"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-018",
+      "category": "control",
+      "surface": "library-open",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-truncation-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-truncation-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-truncation-002"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-019",
+      "category": "control",
+      "surface": "export-modal",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-truncation-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-truncation-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-truncation-004"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-020",
+      "category": "control",
+      "surface": "settings-drawer",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-truncation-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-truncation-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-truncation-006"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-021",
+      "category": "control",
+      "surface": "empty-canvas",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-truncation-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-truncation-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-truncation-008"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-022",
+      "category": "control",
+      "surface": "toolbar-visible",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-zorder-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-zorder-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-zorder-002"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-023",
+      "category": "control",
+      "surface": "library-open",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-zorder-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-zorder-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-zorder-004"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-024",
+      "category": "control",
+      "surface": "settings-drawer",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-zorder-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-zorder-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-zorder-006"
+    },
+    {
+      "app": "excalidraw",
+      "defect_id": "excalidraw-control-025",
+      "category": "control",
+      "surface": "toolbar-visible",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-zorder-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/excalidraw/baseline/excalidraw-zorder-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "excalidraw-zorder-008"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-001",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-color-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-color-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-color-001"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-002",
+      "category": "control",
+      "surface": "project",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-color-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-color-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-color-003"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-003",
+      "category": "control",
+      "surface": "mr-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-color-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-color-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-color-005"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-004",
+      "category": "control",
+      "surface": "issue-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-color-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-color-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-color-007"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-005",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-contrast-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-contrast-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-contrast-001"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-006",
+      "category": "control",
+      "surface": "project",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-contrast-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-contrast-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-contrast-003"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-007",
+      "category": "control",
+      "surface": "mr-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-contrast-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-contrast-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-contrast-005"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-008",
+      "category": "control",
+      "surface": "issue-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-contrast-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-contrast-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-contrast-007"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-009",
+      "category": "control",
+      "surface": "admin",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-contrast-009.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-contrast-009.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-contrast-009"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-010",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-layout-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-layout-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-layout-002"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-011",
+      "category": "control",
+      "surface": "project",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-layout-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-layout-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-layout-004"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-012",
+      "category": "control",
+      "surface": "issue-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-layout-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-layout-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-layout-006"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-013",
+      "category": "control",
+      "surface": "admin",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-layout-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-layout-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-layout-008"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-014",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-missing-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-missing-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-missing-002"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-015",
+      "category": "control",
+      "surface": "project",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-missing-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-missing-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-missing-004"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-016",
+      "category": "control",
+      "surface": "mr-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-missing-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-missing-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-missing-006"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-017",
+      "category": "control",
+      "surface": "admin",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-missing-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-missing-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-missing-008"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-018",
+      "category": "control",
+      "surface": "project",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-truncation-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-truncation-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-truncation-002"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-019",
+      "category": "control",
+      "surface": "mr-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-truncation-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-truncation-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-truncation-004"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-020",
+      "category": "control",
+      "surface": "issue-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-truncation-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-truncation-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-truncation-006"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-021",
+      "category": "control",
+      "surface": "admin",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-truncation-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-truncation-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-truncation-008"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-022",
+      "category": "control",
+      "surface": "project",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-zorder-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-zorder-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-zorder-002"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-023",
+      "category": "control",
+      "surface": "mr-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-zorder-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-zorder-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-zorder-004"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-024",
+      "category": "control",
+      "surface": "issue-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-zorder-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-zorder-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-zorder-006"
+    },
+    {
+      "app": "gitlab-ce",
+      "defect_id": "gitlab-ce-control-025",
+      "category": "control",
+      "surface": "admin",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-zorder-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/gitlab-ce/baseline/gitlab-zorder-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "gitlab-zorder-008"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-001",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-color-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-color-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-color-001"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-002",
+      "category": "control",
+      "surface": "channel-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-color-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-color-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-color-003"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-003",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-color-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-color-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-color-005"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-004",
+      "category": "control",
+      "surface": "profile-modal",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-color-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-color-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-color-007"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-005",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-contrast-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-contrast-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-contrast-001"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-006",
+      "category": "control",
+      "surface": "channel-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-contrast-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-contrast-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-contrast-003"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-007",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-contrast-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-contrast-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-contrast-005"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-008",
+      "category": "control",
+      "surface": "profile-modal",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-contrast-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-contrast-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-contrast-007"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-009",
+      "category": "control",
+      "surface": "settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-contrast-009.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-contrast-009.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-contrast-009"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-010",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-layout-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-layout-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-layout-002"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-011",
+      "category": "control",
+      "surface": "channel-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-layout-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-layout-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-layout-004"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-012",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-layout-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-layout-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-layout-006"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-013",
+      "category": "control",
+      "surface": "settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-layout-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-layout-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-layout-008"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-014",
+      "category": "control",
+      "surface": "channel-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-missing-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-missing-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-missing-002"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-015",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-missing-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-missing-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-missing-004"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-016",
+      "category": "control",
+      "surface": "profile-modal",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-missing-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-missing-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-missing-006"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-017",
+      "category": "control",
+      "surface": "settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-missing-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-missing-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-missing-008"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-018",
+      "category": "control",
+      "surface": "channel-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-truncation-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-truncation-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-truncation-002"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-019",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-truncation-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-truncation-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-truncation-004"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-020",
+      "category": "control",
+      "surface": "profile-modal",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-truncation-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-truncation-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-truncation-006"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-021",
+      "category": "control",
+      "surface": "settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-truncation-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-truncation-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-truncation-008"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-022",
+      "category": "control",
+      "surface": "channel-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-zorder-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-zorder-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-zorder-002"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-023",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-zorder-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-zorder-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-zorder-004"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-024",
+      "category": "control",
+      "surface": "profile-modal",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-zorder-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-zorder-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-zorder-006"
+    },
+    {
+      "app": "mattermost",
+      "defect_id": "mattermost-control-025",
+      "category": "control",
+      "surface": "settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-zorder-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/mattermost/baseline/mattermost-zorder-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "mattermost-zorder-008"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-001",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-color-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-color-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-color-001"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-002",
+      "category": "control",
+      "surface": "base-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-color-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-color-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-color-003"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-003",
+      "category": "control",
+      "surface": "table-grid",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-color-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-color-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-color-005"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-004",
+      "category": "control",
+      "surface": "table-form",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-color-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-color-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-color-007"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-005",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-contrast-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-contrast-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-contrast-001"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-006",
+      "category": "control",
+      "surface": "base-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-contrast-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-contrast-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-contrast-003"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-007",
+      "category": "control",
+      "surface": "table-grid",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-contrast-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-contrast-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-contrast-005"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-008",
+      "category": "control",
+      "surface": "table-form",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-contrast-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-contrast-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-contrast-007"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-009",
+      "category": "control",
+      "surface": "settings-drawer",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-contrast-009.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-contrast-009.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-contrast-009"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-010",
+      "category": "control",
+      "surface": "base-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-layout-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-layout-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-layout-002"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-011",
+      "category": "control",
+      "surface": "table-grid",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-layout-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-layout-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-layout-004"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-012",
+      "category": "control",
+      "surface": "table-form",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-layout-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-layout-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-layout-006"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-013",
+      "category": "control",
+      "surface": "settings-drawer",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-layout-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-layout-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-layout-008"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-014",
+      "category": "control",
+      "surface": "base-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-missing-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-missing-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-missing-002"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-015",
+      "category": "control",
+      "surface": "table-grid",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-missing-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-missing-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-missing-004"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-016",
+      "category": "control",
+      "surface": "table-grid",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-missing-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-missing-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-missing-006"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-017",
+      "category": "control",
+      "surface": "settings-drawer",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-missing-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-missing-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-missing-008"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-018",
+      "category": "control",
+      "surface": "base-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-truncation-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-truncation-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-truncation-002"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-019",
+      "category": "control",
+      "surface": "table-grid",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-truncation-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-truncation-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-truncation-004"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-020",
+      "category": "control",
+      "surface": "table-form",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-truncation-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-truncation-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-truncation-006"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-021",
+      "category": "control",
+      "surface": "settings-drawer",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-truncation-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-truncation-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-truncation-008"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-022",
+      "category": "control",
+      "surface": "base-list",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-zorder-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-zorder-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-zorder-002"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-023",
+      "category": "control",
+      "surface": "table-grid",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-zorder-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-zorder-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-zorder-004"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-024",
+      "category": "control",
+      "surface": "table-grid",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-zorder-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-zorder-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-zorder-006"
+    },
+    {
+      "app": "nocodb",
+      "defect_id": "nocodb-control-025",
+      "category": "control",
+      "surface": "table-form",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-zorder-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/nocodb/baseline/nocodb-zorder-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "nocodb-zorder-008"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-001",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-color-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-color-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-color-001"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-002",
+      "category": "control",
+      "surface": "dashboard",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-color-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-color-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-color-003"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-003",
+      "category": "control",
+      "surface": "settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-color-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-color-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-color-005"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-004",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-color-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-color-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-color-007"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-005",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-contrast-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-contrast-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-contrast-001"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-006",
+      "category": "control",
+      "surface": "dashboard",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-contrast-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-contrast-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-contrast-003"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-007",
+      "category": "control",
+      "surface": "settings",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-contrast-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-contrast-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-contrast-005"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-008",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-contrast-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-contrast-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-contrast-007"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-009",
+      "category": "control",
+      "surface": "file-viewer",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-contrast-009.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-contrast-009.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-contrast-009"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-010",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-layout-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-layout-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-layout-002"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-011",
+      "category": "control",
+      "surface": "dashboard",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-layout-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-layout-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-layout-004"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-012",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-layout-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-layout-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-layout-006"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-013",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-layout-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-layout-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-layout-008"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-014",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-missing-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-missing-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-missing-002"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-015",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-missing-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-missing-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-missing-004"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-016",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-missing-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-missing-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-missing-006"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-017",
+      "category": "control",
+      "surface": "file-viewer",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-missing-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-missing-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-missing-008"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-018",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-truncation-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-truncation-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-truncation-002"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-019",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-truncation-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-truncation-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-truncation-004"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-020",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-truncation-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-truncation-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-truncation-006"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-021",
+      "category": "control",
+      "surface": "file-viewer",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-truncation-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-truncation-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-truncation-008"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-022",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-zorder-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-zorder-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-zorder-002"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-023",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-zorder-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-zorder-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-zorder-004"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-024",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-zorder-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-zorder-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-zorder-006"
+    },
+    {
+      "app": "penpot",
+      "defect_id": "penpot-control-025",
+      "category": "control",
+      "surface": "workspace",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-zorder-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/penpot/baseline/penpot-zorder-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "penpot-zorder-008"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-001",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-color-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-color-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-color-001"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-002",
+      "category": "control",
+      "surface": "channel-sidebar",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-color-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-color-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-color-003"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-003",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-color-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-color-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-color-005"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-004",
+      "category": "control",
+      "surface": "profile-modal",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-color-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-color-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-color-007"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-005",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-contrast-001.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-contrast-001.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-contrast-001"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-006",
+      "category": "control",
+      "surface": "channel-sidebar",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-contrast-003.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-contrast-003.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-contrast-003"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-007",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-contrast-005.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-contrast-005.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-contrast-005"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-008",
+      "category": "control",
+      "surface": "profile-modal",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-contrast-007.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-contrast-007.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-contrast-007"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-009",
+      "category": "control",
+      "surface": "admin",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-contrast-009.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-contrast-009.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-contrast-009"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-010",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-layout-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-layout-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-layout-002"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-011",
+      "category": "control",
+      "surface": "channel-sidebar",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-layout-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-layout-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-layout-004"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-012",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-layout-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-layout-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-layout-006"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-013",
+      "category": "control",
+      "surface": "admin",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-layout-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-layout-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-layout-008"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-014",
+      "category": "control",
+      "surface": "login",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-missing-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-missing-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-missing-002"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-015",
+      "category": "control",
+      "surface": "channel-sidebar",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-missing-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-missing-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-missing-004"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-016",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-missing-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-missing-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-missing-006"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-017",
+      "category": "control",
+      "surface": "admin",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-missing-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-missing-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-missing-008"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-018",
+      "category": "control",
+      "surface": "channel-sidebar",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-truncation-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-truncation-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-truncation-002"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-019",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-truncation-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-truncation-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-truncation-004"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-020",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-truncation-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-truncation-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-truncation-006"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-021",
+      "category": "control",
+      "surface": "admin",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-truncation-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-truncation-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-truncation-008"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-022",
+      "category": "control",
+      "surface": "channel-sidebar",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-zorder-002.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-zorder-002.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-zorder-002"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-023",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-zorder-004.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-zorder-004.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-zorder-004"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-024",
+      "category": "control",
+      "surface": "channel-view",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-zorder-006.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-zorder-006.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-zorder-006"
+    },
+    {
+      "app": "rocket-chat",
+      "defect_id": "rocket-chat-control-025",
+      "category": "control",
+      "surface": "admin",
+      "baseline": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-zorder-008.png",
+      "defect": "/Users/suneetmalhotra/work/visual-oracle-bench/data/images/rocket-chat/baseline/rocket-zorder-008.png",
+      "expected_verdict": "pass",
+      "source_baseline_of": "rocket-zorder-008"
+    }
+  ],
+  "v2_generated_at": "2026-06-10T16:45:06Z",
+  "v2_control_pairs_added": 200,
+  "v2_change_rationale": "Added 200 true-negative control pairs (25 per app) where baseline == defect to enable precision / specificity / F1 / MCC reporting. Addresses 2026-06-10 hostile-review BLOCKER 2.",
+  "topup_note": "Subset of _pairs_manifest_v2.json: Codex-only top-up for clean salvage strategy (Option 1)"
+}

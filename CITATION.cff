@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 type: software
-title: "Visual Oracle Bench (Phase 1) — Two-Judge Synthetic-HTML Pilot for LLM-as-Judge Visual Regression Detection with Specificity Reporting"
+title: "Visual Oracle Bench (Phase 1): A Two-Judge Synthetic-HTML Pilot for LLM-as-Judge Visual Regression Detection with Specificity Reporting"
 abstract: >-
   Companion software, datasets, and analysis pipeline for the Empirical
   Software Engineering submission "Visual Oracle Bench (Phase 1): A
@@ -45,5 +45,5 @@ preferred-citation:
 # Zenodo DOIs auto-appended by mint_zenodo_doi.py
 # Concept DOI: 10.5281/zenodo.20620870
 # Version DOI 10.5281/zenodo.20620871 = tag v0.3.0-phase1-pilot (superseded)
-# Version DOI for tag v1.6.0-emse-option-b: minted at submission via
-#   scripts/mint_zenodo_doi.py --tag v1.6.0-emse-option-b --substitute
+# Version DOI for tag v1.6.1-emse-option-b: minted at submission via
+#   scripts/mint_zenodo_doi.py --tag v1.6.1-emse-option-b --substitute

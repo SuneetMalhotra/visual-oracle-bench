@@ -8,7 +8,7 @@
 **GitHub:** [@SuneetMalhotra](https://github.com/SuneetMalhotra)
 **LinkedIn:** [linkedin.com/in/suneet-m](https://www.linkedin.com/in/suneet-m)
 **Pre-registration:** OSF DOI [10.17605/OSF.IO/NKD6J](https://osf.io/nkd6j/) (registered 2026-06-06, prior to any LLM judgment collection; Amendment 1, 2026-06-11, documents the Phase 1 correction protocol — see §3.5)
-**Companion repository:** [github.com/SuneetMalhotra/visual-oracle-bench](https://github.com/SuneetMalhotra/visual-oracle-bench) — Zenodo concept DOI 10.5281/zenodo.20620870; version DOI for release tag `v1.6.0-emse-option-b`: 10.5281/zenodo.TBD-VERSION-DOI *(minted at submission; see Data Availability)* (MIT code, CC-BY 4.0 data)
+**Companion repository:** [github.com/SuneetMalhotra/visual-oracle-bench](https://github.com/SuneetMalhotra/visual-oracle-bench) — Zenodo concept DOI 10.5281/zenodo.20620870; version DOI for release tag `v1.6.1-emse-option-b`: 10.5281/zenodo.TBD-VERSION-DOI *(minted at submission; see Data Availability)* (MIT code, CC-BY 4.0 data)
 **Target venue:** Empirical Software Engineering (EMSE) — Methodological Articles track
 **Manuscript draft date:** 2026-06-11 (v1.6)
 
@@ -21,7 +21,7 @@
 - Neither judge produced a false positive on the identical-image control pairs (Claude 0/125 clean controls, Codex 0/200). The controls' larger payoff was diagnostic: an impossible 200/200 fail run on identical images is what exposed the wrapper bug below.
 - A silent-fabrication detection mechanism and data-integrity correction protocol, demonstrated on this pipeline's own data: the original judge wrappers silently defaulted to `verdict=fail` on rate-limit and auth-error responses; 617 affected rows were detected, re-flagged, and excluded, and the wrapper patch, detection signals, and audit trail are all released. The transferable element is the design rule (treat unparseable output as malformed; include cases where the lazy default is wrong; fail fast), not the provider-specific signals.
 - One judge (Llama 3.2 Vision 11B) is excluded from comparative analysis owing to a documented multi-image input limitation; the integration failure is reported as a methodological finding in Appendix A.
-- OSF pre-registration timestamp predates any LLM judgment collection. Phase 1 is a separately-framed methodological pilot; the registered Phase 2 live-capture experiment is deferred and unchanged.
+- OSF pre-registration timestamp predates any LLM judgment collection. Phase 1 is an unregistered pilot reported with exploratory status; the registered Phase 2 live-capture experiment is deferred and unchanged.
 
 ---
 
@@ -172,7 +172,7 @@ The full analysis is reproducible from a fresh clone: the released parquets plus
 
 # 4. Results (Phase 1 — integrity-audited subset)
 
-All numbers in this section are taken from the analyzer output (`analysis/results/phase1_analysis_2026-06-11T04-39-28Z.{json,md}`) and the paired-test output (`analysis/results/paired_tests_latest.json`); both are regenerable from the released parquets without any LLM call. Two reconciliation notes for verifiers: the analyzer joins 1,600 rows in total (the 1,200 comparable-judge dispatches reported here, plus 400 Llama rows used only in Appendix A); and per §3.6, this section manually suppresses bootstrap CIs to n/a for cells with n < 10, which the analyzer prints as boundary-collapsed intervals. The clean subset per judge is what survived the silent-fabrication exclusion of §3.5: 208 of 600 dispatched judgments for Claude, 375 of 600 for Codex. The headline findings, stated up front including the unflattering ones: Codex reaches 87.5% accuracy with 100.0% specificity but misses 26.9% of defects; Claude's specificity is also 100.0% but its clean-subset recall is 45.8%; and **both judges missed every z-order defect in their clean subsets** (Claude 0/9, Codex 0/27).
+All numbers in this section are taken from the analyzer output (`analysis/results/phase1_analysis_2026-06-11T04-39-28Z.{json,md}`) and the paired-test output (`analysis/results/paired_tests_latest.json`); both are regenerable from the released parquets without any LLM call. Two reconciliation notes for verifiers: the analyzer joins 1,600 rows in total (the 1,200 comparable-judge dispatches reported here, plus 400 Llama rows used only in Appendix A); and per §3.6, this section manually suppresses bootstrap CIs to n/a for cells with n < 10, which the analyzer prints as boundary-collapsed intervals. The clean subset per judge is what survived the silent-fabrication exclusion of §3.5: 208 of 600 dispatched judgments for Claude, 375 of 600 for Codex. The headline findings, negative ones included: Codex reaches 87.5% accuracy with 100.0% specificity but misses 26.9% of defects; Claude's specificity is also 100.0% but its clean-subset recall is 45.8%; and **both judges missed every z-order defect in their clean subsets** (Claude 0/9, Codex 0/27).
 
 ## 4.1 Confusion matrices and oracle metrics
 
@@ -275,7 +275,7 @@ The shared z-order blindness is a different kind of finding. A z-index swap leav
 
 Both judges returned `pass` on every clean control row — Claude 125/125, Codex 200/200. The first thing to say about this result is what it is not: byte-identical pairs are the easiest possible negatives, so 100.0% here is a sanity-check floor, not deployability evidence. A judge that fails it is unusable; a judge that passes it has demonstrated only that it actually compares its two inputs rather than pattern-matching toward "regression found." Production negatives — antialiasing drift, dynamic timestamps, legitimate redesigns — are harder, and the benign-change variant of this measurement belongs to Phase 2. The measured figure is an upper bound on deployed specificity (confidence that the no-hallucination property itself is real: high, on n=325 clean controls with zero exceptions; confidence that it predicts benign-change specificity: low).
 
-The controls' larger contribution to this study was diagnostic. False positives are what cause teams to mute a visual CI gate, so specificity must be measured — and the act of measuring it is what exposed the wrapper bug: 200/200 `fail` verdicts on identical images is impossible for a functioning judge, whereas the same fabricated verdicts on defect pairs had looked like an 88.8% success rate (§6.1). A corpus with cases where the lazy default answer is wrong is not just better measurement; it is the tripwire that catches a silently broken pipeline.
+The controls' larger contribution to this study was diagnostic. False positives are what cause teams to mute a visual CI gate, so specificity must be measured — and the act of measuring it is what exposed the wrapper bug: 200/200 `fail` verdicts on identical images is impossible for a functioning judge, whereas the same fabricated verdicts on defect pairs had looked like an 88.8% success rate (§6.1). Control pairs double as a pipeline tripwire: they are the only rows on which a silently broken judge produces impossible aggregates.
 
 ## 5.3 Why κ moved from 0.361 to 0.679 — and why 0.423 is the like-for-like number
 
@@ -293,7 +293,7 @@ The silent-fabrication episode generalises beyond this benchmark. Every LLM-eval
 
 # 6. Threats to Validity
 
-We organise threats along the four conventional axes [Wohlin et al. 2012], leading with the one we created ourselves.
+We organise threats along the four conventional axes [Wohlin et al. 2012], beginning with the silent-fabrication contamination.
 
 ## 6.1 Silent-fabrication contamination (internal validity)
 
@@ -342,7 +342,7 @@ Six lessons for test-engineering leaders, each grounded in a specific Phase 1 ob
 
 ## Data availability
 
-All artifacts ship at the companion repository under MIT (code) and CC-BY 4.0 (data): the 600-pair corpus and manifest v2, all four judgment parquets including the contaminated originals, the patched wrappers and dispatcher, the analyzer with the silent-fabrication filter, the paired-test script, and this manuscript. Zenodo concept DOI 10.5281/zenodo.20620870; version DOI for tag `v1.6.0-emse-option-b`: 10.5281/zenodo.TBD-VERSION-DOI *(minted at submission)*. Every number in §4 regenerates from the released parquets via `analysis/analyze_judgments.py` and `analysis/paired_tests.py` with no LLM access required.
+All artifacts ship at the companion repository under MIT (code) and CC-BY 4.0 (data): the 600-pair corpus and manifest v2, all four judgment parquets including the contaminated originals, the patched wrappers and dispatcher, the analyzer with the silent-fabrication filter, the paired-test script, and this manuscript. Zenodo concept DOI 10.5281/zenodo.20620870; version DOI for tag `v1.6.1-emse-option-b`: 10.5281/zenodo.TBD-VERSION-DOI *(minted at submission)*. Every number in §4 regenerates from the released parquets via `analysis/analyze_judgments.py` and `analysis/paired_tests.py` with no LLM access required.
 
 ---
 

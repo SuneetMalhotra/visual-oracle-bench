@@ -8,7 +8,7 @@
 **GitHub:** [@SuneetMalhotra](https://github.com/SuneetMalhotra)
 **LinkedIn:** [linkedin.com/in/suneet-m](https://www.linkedin.com/in/suneet-m)
 **Pre-registration:** OSF DOI [10.17605/OSF.IO/NKD6J](https://osf.io/nkd6j/) (registered 2026-06-06, prior to any LLM judgment collection; Amendment 1, 2026-06-11, documents the Phase 1 correction protocol — see §3.5)
-**Companion repository:** [github.com/SuneetMalhotra/visual-oracle-bench](https://github.com/SuneetMalhotra/visual-oracle-bench) — Zenodo concept DOI 10.5281/zenodo.20620870; version DOI for release tag `v1.6.1-emse-option-b`: 10.5281/zenodo.TBD-VERSION-DOI *(minted at submission; see Data Availability)* (MIT code, CC-BY 4.0 data)
+**Companion repository:** [github.com/SuneetMalhotra/visual-oracle-bench](https://github.com/SuneetMalhotra/visual-oracle-bench) — Zenodo concept DOI 10.5281/zenodo.20620870; version DOI for release tag `v1.6.1-emse-option-b`: 10.5281/zenodo.20645248 *(minted at submission; see Data Availability)* (MIT code, CC-BY 4.0 data)
 **Target venue:** Empirical Software Engineering (EMSE) — Methodological Articles track
 **Manuscript draft date:** 2026-06-11 (v1.6)
 
@@ -342,7 +342,7 @@ Six lessons for test-engineering leaders, each grounded in a specific Phase 1 ob
 
 ## Data availability
 
-All artifacts ship at the companion repository under MIT (code) and CC-BY 4.0 (data): the 600-pair corpus and manifest v2, all four judgment parquets including the contaminated originals, the patched wrappers and dispatcher, the analyzer with the silent-fabrication filter, the paired-test script, and this manuscript. Zenodo concept DOI 10.5281/zenodo.20620870; version DOI for tag `v1.6.1-emse-option-b`: 10.5281/zenodo.TBD-VERSION-DOI *(minted at submission)*. Every number in §4 regenerates from the released parquets via `analysis/analyze_judgments.py` and `analysis/paired_tests.py` with no LLM access required.
+All artifacts ship at the companion repository under MIT (code) and CC-BY 4.0 (data): the 600-pair corpus and manifest v2, all four judgment parquets including the contaminated originals, the patched wrappers and dispatcher, the analyzer with the silent-fabrication filter, the paired-test script, and this manuscript. Zenodo concept DOI 10.5281/zenodo.20620870; version DOI for tag `v1.6.1-emse-option-b`: 10.5281/zenodo.20645248 *(minted at submission)*. Every number in §4 regenerates from the released parquets via `analysis/analyze_judgments.py` and `analysis/paired_tests.py` with no LLM access required.
 
 ---
 

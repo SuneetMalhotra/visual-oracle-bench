@@ -43,5 +43,7 @@ preferred-citation:
   year: 2026
   month: 6
 # Zenodo DOIs auto-appended by mint_zenodo_doi.py
-# Version DOI: 10.5281/zenodo.20620871
 # Concept DOI: 10.5281/zenodo.20620870
+# Version DOI 10.5281/zenodo.20620871 = tag v0.3.0-phase1-pilot (superseded)
+# Version DOI for tag v1.6.0-emse-option-b: minted at submission via
+#   scripts/mint_zenodo_doi.py --tag v1.6.0-emse-option-b --substitute

@@ -148,7 +148,9 @@ export class ClaudeOAuthJudge implements Judge {
         // failures leaked through the success branch with malformed:false and
         // a defaulted 'fail' verdict (bug found 2026-06-10: 317/400 claude
         // rows and 225/400 codex rows in the 06-07 parquet were silent parse
-        // failures counted as valid verdicts).
+        // failures counted as valid verdicts; +75 claude control rows in the
+        // 06-10 parquet -> 392 claude + 225 codex = 617 total, see
+        // manuscript §4.7 and _flag_silent_fabrications()).
         if (code !== 0 || parsed.malformed) {
           resolve({
             verdict: 'fail',

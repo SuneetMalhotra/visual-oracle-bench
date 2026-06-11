@@ -60,5 +60,18 @@
       "p_exact": NaN
     }
   },
-  "n_holm_tests": 2
+  "n_holm_tests": 2,
+  "defect_only_kappa": {
+    "n": 83,
+    "kappa": 0.423,
+    "ci95": [
+      0.277,
+      0.583
+    ],
+    "note": "Cohen's kappa restricted to defect pairs in the both-clean intersection; the oracle-relevant agreement regime. The full-intersection kappa includes 125 control pairs on which both judges agree trivially."
+  },
+  "claude_clean_defect_rows_by_profile": {
+    "cal-com": 50,
+    "conduit": 33
+  }
 }

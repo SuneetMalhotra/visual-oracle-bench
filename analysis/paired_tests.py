@@ -73,6 +73,43 @@ def main() -> None:
     out["per_category_defects"] = per_cat
     out["n_holm_tests"] = m
 
+    # Defect-only Cohen's kappa on the both-clean intersection (manuscript
+    # Table 3 second row). Same bootstrap protocol as the analyzer
+    # (percentile, 1000 resamples, seed 42).
+    import numpy as np
+    dsub = valid.set_index("pair_id")
+    cla_v = cla["verdict"]
+    cdx_v = cdx["verdict"]
+    common = both.index
+    defect_ids = [i for i in common
+                  if cla.loc[i, "ground_truth"] == "fail"]
+    v1 = cla_v.loc[defect_ids].to_numpy()
+    v2 = cdx_v.loc[defect_ids].to_numpy()
+    cats = ["fail", "pass"]
+    k_pt = aj.cohen_kappa(list(v1), list(v2), cats)
+    rng = np.random.default_rng(42)
+    n = len(defect_ids)
+    ks = sorted(k for k in (
+        aj.cohen_kappa(list(v1[idx]), list(v2[idx]), cats)
+        for idx in (rng.integers(0, n, n) for _ in range(1000))
+    ) if k == k)
+    out["defect_only_kappa"] = {
+        "n": n, "kappa": round(k_pt, 3),
+        "ci95": [round(ks[int(0.025 * len(ks))], 3),
+                 round(ks[int(0.975 * len(ks))], 3)],
+        "note": ("Cohen's kappa restricted to defect pairs in the both-clean "
+                 "intersection; the oracle-relevant agreement regime. The "
+                 "full-intersection kappa includes 125 control pairs on "
+                 "which both judges agree trivially."),
+    }
+
+    # Profile confinement of Claude's clean defect rows (manuscript §6.2):
+    # which synthetic profiles contribute clean Claude defect verdicts.
+    cprof = (cla.loc[[i for i in cla.index
+                      if cla.loc[i, "ground_truth"] == "fail"], "baselinePath"]
+             .str.extract(r"data/images/([^/]+)/")[0].value_counts().to_dict())
+    out["claude_clean_defect_rows_by_profile"] = cprof
+
     print(json.dumps(out, indent=2))
     dest = REPO / "analysis" / "results" / "paired_tests_latest.json"
     dest.write_text(json.dumps(out, indent=2))

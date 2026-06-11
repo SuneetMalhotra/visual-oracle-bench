@@ -115,7 +115,7 @@ npm run oracles:judge:dispatch -- --pairs data/images/_pairs_manifest.json
 - LLM provider versions pinned at run time.
 - All random seeds stated.
 - Single-command end-to-end reproduction at v1.0.0 release tag.
-- Image corpus mirrored to Zenodo (Zenodo concept DOI 10.5281/zenodo.20620870 / version DOI 10.5281/zenodo.20620871).
+- Image corpus mirrored to Zenodo (concept DOI 10.5281/zenodo.20620870; version DOI 10.5281/zenodo.20620871 covers tag `v0.3.0-phase1-pilot`; a new version DOI for tag `v1.6.0-emse-option-b` is minted at submission and substituted into the manuscript by `scripts/mint_zenodo_doi.py`).
 
 ## License
 

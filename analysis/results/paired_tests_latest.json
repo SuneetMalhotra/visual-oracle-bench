@@ -1,0 +1,64 @@
+{
+  "note": "Exact McNemar (two-sided binomial on discordant pairs), computed on the intersection of pairs where BOTH judges have a clean (non-silent-fab, non-malformed) verdict.",
+  "overall_defect_subset": {
+    "n": 83,
+    "claude_only_correct": 0,
+    "codex_only_correct": 25,
+    "n_discordant": 25,
+    "p_exact": 5.960464477539063e-08
+  },
+  "overall_control_subset": {
+    "n": 125,
+    "claude_only_correct": 0,
+    "codex_only_correct": 0,
+    "n_discordant": 0,
+    "p_exact": NaN
+  },
+  "per_category_defects": {
+    "color": {
+      "n": 16,
+      "claude_only_correct": 0,
+      "codex_only_correct": 0,
+      "n_discordant": 0,
+      "p_exact": NaN
+    },
+    "contrast": {
+      "n": 18,
+      "claude_only_correct": 0,
+      "codex_only_correct": 14,
+      "n_discordant": 14,
+      "p_exact": 0.0001220703125,
+      "p_holm": 0.000244140625
+    },
+    "layout": {
+      "n": 16,
+      "claude_only_correct": 0,
+      "codex_only_correct": 11,
+      "n_discordant": 11,
+      "p_exact": 0.0009765625,
+      "p_holm": 0.0009765625
+    },
+    "missing": {
+      "n": 16,
+      "claude_only_correct": 0,
+      "codex_only_correct": 0,
+      "n_discordant": 0,
+      "p_exact": NaN
+    },
+    "truncation": {
+      "n": 8,
+      "claude_only_correct": 0,
+      "codex_only_correct": 0,
+      "n_discordant": 0,
+      "p_exact": NaN
+    },
+    "zorder": {
+      "n": 9,
+      "claude_only_correct": 0,
+      "codex_only_correct": 0,
+      "n_discordant": 0,
+      "p_exact": NaN
+    }
+  },
+  "n_holm_tests": 2
+}

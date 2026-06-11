@@ -1,0 +1,28 @@
+Dear Professor Feldt and Professor Zimmermann,
+
+I am submitting *Visual Oracle Bench (Phase 1): A Two-Judge Synthetic-HTML Pilot for LLM-as-Judge Visual Regression Detection with Specificity Reporting* for consideration as a Methodological Article in Empirical Software Engineering.
+
+**What the methodological contribution is.** Two reusable methods, each demonstrated on the paper's own data rather than asserted. First, a benchmark-design pattern for LLM-as-judge visual-oracle evaluation: by-construction sensitivity ground truth (programmatic defect injection) combined with explicit specificity controls (identical-image pairs), so that precision, specificity, F1, and MCC are defined and a degenerate always-"fail" judge cannot score at ceiling — a deficit shared by most published LLM-as-judge corpora. Second, a silent-fabrication detection and correction protocol for LLM-eval pipelines: during analysis we discovered that our original judge wrappers silently converted provider rate-limit and auth-error responses into syntactically valid default "fail" verdicts; the paper specifies the retroactive detection signals, the audited-exclusion procedure (original parquets retained, exclusion recomputed at every analyzer run), and the prospective fail-fast guards. Both methods transfer to any wrapper-mediated LLM evaluation, which is the track-fit argument: the contribution is the methodology and its measured failure modes, not a hypothesis test.
+
+**Revision history, disclosed.** A v1 draft of this manuscript was subjected to independent adversarial review on 2026-06-10, which identified three structural issues: no true-negative pairs, an input-modality confound for one judge, and an over-broad methodological claim. During the structural correction we also discovered the silent-fabrication artifact described above, which had inflated v1's reported accuracy (e.g., Claude Sonnet 4.5 from a true 78.4% to a reported 88.8%) and depressed reported inter-judge agreement (κ = 0.361 contaminated vs. 0.679 corrected). All three structural issues and the data-integrity defect are corrected in this version: the corpus now contains 200 control pairs alongside the 400 defect pairs; the affected 617 of 1,200 comparable-judge rows are excluded by a reproducible filter and the contaminated originals are retained for audit; the numbers in this submission are computed on the integrity-audited subset; and the correction is disclosed in the abstract, §1.4, §3.5, and §6.1 of the manuscript rather than summarized away.
+
+**Headline evidence.** On the audited subset: OpenAI gpt-5-codex 87.5% accuracy, 73.1% recall, 100.0% specificity (n=375); Claude Sonnet 4.5 78.4% accuracy, 45.8% recall, 100.0% specificity (n=208); recall gap significant under an exact paired McNemar test (p = 6.0 × 10⁻⁸) with Holm correction applied to per-category comparisons; pairwise Cohen's κ = 0.679 (95% CI [0.565, 0.788]). Neither judge produced a false positive on any control pair; both judges missed every z-order defect. Negative results are reported with the same prominence as positive ones.
+
+**Llama exclusion.** A third judge, Llama 3.2 Vision 11B, was dispatched but is excluded from all comparative analysis: the model rejects multi-image requests, and the documented side-by-side composite workaround changes the input modality relative to the other judges, so capability and format cannot be disentangled within the Phase 1 corpus. The integration failure is reported as a methodological finding in Appendix A; it does not appear in any headline table.
+
+**Pre-registration status.** The full study design was registered at OSF (DOI 10.17605/OSF.IO/NKD6J) on 2026-06-06, before any LLM judgment was collected. The Phase 1 / Phase 2 split is not a pre-registration amendment: the registration covers the Phase 2 live-capture experiment over eight applications, which remains deferred and unchanged; Phase 1 is a separately framed methodological pilot. Amendment 1 (2026-06-11) documents only the Phase 1 correction protocol and the control-pair extension, as a dated supplemental record rather than a re-registration.
+
+**Concurrent submissions.** One related manuscript is under consideration elsewhere: the antecedent agent-harness study at the *Journal of Systems and Software*, In-Practice track (JSSOFTWARE-D-26-01260). No other manuscript of mine is under review at any venue. The present manuscript is not under consideration elsewhere and has not been published previously.
+
+I am the sole author and declare no competing interests. Code and data — including the contaminated original parquets, the corrected analyzer, and the paired-test scripts — are archived at GitHub (github.com/SuneetMalhotra/visual-oracle-bench, tag v1.6.0-emse-option-b) and Zenodo (concept DOI 10.5281/zenodo.20620870; version DOI minted at the v1.6.0 tag and cited in the manuscript). Generative-AI use is disclosed inside the manuscript: the Claude model family is both a manuscript-preparation tool and one of the judges under evaluation; the disclosure names the model, version, and scope of each use.
+
+I would value the opportunity to contribute this work to EMSE and am glad to provide additional materials or respond to editorial questions at any stage.
+
+Sincerely,
+
+Suneet Malhotra
+ORCID: 0009-0003-8707-9590
+Affiliation: Motorola Solutions (independent research; affiliation for identification only)
+Email: suneetmalhotra2002@gmail.com
+Website: https://suneetmalhotra.com
+GitHub: https://github.com/SuneetMalhotra

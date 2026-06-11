@@ -70,8 +70,8 @@ Fallback: Research Article (if Methodological is absent)
 ## Step 5 — Title
 
 Paste:
-"Visual Oracle Bench: A Pre-Registered Methodological Pilot for
-Multi-Application LLM-as-Judge Visual Regression Detection"
+"Visual Oracle Bench (Phase 1): A Two-Judge Synthetic-HTML Pilot for
+LLM-as-Judge Visual Regression Detection with Specificity Reporting"
 
 ## Step 6 — Abstract (≤250 words)
 
@@ -101,7 +101,7 @@ Select: ~/Desktop/article3_phase1_emse.pdf
 ## Step 11 — Cover letter
 
 Select: ~/Desktop/cover_letter_emse_phase1.pdf
-Or paste content from manuscript/cover_letter_emse_phase1_v1.md if
+Or paste content from manuscript/cover_letter_emse_phase1_v1_6.md if
 portal accepts text instead of file.
 
 ## Step 12 — Suggested reviewers (5)

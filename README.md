@@ -1,21 +1,34 @@
 # visual-oracle-bench
 
-Multi-application empirical benchmark for LLM-as-Judge visual regression detection across 8 open-source web applications.
+Pre-registered benchmark harness for LLM-as-Judge visual regression detection. Phase 1 (this cycle) is a two-judge, specificity-inclusive synthetic-HTML pilot; Phase 2 (deferred, pre-registered) targets live capture of 8 open-source web applications.
 
 **Two-phase paper plan (companion manuscripts):**
 
-- **Phase 1 — Methodological Pilot (THIS submission cycle).** Visual Oracle Bench harness + 400-pair synthetic-HTML pilot + 3-judge dispatch (1,200 judgments). Reports per-judge accuracy vs by-construction ground truth, pairwise Cohen's κ + Fleiss' κ, per-category breakdown, and a catalog of integration failure modes (including the discovered Llama-vision single-image limitation and its documented workaround).
+- **Phase 1 — Methodological Pilot (THIS submission cycle).** Visual Oracle Bench harness + **600-pair synthetic-HTML corpus (400 defect pairs + 200 identical-image control pairs, manifest v2)**. Two comparable judges in the headline analysis (Claude Sonnet 4.5, OpenAI gpt-5-codex); one judge (Llama 3.2 Vision 11B) excluded from comparison for an input-modality confound and reported in the manuscript's Appendix A. Reports full confusion-matrix oracle metrics (sensitivity, specificity, precision, F1, MCC) against by-construction ground truth, pairwise Cohen's κ with bootstrap CIs, exact paired McNemar tests with Holm correction, and a catalog of integration failure modes — including the silent-fabrication wrapper bug documented under Data Integrity below.
 - **Phase 2 — Pre-Registered 8-App Experiment (deferred to a later cycle).** The OSF-locked design: 8 live OSS web apps (Conduit, Mattermost, Excalidraw, GitLab CE, Rocket.Chat, Penpot, Cal.com, NocoDB) × 50 seeded defects × 6 categories = 800 image pairs evaluated by 4 pre-registered judges. Blocked on per-app Dockerfile debugging.
 
 **Pre-registration:** [OSF DOI 10.17605/OSF.IO/NKD6J](https://osf.io/nkd6j/) — registered and locked 2026-06-06, BEFORE any LLM judgments were collected. The Phase 1 / Phase 2 split is explicitly NOT a pre-registration amendment: the OSF registration remains intact for what it registered (the 8-app live-Docker experiment, Phase 2). Phase 1 is a separately-framed methodological pilot of the harness infrastructure.
 
-This benchmark is the external-validity follow-up to the single-application κ = 0.667 visual-assertion result reported in the antecedent agent-harness work ([github.com/SuneetMalhotra/agent-harness](https://github.com/SuneetMalhotra/agent-harness), v1.2.0). Two peer-reviewed companion manuscripts from the same research line are currently under submission:
+This benchmark is the external-validity follow-up to the single-application κ = 0.667 visual-assertion result reported in the antecedent agent-harness work ([github.com/SuneetMalhotra/agent-harness](https://github.com/SuneetMalhotra/agent-harness), v1.2.0). One companion manuscript from the same research line is currently under submission:
 
-- **Specification Enrichment** — IEEE Software (Magazine, editor-invited submission)
 - **Agent Harness for Cross-Layer Test Automation** — Journal of Systems and Software (Elsevier, "In Practice" track, manuscript JSSOFTWARE-D-26-01260)
+
+## Data Integrity
+
+**Silent-fabrication discovery and correction (2026-06-10/11).** The original judge wrappers (commit `eaf1e4d`) silently converted provider rate-limit and auth-error responses into syntactically valid `verdict=fail` rows with `malformed=false`: `parseVerdictJson` returns a fallback object on unparseable output, and the wrappers' null-guard could never fire, so parse failures flowed through the success path. Across the three pre-2026-06-10 dispatch runs this fabricated **617 of 1,200 comparable-judge rows** (392 Claude, 225 Codex). On the defect-only portion of the corpus every fabricated `fail` scored as a correct detection, inflating the v1 draft's headline accuracy.
+
+Correction, all released in this repository:
+
+- **Wrapper patch** (commits `9352483`, `da1f70a`): the malformed flag now propagates, re-arming the dispatcher's retry-once path; a fail-fast gate aborts on consecutive-malformed streaks.
+- **Retroactive detection** (`analysis/analyze_judgments.py::_flag_silent_fabrications()`): four signals — `MALFORMED` rationale prefix, empty raw response, `session limit` substring, `refresh_token` substring — re-flag affected rows as `malformed=True` at every analyzer run.
+- **Targeted re-collection** (commit `0745d7b`): Codex top-up on the 200 control pairs (`data/images/_topup_codex_2026-06-11.json`), 0/200 malformed.
+- **Auditability:** the contaminated original parquets are retained unmodified; deleting the filter reproduces the inflated v1 numbers, which is the point.
+
+All reported metrics are computed on the integrity-audited subset (Claude n=208, Codex n=375 of 600 dispatched each).
 
 ## Status
 
+- **2026-06-11 (Option B v1.6 — integrity-audited results).** Manifest v2 with 200 true-negative control pairs (`data/images/_pairs_manifest_v2.json`, 600 pairs total); silent-fabrication filter in the analyzer; Codex control top-up parquet landed. Headline (clean subset): Codex 87.5% acc / 73.1% recall / 100% spec (n=375); Claude 78.4% acc / 45.8% recall / 100% spec (n=208); κ=0.679 [0.565, 0.788] on n=208. Manuscript v1.6 (`manuscript/article3_phase1_v1_6.md`) retitled, Llama moved to Appendix A. Downstream verification needs no LLM calls: `python3 analysis/analyze_judgments.py && python3 analysis/paired_tests.py` regenerates every reported number from the released parquets.
 - **2026-06-09 (Llama re-run + W8 analysis script written).** Phase 1 W7 dispatch (2026-06-06) revealed Llama 3.2 Vision 11B refuses multi-image requests. Patched the Llama judge (`oracles/llm_judge/llama_ollama.ts`) with a side-by-side composite workaround using `sharp`. Re-run dispatched 2026-06-09 against the same 400-pair manifest (~40 min wall clock at concurrency 3). W8 analysis pipeline written (`analysis/analyze_judgments.py`): pairwise Cohen's κ + Fleiss' κ + per-app + per-category + latency + cost; ready to consume both parquets once Llama re-run completes.
 - **2026-06-06 (Phase 1 W7 dispatch initial run, 3-judge × 400 pairs = 1,200 judgments).** Dispatcher ran 29 min wall clock. Output: `results/judgments_2026-06-07T02-50-09-790Z.parquet`. Real result: 800 valid + 400 malformed (Llama integration bug — see 2026-06-09 entry). Phase 1 is methodological-pilot framing — see `manuscript/skeleton.md` Phase 1 / Phase 2 disclosure block.
 - **2026-06-06 (W6 orchestrator ready).** W1-W5 + W7-infra deliverables in place. **W6 capture orchestrator ready** (`scripts/capture_corpus.ts` + `scripts/capture_pairs_manifest.ts` + per-app drivers under `capture/drivers/`); actual 800-PNG real-app capture deferred to a Docker-up session. The orchestrator is end-to-end-validated against a synthetic-HTML fixture: `npx tsx scripts/capture_corpus.ts --offline-pipeline` produces 400 baseline + 400 defect PNGs (50 per app × 8 apps) and per-app `_capture_ledger.json` files, then `npx tsx scripts/capture_pairs_manifest.ts` aggregates them into `data/images/_pairs_manifest.json` that `oracles/llm_judge/dispatcher.ts --pairs` consumes verbatim.

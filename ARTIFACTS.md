@@ -1,6 +1,6 @@
 # ARTIFACTS.md — Visual Oracle Bench reproducibility manifest
 
-**Document version:** 1.0 (2026-06-09 — Phase 1 pilot submission)
+**Document version:** 1.6 (2026-06-11 — Option B integrity-audited resubmission; supersedes 1.0)
 **Repo:** https://github.com/SuneetMalhotra/visual-oracle-bench
 **Author:** Suneet Malhotra (ORCID 0009-0003-8707-9590)
 **OSF pre-registration:** [10.17605/OSF.IO/NKD6J](https://osf.io/nkd6j/) (registered 2026-06-06, BEFORE any LLM judgments collected)
@@ -12,13 +12,13 @@ This manifest inventories every artifact a reviewer or independent replicator ne
 
 ## 1. What this paper is
 
-A methodological pilot for a multi-application LLM-as-Judge visual-regression benchmark. Phase 1 reports:
+A two-judge, specificity-inclusive synthetic-HTML pilot for LLM-as-judge visual regression oracles (manuscript: `manuscript/article3_phase1_v1_6.md`). Phase 1 reports:
 
-- The reusable benchmark harness (injection primitives, capture orchestrator, dispatcher, 3 pre-registered LLM judges, parquet result schema, analysis pipeline)
-- A 400-pair synthetic-HTML pilot corpus (6 defect categories × 8 nominal app labels × ~50 pairs)
-- 1,200 LLM judgments (3 judges × 400 pairs)
-- A catalog of failure modes (most notably: Llama 3.2 Vision 11B refuses multi-image requests; the documented side-by-side composite workaround)
-- Per-judge accuracy vs by-construction ground truth, pairwise Cohen's κ, Fleiss' κ across all 3 judges
+- The reusable benchmark harness (injection primitives, capture orchestrator, dispatcher, judge wrappers, parquet result schema, analysis pipeline)
+- A 600-pair synthetic-HTML corpus: 400 defect pairs (6 categories × 8 nominal profiles) + 200 identical-image control pairs (manifest v2)
+- Full oracle metrics on the integrity-audited subset (confusion matrix, sensitivity, specificity, precision, F1, MCC), pairwise Cohen's κ with bootstrap CIs, exact paired McNemar tests with Holm correction
+- A silent-fabrication detection + correction protocol (see §7 item 0 below and README "Data Integrity")
+- An integration-failure catalog; Llama 3.2 Vision 11B is excluded from comparison (input-modality confound) and reported in the manuscript's Appendix A
 
 Phase 1 does NOT answer the pre-registered RQ1 (does κ generalize across real applications?). That is reserved for Phase 2.
 
@@ -48,6 +48,9 @@ Phase 1 does NOT answer the pre-registered RQ1 (does κ generalize across real a
 | `analysis/analyze_judgments.py` | **Phase 1 analysis pipeline**: pairwise Cohen's κ + Fleiss' κ + per-judge accuracy vs ground truth + per-app + per-category + latency + cost; bootstrap 95% CIs (seed-pinned); outputs `phase1_analysis_<ts>.json` and `.md` | dry-run mode (`--dry-run`) |
 | `scripts/reproduce_paper.sh` | One-shot offline reproduction: 7 stages (npm, playwright, primitives, oracles, judge stubs, llama composite, offline smoke) | runs end-to-end on a fresh clone |
 | `scripts/smoke_llama_fix.ts` | Manual smoke test for the patched Llama judge against 1 pair from the manifest | runnable directly |
+| `scripts/add_true_negatives.py` | Generates the 200 control pairs + manifest v2 (B.1, 2026-06-10) | manual |
+| `scripts/launch_full_dispatch_2026-06-11.sh` | Launch script for the post-patch Codex control top-up dispatch | manual |
+| `analysis/paired_tests.py` | Exact McNemar (both-clean intersection) + Holm correction; same row-inclusion rule as the analyzer | regenerates `paired_tests_latest.json` |
 
 ### Data + ground truth (CC-BY 4.0)
 
@@ -77,11 +80,16 @@ Phase 1 does NOT answer the pre-registered RQ1 (does κ generalize across real a
 
 | Path | Description |
 |---|---|
-| `results/judgments_2026-06-07T02-50-09-790Z.parquet` | Initial W7 dispatch (1,200 rows). 800 valid (openai-codex + claude-oauth) + 400 malformed (llama, single-image bug pre-fix). |
-| `results/judgments_<llama-rerun-ts>.parquet` | Llama re-run after sharp-composite workaround (2026-06-09). 400 rows. |
+| `results/judgments_2026-06-07T02-50-09-790Z.parquet` | Initial W7 dispatch (1,200 rows). **Retained unmodified for audit**: 392 Claude + 225 Codex rows are silent-fabrication artifacts (re-flagged at analysis time), plus 400 malformed Llama rows (single-image bug pre-fix). |
+| `results/judgments_2026-06-09T22-16-41-218Z.parquet` | Llama re-run after sharp-composite workaround (2026-06-09). 400 rows, 0 malformed. Appendix-A only. |
+| `results/judgments_2026-06-10T16-47-33-248Z.parquet` | Claude + Codex on the 200 control pairs. Claude: 125 clean + 75 silent-fab; Codex: 200/200 silent-fab (expired refresh token), superseded by the top-up below. |
+| `results/judgments_2026-06-11T03-17-58-910Z.parquet` | **Codex control top-up** (patched wrappers, fail-fast gate). 200 rows, 0 malformed. |
+| `data/images/_pairs_manifest_v2.json` | Manifest v2: 600 pairs with per-pair `expected_verdict` (`fail` × 400 defect, `pass` × 200 control). |
+| `data/images/_topup_codex_2026-06-11.json` | Top-up manifest (the 200 control pairs re-dispatched to Codex only). |
 | `results/judgments_metadata.json` | Run metadata (cost constants, judges, pricing snapshot, pre-reg link). Note: the dispatcher overwrites this per run; a reconstructed merged file is at `results/judgments_metadata_merged.json` if present. |
 | `analysis/results/phase1_analysis_<ts>.json` | Machine-readable Phase 1 analysis output |
-| `analysis/results/phase1_analysis_<ts>.md` | Human-readable Phase 1 analysis report (drop-in for manuscript §6.1) |
+| `analysis/results/phase1_analysis_<ts>.md` | Human-readable Phase 1 analysis report (drop-in for manuscript §4) |
+| `analysis/results/paired_tests_latest.json` | Exact McNemar + Holm output (manuscript §4.3) |
 
 ### Logs (not for publication; for audit only)
 
@@ -169,7 +177,7 @@ The Phase 1 / Phase 2 split is explicitly NOT a pre-registration amendment: the 
 
 | Paper | Status | Venue | Manuscript ID |
 |---|---|---|---|
-| Antecedent: Specification Enrichment (LLM-assisted design-to-test) | Under submission | IEEE Software (Magazine, editor-invited) | — |
+| Antecedent: Specification Enrichment (LLM-assisted design-to-test) | Under revision (not under submission) | — | — |
 | Antecedent: Agent Harness for Cross-Layer Test Automation | Under submission | Journal of Systems and Software (Elsevier, "In Practice" track) | JSSOFTWARE-D-26-01260 |
 | THIS PAPER: Visual Oracle Bench Phase 1 pilot | Under preparation | TBD (see venue rationale section in submission cover letter) | — |
 | Phase 2 follow-up (pre-registered 8-app experiment) | Future | TBD | — |
@@ -181,6 +189,8 @@ Author affiliation: Suneet Malhotra is Senior Manager, Test Engineering at Motor
 ## 7. Failure modes documented during Phase 1
 
 These are the engineering surprises encountered during the methodological pilot, surfaced honestly to inform future LLM-as-Judge benchmark designers:
+
+0. **Silent fabrication in the judge wrappers (the big one).** The original wrappers (commit `eaf1e4d`) converted provider rate-limit / auth-error responses into valid-looking `verdict=fail` rows with `malformed=false`; 617 of 1,200 comparable-judge rows across the pre-2026-06-10 parquets were fabricated this way and scored as correct detections on the defect-only corpus. Fixed in commits `9352483` + `da1f70a` (flag propagation + dispatcher fail-fast); retroactive detection in `analysis/analyze_judgments.py::_flag_silent_fabrications()` (4 signals: `MALFORMED` rationale prefix, empty rawResponse, `session limit`, `refresh_token`); Codex control top-up in commit `0745d7b` via `scripts/launch_full_dispatch_2026-06-11.sh`. The contaminated parquets are retained so the correction is independently auditable. Manuscript §3.5 + §6.1.
 
 1. **Llama 3.2 Vision 11B refuses multi-image requests.** Discovered on 2026-06-06: dispatcher produced 400/400 malformed Llama judgments with rationale `"this model only supports one image while more than one image requested"`. Workaround: side-by-side composite via `sharp` (baseline LEFT, defect RIGHT, 4px divider, 28px label band). Implemented in `oracles/llm_judge/llama_ollama.ts:compositeBaselineAndDefect()`. Re-run on 2026-06-09 succeeded. Unit-tested in `tests/test_llama_composite_unit.ts`. Manuscript will report this as a Phase 1 methodological-pilot finding.
 

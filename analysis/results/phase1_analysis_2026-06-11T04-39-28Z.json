@@ -1,0 +1,710 @@
+{
+  "bootstrap_resamples": 1000,
+  "bootstrap_seed": 42,
+  "comparable_judges": [
+    "claude-oauth",
+    "openai-codex"
+  ],
+  "cost": {
+    "claude-oauth": {
+      "mean_per_call_usd": 0.0,
+      "n": 600,
+      "total_usd": 0.0
+    },
+    "llama": {
+      "mean_per_call_usd": 0.0,
+      "n": 400,
+      "total_usd": 0.0
+    },
+    "openai-codex": {
+      "mean_per_call_usd": 0.0,
+      "n": 600,
+      "total_usd": 0.0
+    }
+  },
+  "data_inputs": {
+    "files": [
+      {
+        "judges": {
+          "claude-oauth": 400,
+          "llama": 400,
+          "openai-codex": 400
+        },
+        "path": "/sessions/bold-hopeful-cerf/mnt/visual-oracle-bench/results/judgments_2026-06-07T02-50-09-790Z.parquet",
+        "rows": 1200,
+        "rows_won": 800,
+        "timestamp": "2026-06-07T02:50:09.790000+00:00",
+        "used_for_judges": [
+          "claude-oauth",
+          "openai-codex"
+        ]
+      },
+      {
+        "judges": {
+          "llama": 400
+        },
+        "path": "/sessions/bold-hopeful-cerf/mnt/visual-oracle-bench/results/judgments_2026-06-09T22-16-41-218Z.parquet",
+        "rows": 400,
+        "rows_won": 400,
+        "timestamp": "2026-06-09T22:16:41.218000+00:00",
+        "used_for_judges": [
+          "llama"
+        ]
+      },
+      {
+        "judges": {
+          "claude-oauth": 200,
+          "openai-codex": 200
+        },
+        "path": "/sessions/bold-hopeful-cerf/mnt/visual-oracle-bench/results/judgments_2026-06-10T16-47-33-248Z.parquet",
+        "rows": 400,
+        "rows_won": 200,
+        "timestamp": "2026-06-10T16:47:33.248000+00:00",
+        "used_for_judges": [
+          "claude-oauth"
+        ]
+      },
+      {
+        "judges": {
+          "openai-codex": 200
+        },
+        "path": "/sessions/bold-hopeful-cerf/mnt/visual-oracle-bench/results/judgments_2026-06-11T03-17-58-910Z.parquet",
+        "rows": 200,
+        "rows_won": 200,
+        "timestamp": "2026-06-11T03:17:58.910000+00:00",
+        "used_for_judges": [
+          "openai-codex"
+        ]
+      }
+    ],
+    "judges": {
+      "claude-oauth": {
+        "rows": 600,
+        "source_parquets": [
+          {
+            "path": "/sessions/bold-hopeful-cerf/mnt/visual-oracle-bench/results/judgments_2026-06-07T02-50-09-790Z.parquet",
+            "rows": 400
+          },
+          {
+            "path": "/sessions/bold-hopeful-cerf/mnt/visual-oracle-bench/results/judgments_2026-06-10T16-47-33-248Z.parquet",
+            "rows": 200
+          }
+        ]
+      },
+      "llama": {
+        "rows": 400,
+        "source_parquets": [
+          {
+            "path": "/sessions/bold-hopeful-cerf/mnt/visual-oracle-bench/results/judgments_2026-06-09T22-16-41-218Z.parquet",
+            "rows": 400
+          }
+        ]
+      },
+      "openai-codex": {
+        "rows": 600,
+        "source_parquets": [
+          {
+            "path": "/sessions/bold-hopeful-cerf/mnt/visual-oracle-bench/results/judgments_2026-06-07T02-50-09-790Z.parquet",
+            "rows": 400
+          },
+          {
+            "path": "/sessions/bold-hopeful-cerf/mnt/visual-oracle-bench/results/judgments_2026-06-11T03-17-58-910Z.parquet",
+            "rows": 200
+          }
+        ]
+      }
+    }
+  },
+  "expected_judges": [
+    "openai-codex",
+    "claude-oauth",
+    "llama"
+  ],
+  "failure_modes": {
+    "claude-oauth": {
+      "n_invalid_verdict": 0,
+      "n_malformed": 392,
+      "n_retried": 0,
+      "n_total": 600
+    },
+    "llama": {
+      "n_invalid_verdict": 0,
+      "n_malformed": 0,
+      "n_retried": 0,
+      "n_total": 400
+    },
+    "openai-codex": {
+      "n_invalid_verdict": 0,
+      "n_malformed": 225,
+      "n_retried": 0,
+      "n_total": 600
+    }
+  },
+  "fleiss_kappa": {
+    "ci95": [
+      NaN,
+      NaN
+    ],
+    "judges": [
+      "claude-oauth",
+      "openai-codex"
+    ],
+    "kappa": NaN,
+    "n_categories": 2,
+    "n_subjects": 0,
+    "note": "Fleiss undefined for fewer than 3 raters; see pairwise Cohen."
+  },
+  "fleiss_kappa_all": {
+    "ci95": [
+      -0.1447460736480699,
+      0.03892334279888998
+    ],
+    "judges": [
+      "claude-oauth",
+      "llama",
+      "openai-codex"
+    ],
+    "kappa": -0.0494380519132991,
+    "n_categories": 2,
+    "n_subjects": 83
+  },
+  "fleiss_kappa_comparable": {
+    "ci95": [
+      NaN,
+      NaN
+    ],
+    "judges": [
+      "claude-oauth",
+      "openai-codex"
+    ],
+    "kappa": NaN,
+    "n_categories": 2,
+    "n_subjects": 0,
+    "note": "Fleiss undefined for fewer than 3 raters; see pairwise Cohen."
+  },
+  "generated_at": "2026-06-11T04:39:28.039807+00:00",
+  "ground_truth_source": "Per-pair `expected_verdict` from manifest v2 (_pairs_manifest_v2.json): 'fail' for 400 defect pairs, 'pass' for 200 control pairs (baseline == defect). Precision, specificity, F1, MCC are now defined.",
+  "latency": {
+    "claude-oauth": {
+      "mean_ms": 5369.595,
+      "median_ms": 1745.0,
+      "n": 600,
+      "p95_ms": 13930.55
+    },
+    "llama": {
+      "mean_ms": 18956.6525,
+      "median_ms": 21573.5,
+      "n": 400,
+      "p95_ms": 32940.65
+    },
+    "openai-codex": {
+      "mean_ms": 10085.535,
+      "median_ms": 9855.0,
+      "n": 600,
+      "p95_ms": 27413.349999999995
+    }
+  },
+  "manifest_join": {
+    "judgment_rows_matched": 1600,
+    "judgment_rows_total": 1600,
+    "judgment_rows_unmatched": 0,
+    "manifest_control_pairs": 200,
+    "manifest_defect_pairs": 400,
+    "manifest_pairs_total": 600
+  },
+  "noncomparable_judges": [
+    "llama"
+  ],
+  "noncomparable_rationale": "Llama judges were fed a side-by-side composite PNG (multi-image workaround for Ollama's single-image input limit); other judges received paired images. Per-judge metrics are kept for the integration-failure appendix but Llama is excluded from headline pairwise / Fleiss kappa.",
+  "pairwise_cohen_kappa": [
+    {
+      "ci95": [
+        0.5653384447252485,
+        0.7881813746564049
+      ],
+      "judge_a": "claude-oauth",
+      "judge_b": "openai-codex",
+      "kappa": 0.6794081381011097,
+      "n_pairs": 208
+    }
+  ],
+  "pairwise_cohen_kappa_comparable": [
+    {
+      "ci95": [
+        0.5653384447252485,
+        0.7881813746564049
+      ],
+      "judge_a": "claude-oauth",
+      "judge_b": "openai-codex",
+      "kappa": 0.6794081381011097,
+      "n_pairs": 208
+    }
+  ],
+  "pairwise_cohen_kappa_noncomparable_cross": [
+    {
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "judge_a": "claude-oauth",
+      "judge_b": "llama",
+      "kappa": 0.0,
+      "n_pairs": 83
+    },
+    {
+      "ci95": [
+        0.0,
+        0.0
+      ],
+      "judge_a": "llama",
+      "judge_b": "openai-codex",
+      "kappa": 0.0,
+      "n_pairs": 175
+    }
+  ],
+  "per_app_accuracy": {
+    "claude-oauth": {
+      "cal-com": {
+        "accuracy": 0.64,
+        "ci_hi": 0.7466666666666667,
+        "ci_lo": 0.52,
+        "n_correct": 48,
+        "n_fail": 23,
+        "n_valid": 75
+      },
+      "conduit": {
+        "accuracy": 0.6842105263157895,
+        "ci_hi": 0.8070175438596491,
+        "ci_lo": 0.5614035087719298,
+        "n_correct": 39,
+        "n_fail": 15,
+        "n_valid": 57
+      },
+      "excalidraw": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 25,
+        "n_fail": 0,
+        "n_valid": 25
+      },
+      "gitlab-ce": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 25,
+        "n_fail": 0,
+        "n_valid": 25
+      },
+      "mattermost": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 25,
+        "n_fail": 0,
+        "n_valid": 25
+      },
+      "nocodb": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 1,
+        "n_fail": 0,
+        "n_valid": 1
+      }
+    },
+    "llama": {
+      "cal-com": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "conduit": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "excalidraw": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "gitlab-ce": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "mattermost": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "nocodb": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "penpot": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 50
+      },
+      "rocket-chat": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 50
+      }
+    },
+    "openai-codex": {
+      "cal-com": {
+        "accuracy": 0.8,
+        "ci_hi": 0.88,
+        "ci_lo": 0.7066666666666667,
+        "n_correct": 60,
+        "n_fail": 35,
+        "n_valid": 75
+      },
+      "conduit": {
+        "accuracy": 0.8133333333333334,
+        "ci_hi": 0.8933333333333333,
+        "ci_lo": 0.72,
+        "n_correct": 61,
+        "n_fail": 36,
+        "n_valid": 75
+      },
+      "excalidraw": {
+        "accuracy": 0.8133333333333334,
+        "ci_hi": 0.8933333333333333,
+        "ci_lo": 0.7066666666666667,
+        "n_correct": 61,
+        "n_fail": 36,
+        "n_valid": 75
+      },
+      "gitlab-ce": {
+        "accuracy": 0.9148936170212766,
+        "ci_hi": 0.9787234042553191,
+        "ci_lo": 0.8297872340425532,
+        "n_correct": 43,
+        "n_fail": 18,
+        "n_valid": 47
+      },
+      "mattermost": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 26,
+        "n_fail": 1,
+        "n_valid": 26
+      },
+      "nocodb": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 25,
+        "n_fail": 0,
+        "n_valid": 25
+      },
+      "penpot": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 26,
+        "n_fail": 1,
+        "n_valid": 26
+      },
+      "rocket-chat": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 26,
+        "n_fail": 1,
+        "n_valid": 26
+      }
+    }
+  },
+  "per_category_accuracy": {
+    "claude-oauth": {
+      "color": {
+        "accuracy": 0.5625,
+        "ci_hi": 0.8125,
+        "ci_lo": 0.3125,
+        "n_correct": 9,
+        "n_fail": 9,
+        "n_valid": 16
+      },
+      "contrast": {
+        "accuracy": 0.2222222222222222,
+        "ci_hi": 0.4444444444444444,
+        "ci_lo": 0.05555555555555555,
+        "n_correct": 4,
+        "n_fail": 4,
+        "n_valid": 18
+      },
+      "control": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 125,
+        "n_fail": 0,
+        "n_valid": 125
+      },
+      "layout": {
+        "accuracy": 0.0625,
+        "ci_hi": 0.1875,
+        "ci_lo": 0.0,
+        "n_correct": 1,
+        "n_fail": 1,
+        "n_valid": 16
+      },
+      "missing": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 16,
+        "n_fail": 16,
+        "n_valid": 16
+      },
+      "truncation": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 8,
+        "n_fail": 8,
+        "n_valid": 8
+      },
+      "zorder": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 9
+      }
+    },
+    "llama": {
+      "color": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 64
+      },
+      "contrast": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 72
+      },
+      "layout": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 64
+      },
+      "missing": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 64
+      },
+      "truncation": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 64
+      },
+      "zorder": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 72
+      }
+    },
+    "openai-codex": {
+      "color": {
+        "accuracy": 0.696969696969697,
+        "ci_hi": 0.8484848484848485,
+        "ci_lo": 0.5151515151515151,
+        "n_correct": 23,
+        "n_fail": 23,
+        "n_valid": 33
+      },
+      "contrast": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 36,
+        "n_fail": 36,
+        "n_valid": 36
+      },
+      "control": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 200,
+        "n_fail": 0,
+        "n_valid": 200
+      },
+      "layout": {
+        "accuracy": 0.6666666666666666,
+        "ci_hi": 0.8333333333333334,
+        "ci_lo": 0.5,
+        "n_correct": 20,
+        "n_fail": 20,
+        "n_valid": 30
+      },
+      "missing": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 24,
+        "n_fail": 24,
+        "n_valid": 24
+      },
+      "truncation": {
+        "accuracy": 1.0,
+        "ci_hi": 1.0,
+        "ci_lo": 1.0,
+        "n_correct": 25,
+        "n_fail": 25,
+        "n_valid": 25
+      },
+      "zorder": {
+        "accuracy": 0.0,
+        "ci_hi": 0.0,
+        "ci_lo": 0.0,
+        "n_correct": 0,
+        "n_fail": 0,
+        "n_valid": 27
+      }
+    }
+  },
+  "per_judge_classification": {
+    "claude-oauth": {
+      "accuracy": 0.7836538461538461,
+      "accuracy_vs_truth": 0.7836538461538461,
+      "balanced_accuracy": 0.7289156626506024,
+      "confusion_matrix": {
+        "FN": 45,
+        "FP": 0,
+        "TN": 125,
+        "TP": 38,
+        "n_ground_truth_negatives": 125,
+        "n_ground_truth_positives": 83,
+        "n_predicted_fail": 38,
+        "n_predicted_pass": 170
+      },
+      "f1": 0.628099173553719,
+      "false_negative_rate": 0.5421686746987951,
+      "false_positive_rate": 0.0,
+      "mcc": 0.5802074459781889,
+      "n_invalid_verdict": 0,
+      "n_malformed": 392,
+      "n_predicted_fail": 38,
+      "n_predicted_pass": 170,
+      "n_total": 600,
+      "n_valid": 208,
+      "precision": 1.0,
+      "precision_vs_truth": 1.0,
+      "recall_sensitivity": 0.4578313253012048,
+      "recall_vs_truth": 0.4578313253012048,
+      "specificity_tnr": 1.0
+    },
+    "llama": {
+      "accuracy": 0.0,
+      "accuracy_vs_truth": 0.0,
+      "balanced_accuracy": NaN,
+      "confusion_matrix": {
+        "FN": 400,
+        "FP": 0,
+        "TN": 0,
+        "TP": 0,
+        "n_ground_truth_negatives": 0,
+        "n_ground_truth_positives": 400,
+        "n_predicted_fail": 0,
+        "n_predicted_pass": 400
+      },
+      "f1": NaN,
+      "false_negative_rate": 1.0,
+      "false_positive_rate": NaN,
+      "mcc": NaN,
+      "n_invalid_verdict": 0,
+      "n_malformed": 0,
+      "n_predicted_fail": 0,
+      "n_predicted_pass": 400,
+      "n_total": 400,
+      "n_valid": 400,
+      "precision": NaN,
+      "precision_vs_truth": null,
+      "recall_sensitivity": 0.0,
+      "recall_vs_truth": 0.0,
+      "specificity_tnr": NaN
+    },
+    "openai-codex": {
+      "accuracy": 0.8746666666666667,
+      "accuracy_vs_truth": 0.8746666666666667,
+      "balanced_accuracy": 0.8657142857142857,
+      "confusion_matrix": {
+        "FN": 47,
+        "FP": 0,
+        "TN": 200,
+        "TP": 128,
+        "n_ground_truth_negatives": 200,
+        "n_ground_truth_positives": 175,
+        "n_predicted_fail": 128,
+        "n_predicted_pass": 247
+      },
+      "f1": 0.8448844884488449,
+      "false_negative_rate": 0.26857142857142857,
+      "false_positive_rate": 0.0,
+      "mcc": 0.7695777123902109,
+      "n_invalid_verdict": 0,
+      "n_malformed": 225,
+      "n_predicted_fail": 128,
+      "n_predicted_pass": 247,
+      "n_total": 600,
+      "n_valid": 375,
+      "precision": 1.0,
+      "precision_vs_truth": 1.0,
+      "recall_sensitivity": 0.7314285714285714,
+      "recall_vs_truth": 0.7314285714285714,
+      "specificity_tnr": 1.0
+    }
+  },
+  "tldr": "[comparable judges only \u2014 Llama excluded per modality-confound disclosure] Per-judge: `claude-oauth` acc=78.4% recall=45.8% spec=100.0% prec=100.0% F1=0.628 MCC=0.580 (n_valid=208); `openai-codex` acc=87.5% recall=73.1% spec=100.0% prec=100.0% F1=0.845 MCC=0.770 (n_valid=375). Pairwise Cohen kappa: `claude-oauth`/`openai-codex` kappa=0.679 (n=208)."
+}
